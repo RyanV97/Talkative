@@ -12,14 +12,18 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "ryanv.talkative.fabric.TalkativeFabric"
+      {
+        "adapter": "kolin",
+        "value": "ryanv.talkative.fabric.TalkativeFabric"
+      }
     ]
   },
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
     "minecraft": ">=1.16.4",
-    "architectury": ">=1.1.55"
+    "architectury": ">=1.1.55",
+    "fabric-language-kotlin": ">=1.6.5+kotlin.1.5.31"
   },
   "mixins": [
     "talkative.mixins.json"

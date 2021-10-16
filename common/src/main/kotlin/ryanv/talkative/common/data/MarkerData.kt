@@ -6,6 +6,15 @@ import ryanv.talkative.consts.NBTConstants
 
 class MarkerData(var modelLocation: ResourceLocation, var baseColour: Int = 0xFFFFFF, var outlineColour: Int = 0xFFFFFF) {
 
+    fun serialize(tag: CompoundTag): CompoundTag {
+        tag.putString(NBTConstants.MARKER_LOCATION, modelLocation.toString())
+        if (baseColour != 0xFFFFFF)
+            tag.putInt(NBTConstants.MARKER_COLOUR, baseColour)
+        if (outlineColour != 0xFFFFFF)
+            tag.putInt(NBTConstants.MARKER_OUTLINE, outlineColour)
+        return tag
+    }
+
     companion object {
         fun deserialize(tag: CompoundTag): MarkerData {
             var modelLocation = ResourceLocation(tag.getString(NBTConstants.MARKER_LOCATION))

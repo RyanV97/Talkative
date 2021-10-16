@@ -12,6 +12,7 @@ public class ActorUtil {
 
     public static void serialize(IActorEntity entityData, CompoundTag tag) {
         tag.putInt(NBTConstants.ACTOR_DATA_VERSION, 1);
+        entityData.getActorData().serialize(tag);
     }
 
     public static void deserialize(IActorEntity entityData, CompoundTag tag) {
