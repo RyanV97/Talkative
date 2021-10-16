@@ -1,0 +1,36 @@
+modLoader = "javafml"
+loaderVersion = "[35,)"
+#issueTrackerURL = ""
+license = "Insert License Here"
+
+[[mods]]
+modId = "talkative"
+version = "${version}"
+displayName = "Talkative"
+authors = "RyanV"
+description = '''
+A mod for adding Dialog Trees to Entities!
+Originally made for Crypts N Creepers.
+'''
+#logoFile = ""
+
+[[dependencies.talkative]]
+modId = "forge"
+mandatory = true
+versionRange = "[35,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.talkative]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.talkative]]
+modId = "architectury"
+mandatory = true
+versionRange = "[1.1.55,)"
+ordering = "AFTER"
+side = "BOTH"

@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ryanv.talkative.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "entity.LivingEntityActorDataMixin"
+  ],
+  "client": [],
+  "server": []
+}

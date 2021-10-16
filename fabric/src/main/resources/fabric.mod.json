@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "talkative",
+  "version": "${version}",
+  "name": "Talkative",
+  "description": "A mod for adding Dialog Trees to Entities!\nOriginally made for Crypts N Creepers.",
+  "authors": [
+    "RyanV"
+  ],
+  "license": "Insert License Here",
+  "icon": "assets/talkative/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "ryanv.talkative.fabric.TalkativeFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": ">=1.16.4",
+    "architectury": ">=1.1.55"
+  },
+  "mixins": [
+    "talkative.mixins.json"
+  ]
+}
