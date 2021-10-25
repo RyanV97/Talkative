@@ -11,7 +11,7 @@ class TalkativeForge {
 
     init {
         // Submit our event bus to let architectury register our content on the right time
-        EventBuses.registerModEventBus(Talkative.MOD_ID, FMLJavaModLoadingContext.get().modEventBus)
+        EventBuses.registerModEventBus(Talkative.MOD_ID, thedarkcolour.kotlinforforge.forge.MOD_CONTEXT.getKEventBus())
         init()
     }
 

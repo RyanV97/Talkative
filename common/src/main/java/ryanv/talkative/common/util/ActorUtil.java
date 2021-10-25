@@ -17,9 +17,7 @@ public class ActorUtil {
 
     public static void deserialize(IActorEntity entityData, CompoundTag tag) {
         Actor data = new Actor();
-
-        data.markerData = MarkerData.Companion.deserialize(tag.getCompound(NBTConstants.MARKER_DATA));
-
+        data.deserialize(tag);
         entityData.setActorData(data);
     }
 

@@ -4,11 +4,20 @@ import net.minecraft.nbt.CompoundTag
 
 class Conditional {
 
-    companion object {
-        fun deserialize(tag: CompoundTag): Conditional {
-            val conditional: Conditional = Conditional()
+    fun serialize(tag: CompoundTag): CompoundTag {
 
-            return conditional
+        return tag
+    }
+
+    companion object {
+        fun deserialize(tag: CompoundTag): Conditional? {
+            if(tag != null) {
+                val conditional: Conditional = Conditional()
+
+                return conditional
+            }
+            else
+                return null
         }
     }
 

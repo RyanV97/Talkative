@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import ryanv.talkative.consts.NBTConstants
 
-class MarkerData(var modelLocation: ResourceLocation, var baseColour: Int = 0xFFFFFF, var outlineColour: Int = 0xFFFFFF) {
+class MarkerData(var modelLocation: ResourceLocation = ResourceLocation("talkative", "models/marker.json"), var baseColour: Int = 0xFFFFFF, var outlineColour: Int = 0xFFFFFF) {
 
     fun serialize(tag: CompoundTag): CompoundTag {
         tag.putString(NBTConstants.MARKER_LOCATION, modelLocation.toString())
