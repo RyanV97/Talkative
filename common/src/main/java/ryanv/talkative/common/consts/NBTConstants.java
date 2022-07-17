@@ -1,4 +1,4 @@
-package ryanv.talkative.consts;
+package ryanv.talkative.common.consts;
 
 public class NBTConstants {
 
@@ -14,11 +14,13 @@ public class NBTConstants {
     public static final String BRANCH_FILE = "branch_file";
     public static final String BRANCH_PRIORITY = "branch_priority";
 
+    public static final String NODE_ID = "node_id";
+    public static final String NODE_TYPE = "node_type";
     public static final String NODE_CONTENT = "node_contents";
-    public static final String NODE_RESPONSES = "node_responses";
-    public static final String NODE_RESPONSE_STRING = "response_string";
     public static final String NODE_CHILDREN = "node_children";
 
     public static final String CONDITIONAL = "conditional";
+    public static final String CONDITIONAL_EXPRESSIONS = "expressions";
+    public static final String EXPRESSION_TYPE = "type";
 
 }

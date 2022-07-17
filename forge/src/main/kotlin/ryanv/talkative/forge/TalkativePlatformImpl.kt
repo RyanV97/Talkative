@@ -8,4 +8,7 @@ object TalkativePlatformImpl {
     val configDirectory: Path
         get() = FMLPaths.CONFIGDIR.get()
 
+    val gameDirectory: Path
+        get() = FMLPaths.GAMEDIR.get()
+
 }

@@ -4,7 +4,10 @@ import me.shedaniel.architectury.registry.DeferredRegister
 import net.minecraft.core.Registry
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.world.entity.LivingEntity
+import ryanv.talkative.common.events.EntityEventHandler
+import ryanv.talkative.common.events.WorldEventHandler
 import ryanv.talkative.common.item.ActorWandItem
+import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.util.ActorUtil
 
 object Talkative {
@@ -17,6 +20,9 @@ object Talkative {
     @JvmStatic
     fun init() {
         ITEMS.register()
+        EntityEventHandler.init()
+        WorldEventHandler.init()
+        NetworkHandler.init()
     }
 
 }

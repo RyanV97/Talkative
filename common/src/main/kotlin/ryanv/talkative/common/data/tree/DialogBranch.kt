@@ -1,10 +1,22 @@
 package ryanv.talkative.common.data.tree
 
 import net.minecraft.nbt.CompoundTag
-import ryanv.talkative.common.data.Conditional
-import ryanv.talkative.consts.NBTConstants
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.level.storage.LevelResource
+import ryanv.talkative.common.data.conditional.Conditional
+import ryanv.talkative.common.consts.NBTConstants
 
 class DialogBranch(var fileString: String, var branchPriority: Int = 0, var rootConditional: Conditional? = null) {
+
+    fun loadBranchData(level: ServerLevel): DialogNode? {
+        val file = level.server.getWorldPath(LevelResource.ROOT).resolve(fileString)
+
+        return null
+    }
+
+    fun saveBranchData(level: ServerLevel) {
+
+    }
 
     fun serialize(tag: CompoundTag): CompoundTag {
         tag.putString(NBTConstants.BRANCH_FILE, fileString)

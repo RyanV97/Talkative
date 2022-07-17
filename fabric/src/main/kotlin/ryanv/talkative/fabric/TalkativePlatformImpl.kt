@@ -8,4 +8,7 @@ object TalkativePlatformImpl {
     val configDirectory: Path
         get() = FabricLoader.getInstance().configDir
 
+    val gameDirectory: Path
+        get() = FabricLoader.getInstance().gameDir
+
 }

@@ -10,4 +10,9 @@ object TalkativePlatform {
     val configDirectory: Path?
         get() = null
 
+    @JvmStatic
+    @get:ExpectPlatform
+    val gameDirectory: Path?
+        get() = null
+
 }

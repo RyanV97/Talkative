@@ -17,5 +17,4 @@ classes/
 .vscode
 .settings
 *.launch
-/gradle/
-/logs/
+/gradle/wrapper/

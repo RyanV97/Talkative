@@ -13,7 +13,7 @@
   "entrypoints": {
     "main": [
       {
-        "adapter": "kolin",
+        "adapter": "kotlin",
         "value": "ryanv.talkative.fabric.TalkativeFabric"
       }
     ]

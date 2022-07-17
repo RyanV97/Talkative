@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ryanv.talkative.api.IActorEntity;
 import ryanv.talkative.common.data.Actor;
 import ryanv.talkative.common.util.ActorUtil;
-import ryanv.talkative.consts.NBTConstants;
+import ryanv.talkative.common.consts.NBTConstants;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityActorDataMixin extends Entity implements IActorEntity {
 
-    private Actor actorData;
+    private Actor actorData = new Actor();
 
     public LivingEntityActorDataMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);

@@ -1,3 +1,7 @@
+architectury {
+    common(rootProject.enabled_platforms.split(","))
+}
+
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
@@ -6,23 +10,11 @@ dependencies {
     modApi "me.shedaniel:architectury:${rootProject.architectury_version}"
 }
 
-architectury {
-    common()
-}
-
-java {
-    withSourcesJar()
-}
-
 publishing {
     publications {
         mavenCommon(MavenPublication) {
             artifactId = rootProject.archives_base_name
-            // add all the jars that should be included when publishing to maven
-            artifact remapJar
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
+            from components.java
         }
     }
 
