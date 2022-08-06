@@ -10,13 +10,12 @@ import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.widgets.DialogNodeWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
 import ryanv.talkative.client.util.NodePositioner
-import ryanv.talkative.common.data.Actor
+import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class TreeEditorScreen(val actor: Actor, val rootNode: DialogNode): TalkativeScreen(null, TextComponent("Dialog Tree Editor")) {
-
+class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBranch): TalkativeScreen(parent, TextComponent("Dialog Tree Editor")) {
     var offsetX: Int = 0
     var offsetY: Int = 0
     var zoomScale: Float = 1.0F
@@ -25,7 +24,7 @@ class TreeEditorScreen(val actor: Actor, val rootNode: DialogNode): TalkativeScr
     var selectedNode: DialogNodeWidget? = null
 
     override fun init() {
-        rootNodeWidget = loadNodeAndChildren(rootNode)
+        rootNodeWidget = loadNodeAndChildren(branch.rootNode)
         NodePositioner.layoutTree(rootNodeWidget!!)
 
         addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
@@ -100,9 +99,8 @@ class TreeEditorScreen(val actor: Actor, val rootNode: DialogNode): TalkativeScr
                 textEntry.paste()
             if(hasShiftDown() && (keyCode == 257 || keyCode == 335))
                 textEntry.insertText("\n")
-            else
-                selectedNode = null
             when(keyCode) {
+                256 -> selectedNode = null
                 259 -> textEntry.removeCharsFromCursor(-1)
                 261 -> textEntry.removeCharsFromCursor(1)
                 262 -> textEntry.moveByChars(1, hasShiftDown())
@@ -114,10 +112,7 @@ class TreeEditorScreen(val actor: Actor, val rootNode: DialogNode): TalkativeScr
     }
 
     override fun onCharTyped(char: Char, i: Int): Boolean {
-        if(super.charTyped(char, i)) {
-            return true
-        }
-        else if(selectedNode != null && SharedConstants.isAllowedChatCharacter(char)) {
+        if(selectedNode != null && SharedConstants.isAllowedChatCharacter(char)) {
             selectedNode!!.textEntry.insertText(char.toString())
             return true
         }
@@ -137,32 +132,34 @@ class TreeEditorScreen(val actor: Actor, val rootNode: DialogNode): TalkativeScr
 
     fun createSubMenu(mouseX: Int, mouseY: Int, widget: AbstractWidget) {
         if (widget is DialogNodeWidget) {
-            val actionMap = HashMap<String, (DialogNodeWidget) -> Unit>()
+            val actionMap = HashMap<String, () -> Unit>()
 
-            if (widget.children.isEmpty() or (widget.children[0].nodeType == DialogNode.NodeType.Dialog))
+            if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Dialog))
                 actionMap["New Child (Dialog)"] = {
                     println("Make New Dialog Child")
                 }
-            if (widget.children.isEmpty() or (widget.children[0].nodeType == DialogNode.NodeType.Response))
+            if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Response))
                 actionMap["New Child (Response)"] = {
                     println("Make New Response Child")
                 }
 
             actionMap["Copy Node ID"] = {
-                minecraft?.keyboardHandler?.clipboard = it.nodeId.toString()
+                minecraft?.keyboardHandler?.clipboard = widget.nodeId.toString()
+                println(widget.nodeId.toString())
             }
 
-            if (widget.children.isEmpty())
-                actionMap["Remove Node"] = {
-                    println("Delete Node")
-                }
-            else
-                actionMap["Remove Node (And Children)"] = {
-
-                }
+            if(rootNodeWidget!! != widget) {
+                if (widget.children.isEmpty())
+                    actionMap["Remove Node"] = {
+                        println("Delete Node")
+                    }
+                else
+                    actionMap["Remove Node (And Children)"] = {
+                        println("Delete Node and Children")
+                    }
+            }
 
             submenu = SubmenuWidget(mouseX, mouseY, "${widget.nodeType.name} Node", actionMap)
         }
     }
-
 }

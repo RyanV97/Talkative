@@ -59,11 +59,14 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     }
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        //Check Popup
-        onMouseRelease(mouseX, mouseY, mouseButton)
-        getChildAt(mouseX, mouseY).filter { guiEventListener: GuiEventListener ->
-            guiEventListener.mouseReleased(mouseX, mouseY, mouseButton)
-        }.isPresent
+        if(popup == null || !popup!!.mouseReleased(mouseX, mouseY, mouseButton))
+            if(submenu == null || !submenu!!.mouseReleased(mouseX, mouseY, mouseButton)) {
+                submenu = null
+                if(!onMouseRelease(mouseX, mouseY, mouseButton))
+                    getChildAt(mouseX, mouseY).filter { guiEventListener ->
+                        guiEventListener.mouseReleased(mouseX, mouseY, mouseButton)
+                    }
+            }
         isDragging = false
         return true
     }

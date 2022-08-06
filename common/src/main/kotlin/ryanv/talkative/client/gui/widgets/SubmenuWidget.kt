@@ -5,16 +5,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
-import net.minecraft.client.gui.components.Button
 import net.minecraft.network.chat.TextComponent
 
-class SubmenuWidget(x: Int, y: Int, private val label: String = "...", val actions: Map<String, (DialogNodeWidget) -> Unit> = HashMap()) : AbstractWidget(x, y, 100, 150, TextComponent("Submenu")) {
-
-    val font: Font
+class SubmenuWidget(x: Int, y: Int, private val label: String = "...", private val actions: Map<String, () -> Unit> = HashMap()) : AbstractWidget(x, y, 100, 150, TextComponent("Submenu")) {
+    private val font: Font = Minecraft.getInstance().font
 
     init {
-        font = Minecraft.getInstance().font
-        height = (actions.size) * 15
+        height = 13 + (actions.size * 15)
         var maxWidth: Int = width
         actions.forEach {
             val i = font.width(it.key) + 3
@@ -26,16 +23,29 @@ class SubmenuWidget(x: Int, y: Int, private val label: String = "...", val actio
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         fill(poseStack, x, y, x + width, y + 13, 0xFF222222.toInt())
-        fill(poseStack, x, y + 13, x + width, y + 15 + height, 0xFF333333.toInt())
+        fill(poseStack, x, y + 13, x + width, y + height, 0xFF333333.toInt())
         GuiComponent.drawString(poseStack, font, label, x + 2, y + 2, 0xFFFFFF)
         var i = 1
-        actions.forEach {
-            GuiComponent.drawString(poseStack, font, it.key, x + 2, y + 2 + (i++ * 15), 0xFFFFFF)
+        actions.onEachIndexed { index, action ->
+            val color = if(isMouseOver(index, mouseX.toDouble(), mouseY.toDouble())) 0x55FF55 else 0xFFFFFF
+            GuiComponent.drawString(poseStack, font, action.key, x + 2, y + 2 + (i++ * 15), color)
         }
     }
 
-    override fun mouseClicked(d: Double, e: Double, i: Int): Boolean {
+    override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
+        if(mouseX >= x && mouseY >= y + 13 && mouseX < x + width && mouseY < y + height) {
+            val relativeMouseY = (mouseY - y).toInt()
+            val i = (relativeMouseY - 13) / 15
+            if(i >= 0 && i < actions.size) {
+                actions.values.elementAt(i).invoke()
+                return true
+            }
+        }
         return false
     }
 
+    fun isMouseOver(index: Int, mouseX: Double, mouseY: Double): Boolean {
+        val actionY = y + 13 + (index * 15)
+        return active && visible && mouseX >= x.toDouble() && mouseY >= actionY.toDouble() && mouseX < (x + width).toDouble() && mouseY < (actionY + 15).toDouble()
+    }
 }

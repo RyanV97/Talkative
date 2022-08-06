@@ -6,7 +6,7 @@ import net.minecraft.nbt.Tag
 import ryanv.talkative.common.data.conditional.Conditional
 import ryanv.talkative.common.consts.NBTConstants
 
-class DialogNode(var nodeType: NodeType, var content: String = "", var conditional: Conditional? = null, val children: ArrayList<DialogNode> = ArrayList(), val nodeId: Int) {
+class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String = "", var conditional: Conditional? = null, val children: ArrayList<DialogNode> = ArrayList(), val nodeId: Int) {
 
     fun serialize(tag: CompoundTag): CompoundTag {
         tag.putInt(NBTConstants.NODE_ID, nodeId)

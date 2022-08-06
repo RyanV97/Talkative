@@ -2,6 +2,7 @@ package ryanv.talkative.client.gui.popup
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.*
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.network.chat.Component
@@ -9,13 +10,18 @@ import net.minecraft.network.chat.TextComponent
 import net.minecraft.resources.ResourceLocation
 import ryanv.talkative.client.gui.TalkativeScreen
 
-class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, private val clickThrough: Boolean = false) : AbstractWidget(x, y, width, height, TextComponent("Popup Window")) {
+class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) : AbstractWidget(x, y, width, height, TextComponent("Popup Window")) {
 
     private val components: ArrayList<Widget> = ArrayList()
 
     override fun renderButton(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         fill(poseStack, x, y - 10, x + width, y, 0xFF666666.toInt())
         fill(poseStack, x, y, x + width, y + height, 0xFF222222.toInt())
+
+        //ToDo: Window Label not working for some reason :hmm:
+        if(!label.isNullOrEmpty())
+            GuiComponent.drawCenteredString(poseStack, Minecraft.getInstance().font, label, x + (width / 2), y - 9, 0xFFFFFF)
+
         components.forEach {
             it.render(poseStack, mouseX, mouseY, delta)
         }

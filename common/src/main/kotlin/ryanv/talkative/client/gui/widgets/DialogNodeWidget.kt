@@ -6,11 +6,11 @@ import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.font.TextFieldHelper
 import net.minecraft.network.chat.TextComponent
-import ryanv.talkative.client.gui.editor.TreeEditorScreen
+import ryanv.talkative.client.gui.editor.BranchEditorScreen
 import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogNode
 
-class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: DialogNodeWidget?, private val parentScreen: TreeEditorScreen): AbstractWidget(x, y, 121, 25, TextComponent("Dialog Node")) {
+class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: DialogNodeWidget?, private val parentScreen: BranchEditorScreen): AbstractWidget(x, y, 121, 25, TextComponent("Dialog Node")) {
 
     val minecraft: Minecraft = Minecraft.getInstance()
 
@@ -32,7 +32,7 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
         children.forEach { it.renderNodeAndChildren(poseStack, mouseX, mouseY, delta) }
     }
 
-    fun renderNode(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+    private fun renderNode(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         if(visible) {
             val posX = this.x + parentScreen.offsetX
             val posY = this.y + parentScreen.offsetY
@@ -57,10 +57,6 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
 
                 fill(poseStack, posX, posY, posX + width, posY + 11, 0xFF333333.toInt())
                 fill(poseStack, posX, posY + 11, posX + width, posY + height, bgColour)
-
-                if(parentScreen.selectedNode == this) {
-
-                }
 
                 val label: String = when (nodeType) {
                     DialogNode.NodeType.Dialog -> "Dialog Node"
@@ -109,12 +105,9 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
 
     //Mouse
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        println("$button - ${parentScreen.isDragging}")
         if(active && visible && !parentScreen.isDragging && isMouseOver(mouseX, mouseY) && button != 2) {
             when(button) {
-                0 -> {
-                    parentScreen.selectedNode = this
-                    parentScreen.focused = this
-                }
                 1 -> {
                     parentScreen.createSubMenu(mouseX.toInt(), mouseY.toInt(), this)
                 }
@@ -124,7 +117,14 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return isMouseOver(mouseX, mouseY)
+        if(isMouseOver(mouseX, mouseY)) {
+            if(button == 0) {
+                parentScreen.selectedNode = this
+                parentScreen.focused = this
+            }
+            return true
+        }
+        return false
     }
 
     //Misc.

@@ -1,57 +1,35 @@
 package ryanv.talkative.common.network
 
-import io.netty.buffer.Unpooled
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import me.shedaniel.architectury.networking.NetworkChannel
 import me.shedaniel.architectury.networking.NetworkManager
-import me.shedaniel.architectury.utils.NbtType
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.StringTag
-import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.Talkative
 import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.common.data.Actor
-import ryanv.talkative.common.util.FileUtil
+import ryanv.talkative.common.network.bi.OpenEditorPacket_C2S
+import ryanv.talkative.common.network.bi.OpenEditorPacket_S2C
+import ryanv.talkative.common.network.bi.SyncBranchListPacket
+import ryanv.talkative.common.network.c2s.AddBranchPacket
+import ryanv.talkative.common.network.c2s.CreateBranchPacket
+import ryanv.talkative.common.network.s2c.OpenActorUIPacket
 
 class NetworkHandler {
     companion object {
-
-        val Client_OpenActorUI = ResourceLocation(Talkative.MOD_ID, "s2c_actor_ui")
-        val Both_SyncBranchList = ResourceLocation(Talkative.MOD_ID, "sync_branch_list")
+        val CHANNEL: NetworkChannel = NetworkChannel.create(ResourceLocation(Talkative.MOD_ID, "main"))
 
         fun init() {
-            //Client
-            NetworkManager.registerReceiver(NetworkManager.s2c(), Client_OpenActorUI) { byteBuf, context ->
-                TalkativeClient.openActorEditor(Actor().deserialize(byteBuf.readNbt() as CompoundTag))
-            }
-            NetworkManager.registerReceiver(NetworkManager.s2c(), Both_SyncBranchList) { byteBuf, context ->
-                val tag = byteBuf.readNbt()
-                val list = tag?.getList("branchList", NbtType.STRING)
-                TalkativeClient.loadBranchList(list)
-            }
-            //Server
-            NetworkManager.registerReceiver(NetworkManager.c2s(), Both_SyncBranchList) { byteBuf, context ->
-                runBlocking {
-                    launch {
-                        val buf = FriendlyByteBuf(Unpooled.buffer())
-                        val files = FileUtil.getBranchFilePaths()
+            //Bi-directional
+            CHANNEL.register(CreateBranchPacket::class.java, CreateBranchPacket::encode, ::CreateBranchPacket, CreateBranchPacket::process)
+            CHANNEL.register(SyncBranchListPacket::class.java, SyncBranchListPacket::encode, ::SyncBranchListPacket, SyncBranchListPacket::process)
 
-                        val tag = CompoundTag()
-                        val list = ListTag()
-                        files.forEach{
-                            list.add(StringTag.valueOf(it))
-                        }
-                        tag.put("branchList", list)
+            //Client -> Server
+            CHANNEL.register(OpenEditorPacket_C2S::class.java, OpenEditorPacket_C2S::encode, ::OpenEditorPacket_C2S, OpenEditorPacket_C2S::process)
+            CHANNEL.register(AddBranchPacket::class.java, AddBranchPacket::encode, ::AddBranchPacket, AddBranchPacket::process)
 
-                        buf.writeNbt(tag)
-                        NetworkManager.sendToPlayer(context.player as ServerPlayer?, Both_SyncBranchList, buf)
-                    }
-                }
-            }
+            //Server -> Client
+            CHANNEL.register(OpenEditorPacket_S2C::class.java, OpenEditorPacket_S2C::encode, ::OpenEditorPacket_S2C, OpenEditorPacket_S2C::process)
+            CHANNEL.register(OpenActorUIPacket::class.java, OpenActorUIPacket::encode, ::OpenActorUIPacket, OpenActorUIPacket::process)
         }
-
     }
 }
