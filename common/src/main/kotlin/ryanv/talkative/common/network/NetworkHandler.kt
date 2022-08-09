@@ -12,6 +12,8 @@ import ryanv.talkative.common.network.bi.OpenEditorPacket_S2C
 import ryanv.talkative.common.network.bi.SyncBranchListPacket
 import ryanv.talkative.common.network.c2s.AddBranchPacket
 import ryanv.talkative.common.network.c2s.CreateBranchPacket
+import ryanv.talkative.common.network.c2s.RemoveBranchPacket
+import ryanv.talkative.common.network.c2s.UpdateBranchPacket
 import ryanv.talkative.common.network.s2c.OpenActorUIPacket
 
 class NetworkHandler {
@@ -26,6 +28,8 @@ class NetworkHandler {
             //Client -> Server
             CHANNEL.register(OpenEditorPacket_C2S::class.java, OpenEditorPacket_C2S::encode, ::OpenEditorPacket_C2S, OpenEditorPacket_C2S::process)
             CHANNEL.register(AddBranchPacket::class.java, AddBranchPacket::encode, ::AddBranchPacket, AddBranchPacket::process)
+            CHANNEL.register(RemoveBranchPacket::class.java, RemoveBranchPacket::encode, ::RemoveBranchPacket, RemoveBranchPacket::process)
+            CHANNEL.register(UpdateBranchPacket::class.java, UpdateBranchPacket::encode, ::UpdateBranchPacket, UpdateBranchPacket::process)
 
             //Server -> Client
             CHANNEL.register(OpenEditorPacket_S2C::class.java, OpenEditorPacket_S2C::encode, ::OpenEditorPacket_S2C, OpenEditorPacket_S2C::process)

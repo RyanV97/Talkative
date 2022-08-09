@@ -16,6 +16,10 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         isDragging = true
     }
 
+    override fun init() {
+        super.init()
+    }
+
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(poseStack, mouseX, mouseY, delta)
         submenu?.render(poseStack, mouseX, mouseY, delta)

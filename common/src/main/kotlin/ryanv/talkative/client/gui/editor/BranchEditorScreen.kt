@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.SharedConstants
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.widgets.DialogNodeWidget
@@ -12,10 +13,12 @@ import ryanv.talkative.client.gui.widgets.SubmenuWidget
 import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
+import ryanv.talkative.common.network.NetworkHandler
+import ryanv.talkative.common.network.c2s.UpdateBranchPacket
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBranch): TalkativeScreen(parent, TextComponent("Dialog Tree Editor")) {
+class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: String, private val branch: DialogBranch): TalkativeScreen(parent, TextComponent("Dialog Tree Editor")) {
     var offsetX: Int = 0
     var offsetY: Int = 0
     var zoomScale: Float = 1.0F
@@ -24,10 +27,10 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBra
     var selectedNode: DialogNodeWidget? = null
 
     override fun init() {
-        rootNodeWidget = loadNodeAndChildren(branch.rootNode)
-        NodePositioner.layoutTree(rootNodeWidget!!)
+        populateNodes()
 
         addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
+            saveChanges()
             onClose()
         })
 
@@ -38,6 +41,11 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBra
         addButton(Button(width - 150, height - 20, 50, 20, TextComponent("Options")) {
             NodePositioner.layoutTree(rootNodeWidget!!)
         })
+    }
+
+    fun populateNodes() {
+        rootNodeWidget = loadNodeAndChildren(branch.rootNode)
+        NodePositioner.layoutTree(rootNodeWidget!!)
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
@@ -53,6 +61,14 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBra
         RenderSystem.popMatrix()
 
         super.render(poseStack, mouseX, mouseY, delta)
+    }
+
+    private fun saveChanges() {
+        val rootNode = rootNodeWidget?.serializeNodeAndChildren()
+        if (rootNode != null) {
+            branch.rootNode = rootNode
+        }
+        NetworkHandler.CHANNEL.sendToServer(UpdateBranchPacket(branchPath, branch.serialize(CompoundTag())))
     }
 
     override fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
@@ -97,10 +113,13 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBra
                 textEntry.copy()
             if(isPaste(keyCode))
                 textEntry.paste()
-            if(hasShiftDown() && (keyCode == 257 || keyCode == 335))
+            if(keyCode == 257 || keyCode == 335)
                 textEntry.insertText("\n")
             when(keyCode) {
-                256 -> selectedNode = null
+                256 -> {
+                    selectedNode = null
+                    focused = null
+                }
                 259 -> textEntry.removeCharsFromCursor(-1)
                 261 -> textEntry.removeCharsFromCursor(1)
                 262 -> textEntry.moveByChars(1, hasShiftDown())
@@ -137,25 +156,36 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branch: DialogBra
             if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Dialog))
                 actionMap["New Child (Dialog)"] = {
                     println("Make New Dialog Child")
+                    widget.addChild(DialogNode.NodeType.Dialog, branch.highestId)
+                    populateNodes()
+                    closePopup()
                 }
             if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Response))
                 actionMap["New Child (Response)"] = {
                     println("Make New Response Child")
+                    widget.addChild(DialogNode.NodeType.Response, branch.highestId)
+                    populateNodes()
+                    closePopup()
                 }
 
             actionMap["Copy Node ID"] = {
                 minecraft?.keyboardHandler?.clipboard = widget.nodeId.toString()
-                println(widget.nodeId.toString())
             }
 
             if(rootNodeWidget!! != widget) {
                 if (widget.children.isEmpty())
                     actionMap["Remove Node"] = {
                         println("Delete Node")
+                        widget.parentWidget?.removeChild(widget)
+                        populateNodes()
+                        closePopup()
                     }
                 else
                     actionMap["Remove Node (And Children)"] = {
                         println("Delete Node and Children")
+                        widget.parentWidget?.removeChild(widget)
+                        populateNodes()
+                        closePopup()
                     }
             }
 

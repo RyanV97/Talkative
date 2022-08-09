@@ -12,6 +12,9 @@ import ryanv.talkative.common.network.bi.SyncBranchListPacket
 import ryanv.talkative.common.network.s2c.OpenActorUIPacket
 import java.util.function.Supplier
 
+/**
+ * Client to Server packet for adding a Branch to the given Actor's list.
+ */
 class AddBranchPacket(val id: Int, val path: String): TalkativePacket {
     constructor(buf: FriendlyByteBuf): this(buf.readInt(), buf.readUtf())
 

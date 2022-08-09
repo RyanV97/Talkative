@@ -49,10 +49,14 @@ class FileUtil {
 
         fun getBranchDataFromPath(path: String): CompoundTag? {
             val file = File(DIR_BRANCH.toFile(), "$path.branch")
-            println(file)
             if(file.exists())
                 return NbtIo.readCompressed(file)
             return null
+        }
+
+        fun saveBranchData(path: String, data: CompoundTag) {
+            val file = File(DIR_BRANCH.toFile(), "$path.branch")
+            NbtIo.writeCompressed(data, file)
         }
     }
 }

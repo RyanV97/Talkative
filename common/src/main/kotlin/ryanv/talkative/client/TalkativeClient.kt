@@ -24,11 +24,11 @@ class TalkativeClient {
             Minecraft.getInstance().setScreen(ActorEditorScreen(entity, actorData))
         }
 
-        fun openBranchEditor(branch: DialogBranch) {
+        fun openBranchEditor(path: String, branch: DialogBranch) {
             var parent: TalkativeScreen? = null
             if(Minecraft.getInstance().screen is ActorEditorScreen)
                 parent = Minecraft.getInstance().screen as ActorEditorScreen
-            Minecraft.getInstance().setScreen(BranchEditorScreen(parent, branch))
+            Minecraft.getInstance().setScreen(BranchEditorScreen(parent, path, branch))
         }
 
         fun loadBranchList(list: ListTag?) {

@@ -13,19 +13,19 @@ import ryanv.talkative.common.network.TalkativePacket
 import ryanv.talkative.common.util.FileUtil
 import java.util.function.Supplier
 
-class OpenEditorPacket_S2C(val data: CompoundTag?): TalkativePacket {
-    constructor(buf: FriendlyByteBuf): this(buf.readNbt())
+class OpenEditorPacket_S2C(val path: String, val data: CompoundTag?): TalkativePacket {
+    constructor(buf: FriendlyByteBuf): this(buf.readUtf(), buf.readNbt())
 
     override fun encode(buf: FriendlyByteBuf) {
+        buf.writeUtf(path)
         buf.writeNbt(data)
     }
 
     override fun process(ctx: Supplier<NetworkManager.PacketContext>) {
         val isClient = ctx.get().player.level.isClientSide()
-        println(data)
         if(isClient) {
             if(data != null)
-                TalkativeClient.openBranchEditor(DialogBranch.deserialize(data))
+                TalkativeClient.openBranchEditor(path, DialogBranch.deserialize(data))
         }
     }
 }
@@ -39,10 +39,9 @@ class OpenEditorPacket_C2S(val path: String): TalkativePacket {
 
     override fun process(ctx: Supplier<NetworkManager.PacketContext>) {
         val isClient = ctx.get().player.level.isClientSide()
-        println(isClient)
         if (!isClient) {
             val branchData = FileUtil.getBranchDataFromPath(path)
-            NetworkHandler.CHANNEL.sendToPlayer(ctx.get().player as ServerPlayer, OpenEditorPacket_S2C(branchData))
+            NetworkHandler.CHANNEL.sendToPlayer(ctx.get().player as ServerPlayer, OpenEditorPacket_S2C(path, branchData))
         }
     }
 }

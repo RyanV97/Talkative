@@ -26,6 +26,29 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
         calculateHeight()
     }
 
+    fun serializeNodeAndChildren(): DialogNode {
+        val node = serializeNode()
+        for(child in children) {
+            node.children.add(child.serializeNodeAndChildren())
+        }
+        return node
+    }
+
+    private fun serializeNode(): DialogNode {
+        return DialogNode(nodeType, contents, nodeId = nodeId)
+    }
+
+    fun addChild(type: DialogNode.NodeType, id: Int) {
+        children.add(DialogNodeWidget(x, y, "Hello World!", type, id, this, parentScreen))
+
+    }
+
+    fun removeChild(child: DialogNodeWidget) {
+        if(children.remove(child)) {
+
+        }
+    }
+
     //Rendering
     fun renderNodeAndChildren(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         renderNode(poseStack, mouseX, mouseY, delta)
@@ -105,7 +128,6 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
 
     //Mouse
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        println("$button - ${parentScreen.isDragging}")
         if(active && visible && !parentScreen.isDragging && isMouseOver(mouseX, mouseY) && button != 2) {
             when(button) {
                 1 -> {
