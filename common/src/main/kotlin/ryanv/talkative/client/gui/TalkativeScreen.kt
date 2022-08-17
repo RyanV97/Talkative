@@ -48,7 +48,7 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
         if(popup == null || !popup!!.mouseClicked(mouseX, mouseY, mouseButton))
             if(submenu == null || !submenu!!.mouseClicked(mouseX, mouseY, mouseButton)) {
-                submenu = null
+                closeSubmenu()
                 if (!onMouseClick(mouseX, mouseY, mouseButton))
                     if (!super.mouseClicked(mouseX, mouseY, mouseButton))
                         return false
@@ -65,7 +65,6 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     override fun mouseReleased(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
         if(popup == null || !popup!!.mouseReleased(mouseX, mouseY, mouseButton))
             if(submenu == null || !submenu!!.mouseReleased(mouseX, mouseY, mouseButton)) {
-                submenu = null
                 if(!onMouseRelease(mouseX, mouseY, mouseButton))
                     getChildAt(mouseX, mouseY).filter { guiEventListener ->
                         guiEventListener.mouseReleased(mouseX, mouseY, mouseButton)
@@ -83,6 +82,10 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
 
     fun closePopup() {
         popup = null
+    }
+
+    fun closeSubmenu() {
+        submenu = null
     }
 
     abstract fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean

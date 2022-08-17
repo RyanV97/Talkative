@@ -27,7 +27,8 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     var selectedNode: DialogNodeWidget? = null
 
     override fun init() {
-        populateNodes()
+        rootNodeWidget = loadNodeAndChildren(branch.rootNode)
+        NodePositioner.layoutTree(rootNodeWidget!!)
 
         addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
             saveChanges()
@@ -41,11 +42,6 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
         addButton(Button(width - 150, height - 20, 50, 20, TextComponent("Options")) {
             NodePositioner.layoutTree(rootNodeWidget!!)
         })
-    }
-
-    fun populateNodes() {
-        rootNodeWidget = loadNodeAndChildren(branch.rootNode)
-        NodePositioner.layoutTree(rootNodeWidget!!)
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
@@ -80,7 +76,7 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     }
 
     override fun onMouseDrag(mouseX: Double, mouseY: Double, mouseButton: Int, diffX: Double, diffY: Double): Boolean {
-        if(mouseButton == 1) {
+        if(mouseButton == 2) {
             if(!isDragging)
                 isDragging = true
 
@@ -149,6 +145,10 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
         return DialogNodeWidget(width / 2, height / 2, node.content, node.nodeType, node.nodeId, parent, this)
     }
 
+    fun addChild(child: DialogNodeWidget) {
+        children.add(child)
+    }
+
     fun createSubMenu(mouseX: Int, mouseY: Int, widget: AbstractWidget) {
         if (widget is DialogNodeWidget) {
             val actionMap = HashMap<String, () -> Unit>()
@@ -157,15 +157,15 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
                 actionMap["New Child (Dialog)"] = {
                     println("Make New Dialog Child")
                     widget.addChild(DialogNode.NodeType.Dialog, branch.highestId)
-                    populateNodes()
-                    closePopup()
+                    NodePositioner.layoutTree(rootNodeWidget!!)
+                    closeSubmenu()
                 }
             if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Response))
                 actionMap["New Child (Response)"] = {
                     println("Make New Response Child")
                     widget.addChild(DialogNode.NodeType.Response, branch.highestId)
-                    populateNodes()
-                    closePopup()
+                    NodePositioner.layoutTree(rootNodeWidget!!)
+                    closeSubmenu()
                 }
 
             actionMap["Copy Node ID"] = {
@@ -177,15 +177,15 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
                     actionMap["Remove Node"] = {
                         println("Delete Node")
                         widget.parentWidget?.removeChild(widget)
-                        populateNodes()
-                        closePopup()
+                        NodePositioner.layoutTree(rootNodeWidget!!)
+                        closeSubmenu()
                     }
                 else
                     actionMap["Remove Node (And Children)"] = {
                         println("Delete Node and Children")
                         widget.parentWidget?.removeChild(widget)
-                        populateNodes()
-                        closePopup()
+                        NodePositioner.layoutTree(rootNodeWidget!!)
+                        closeSubmenu()
                     }
             }
 

@@ -39,13 +39,14 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
     }
 
     fun addChild(type: DialogNode.NodeType, id: Int) {
-        children.add(DialogNodeWidget(x, y, "Hello World!", type, id, this, parentScreen))
-
+        val child = DialogNodeWidget(x, y, "Hello World!", type, id, this, parentScreen)
+        children.add(child)
+        parentScreen.addChild(child)
     }
 
     fun removeChild(child: DialogNodeWidget) {
         if(children.remove(child)) {
-
+            parentScreen.children().remove(child)
         }
     }
 
@@ -88,8 +89,12 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
 
                 GuiComponent.drawString(poseStack, minecraft.font, label, posX + 2, posY + 1, 0xFFFFFF)
                 minecraft.font.drawWordWrap(TextComponent(contents), posX + 2, posY + 12, width - 4, 0xFFFFFF)
-            }
 
+                if(parentScreen.selectedNode == this) {
+                    fill(poseStack, posX, posY + height + 1, posX + width, posY + height + 12, 0xFF333333.toInt())
+                    GuiComponent.drawString(poseStack, minecraft.font, "[ESC] to Stop Editing", posX + 2, posY + height + 3, 0xFFFFFF)
+                }
+            }
         }
         super.render(poseStack, mouseX, mouseY, delta)
     }
@@ -127,22 +132,16 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
     }
 
     //Mouse
-    override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if(active && visible && !parentScreen.isDragging && isMouseOver(mouseX, mouseY) && button != 2) {
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        if(isMouseOver(mouseX, mouseY)) {
             when(button) {
+                0 -> {
+                    parentScreen.selectedNode = this
+                    parentScreen.focused = this
+                }
                 1 -> {
                     parentScreen.createSubMenu(mouseX.toInt(), mouseY.toInt(), this)
                 }
-            }
-        }
-        return false
-    }
-
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if(isMouseOver(mouseX, mouseY)) {
-            if(button == 0) {
-                parentScreen.selectedNode = this
-                parentScreen.focused = this
             }
             return true
         }

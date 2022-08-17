@@ -1,6 +1,8 @@
 package ryanv.talkative.client.gui.widgets.lists
 
 import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiComponent
 import ryanv.talkative.client.util.ScissorUtil
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.screens.Screen
@@ -11,15 +13,14 @@ import ryanv.talkative.client.gui.widgets.NestedWidget
 import java.awt.Color
 
 //Original Code provided by DenimRed - https://github.com/DenimRed/
-class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height: Int, title: Component? = TextComponent.EMPTY) : NestedWidget(x, y, width, height, title) {
+open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height: Int, title: Component? = TextComponent.EMPTY) : NestedWidget(x, y, width, height, title) {
     protected var totalHeight = 0
     protected var scrollPos = 0
         set(pos) {
-            field = pos
             if (maxScroll > 0) {
                 val last = scrollPos
-                scrollPos = if (pos < 0) 0 else Math.min(pos, maxScroll)
-                if (scrollPos != last) {
+                field = if (pos < 0) 0 else Math.min(pos, maxScroll)
+                if (field != last) {
                     val diff = scrollPos - last
                     for (child in children) {
                         if (child is NestedWidget) {
@@ -33,43 +34,20 @@ class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height
             }
         }
     protected var scrollBarWidth = 8
-        set(value) {
-            field = value
-            for (child in children) {
-                child.width = width - scrollBarWidth
-                if (scrollBarLeft) {
-                    if (child is NestedWidget) {
-                        child.setX(x + scrollBarWidth)
-                    } else {
-                        child.x = x + scrollBarWidth
-                    }
-                }
-            }
-        }
     protected var scrollBarLeft = false
-        set(value) {
-            field = value
-            for (child in children) {
-                val childX = if (scrollBarLeft) x + scrollBarWidth else x
-                if (child is NestedWidget) {
-                    child.setX(childX)
-                } else {
-                    child.x = childX
-                }
-            }
-        }
     protected var scrolling = false
 
-    fun add(widget: AbstractWidget) {
-        this.addChild<AbstractWidget>(widget)
-        val realWidth = width - scrollBarWidth
-        widget.width = realWidth
-        val widgetX = x + realWidth / 2 - widget.width / 2
+    var renderBackground: Boolean = true
+    var renderEntryBackground: Boolean = true
+
+    open fun addChild(widget: AbstractWidget) {
+        super.addChild(widget)
+        widget.width = width
         if (widget is NestedWidget) {
-            widget.setX(widgetX)
+            widget.setX(x)
             widget.setY(y + totalHeight)
         } else {
-            widget.x = widgetX
+            widget.x = x
             widget.y = y + totalHeight
         }
         totalHeight += widget.height
@@ -81,11 +59,30 @@ class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height
         }
     }
 
-    fun remove(widget: AbstractWidget) {
+    open fun remove(widget: AbstractWidget) {
         if (children.contains(widget)) {
             removeChild(widget)
             totalHeight -= widget.height
         }
+    }
+
+    override fun recalculateChildren() {
+        totalHeight = 0
+        for(child in children) {
+            child.width = width
+            if (child is NestedWidget) {
+                child.setX(x)
+                child.setY(y + totalHeight)
+            } else {
+                child.x = x
+                child.y = y + totalHeight
+            }
+            totalHeight += child.height
+        }
+    }
+
+    fun getSize(): Int {
+        return children.size
     }
 
     fun clear() {
@@ -124,7 +121,7 @@ class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height
         if (visible && active) {
             if (isValidClickButton(mouseButton)) {
                 scrolling =
-                    if (scrollBarLeft) mouseX >= x && mouseX <= x + scrollBarWidth else mouseX >= x + width - scrollBarWidth && mouseX <= x + width
+                    if (scrollBarLeft) mouseX >= x - scrollBarWidth && mouseX <= x else mouseX >= x + width && mouseX <= x + width + scrollBarWidth
                 val barY = scrollBarY
                 if (scrolling && (mouseY < barY || mouseY > barY + scrollBarHeight)) {
                     scrollTo(mouseY)
@@ -167,18 +164,19 @@ class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        fill(poseStack, x, y, x + width, y + height, 0x66000000)
-        renderScrollBar(poseStack)
-        ScissorUtil.start(
-            if (scrollBarLeft) x + scrollBarWidth else x, y, width - scrollBarWidth, height
-        )
+        if(renderBackground)
+            fill(poseStack, x, y, x + width, y + height, 0x66000000)
+        if(totalHeight > height)
+            renderScrollBar(poseStack)
+        ScissorUtil.start(x, y, width, height)
         var i = 0
         val size: Int = children.size
         while (i < size) {
             val child: AbstractWidget = children.get(i)
             if (isWidgetWithin(child)) {
                 val color = Color.HSBtoRGB(0.0f, 0.0f, if (i % 2 == 0) 0.1f else 0.2f) and 0x66FFFFFF
-                fill(poseStack, x, child.y, x + width, child.y + child.height, color)
+                if(renderEntryBackground)
+                    fill(poseStack, x, child.y, x + width, child.y + child.height, color)
             }
             i++
         }
@@ -191,7 +189,7 @@ class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height
     }
 
     protected fun renderScrollBar(poseStack: PoseStack?) {
-        val minX = if (scrollBarLeft) x else x + width - scrollBarWidth
+        val minX = if (scrollBarLeft) x - scrollBarWidth else x + width
         val maxX = minX + scrollBarWidth
         val minY = y
         val maxY = y + height
