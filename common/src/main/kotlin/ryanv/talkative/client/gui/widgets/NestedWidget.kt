@@ -28,8 +28,8 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
         return child
     }
 
-    protected fun removeChild(child: AbstractWidget) {
-        children.remove(child)
+    protected fun removeChild(child: AbstractWidget): Boolean {
+        return children.remove(child)
     }
 
     protected fun clearChildren() {

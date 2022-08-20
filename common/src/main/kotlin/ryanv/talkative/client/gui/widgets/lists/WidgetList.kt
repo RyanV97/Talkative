@@ -42,15 +42,10 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
 
     open fun addChild(widget: AbstractWidget) {
         super.addChild(widget)
-        widget.width = width
-        if (widget is NestedWidget) {
-            widget.setX(x)
-            widget.setY(y + totalHeight)
-        } else {
-            widget.x = x
-            widget.y = y + totalHeight
-        }
+        adjustChild(widget)
         totalHeight += widget.height
+//        if(height <= 0)
+//            height = totalHeight
     }
 
     fun remove(i: Int) {
@@ -59,25 +54,31 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
         }
     }
 
-    open fun remove(widget: AbstractWidget) {
-        if (children.contains(widget)) {
-            removeChild(widget)
+    open fun remove(widget: AbstractWidget): Boolean {
+        if (children.contains(widget) && removeChild(widget)) {
             totalHeight -= widget.height
+            recalculateChildren()
+            return true
         }
+        return false
     }
 
     override fun recalculateChildren() {
         totalHeight = 0
         for(child in children) {
-            child.width = width
-            if (child is NestedWidget) {
-                child.setX(x)
-                child.setY(y + totalHeight)
-            } else {
-                child.x = x
-                child.y = y + totalHeight
-            }
+            adjustChild(child)
             totalHeight += child.height
+        }
+    }
+
+    fun adjustChild(child: AbstractWidget) {
+        child.width = width
+        if (child is NestedWidget) {
+            child.setX(x)
+            child.setY((y + totalHeight) - scrollPos)
+        } else {
+            child.x = x
+            child.y = (y + totalHeight) - scrollPos
         }
     }
 
@@ -173,6 +174,7 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
         val size: Int = children.size
         while (i < size) {
             val child: AbstractWidget = children.get(i)
+            GuiComponent.drawString(poseStack, Minecraft.getInstance().font, "${child.y}", x - 20, child.y, 0xFFFFFF)
             if (isWidgetWithin(child)) {
                 val color = Color.HSBtoRGB(0.0f, 0.0f, if (i % 2 == 0) 0.1f else 0.2f) and 0x66FFFFFF
                 if(renderEntryBackground)
