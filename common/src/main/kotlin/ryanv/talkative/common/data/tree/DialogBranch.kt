@@ -3,7 +3,7 @@ package ryanv.talkative.common.data.tree
 import net.minecraft.nbt.CompoundTag
 import ryanv.talkative.common.consts.NBTConstants
 
-class DialogBranch(var rootNode: DialogNode) {
+class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {
 
     var highestId: Int = 0
     get() {
@@ -11,14 +11,24 @@ class DialogBranch(var rootNode: DialogNode) {
     }
 
     fun serialize(tag: CompoundTag): CompoundTag {
-        tag.put(NBTConstants.BRANCH_ROOT, rootNode.serialize(CompoundTag()))
+        val nodeList = CompoundTag()
+        nodes.forEach { (id, node) ->
+            nodeList.put(id.toString(), node.serialize(CompoundTag()))
+        }
+        tag.put(NBTConstants.BRANCH_NODES, nodeList)
         return tag
     }
 
     companion object {
         fun deserialize(tag: CompoundTag): DialogBranch {
-            val rootNode: DialogNode = DialogNode.deserialize(tag.getCompound(NBTConstants.BRANCH_ROOT))
-            return DialogBranch(rootNode)
+            var nodes = HashMap<Int, DialogNode>()
+            var nodeList = tag.get(NBTConstants.BRANCH_NODES) as CompoundTag
+            nodeList.allKeys.forEach {
+                val id: Int = it.toInt()
+                val node = DialogNode.deserialize(nodeList.get(it) as CompoundTag)
+                nodes[id] = node
+            }
+            return DialogBranch(nodes)
         }
     }
 }

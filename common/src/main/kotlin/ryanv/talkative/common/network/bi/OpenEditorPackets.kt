@@ -5,9 +5,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.client.TalkativeClient
-import ryanv.talkative.common.consts.NBTConstants
 import ryanv.talkative.common.data.tree.DialogBranch
-import ryanv.talkative.common.data.tree.DialogNode
 import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.network.TalkativePacket
 import ryanv.talkative.common.util.FileUtil

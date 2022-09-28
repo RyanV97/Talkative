@@ -1,9 +1,10 @@
 package ryanv.talkative.client.gui
 
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.DialogList
@@ -23,7 +24,6 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         addButton(dialogEntryList)
 
         dialogEntryList!!.addChild(DialogEntry(TextComponent("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."), TextComponent("Speaker"), this))
-        addResponses()
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
@@ -35,16 +35,19 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         fill(poseStack, 0, 0, width, height, 0x66000000)
     }
 
-    private fun addResponses() {
-        dialogEntryList?.addChild(ResponsesWidget(this, arrayOf("Test Response", "Another Response", "More Responses")))
+    fun loadDialog(speaker: TextComponent, dialog: String, responses: ListTag? = null) {
+        dialogEntryList?.addChild(DialogEntry(TextComponent(dialog), speaker, this, false))
+        if(responses != null) {
+            val array: Array<String> = emptyArray()
+            for(tag in responses)
+                array.plus((tag as StringTag).asString)
+            dialogEntryList?.addChild(ResponsesWidget(this, array))
+        }
     }
 
     fun onResponse(response: String) {
         dialogEntryList?.remove(dialogEntryList!!.getSize() - 1)
         dialogEntryList?.addChild(DialogEntry(TextComponent(response), TextComponent("Player"), this, false))
-        dialogEntryList?.addChild(DialogEntry(TextComponent("Some more dialog text"), TextComponent("Speaker"), this))
-        //if next nodes are responses
-        addResponses()
     }
 
     override fun tick() {

@@ -24,10 +24,11 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     var zoomScale: Float = 1.0F
 
     var rootNodeWidget: DialogNodeWidget? = null
+    var nodeWidgets: ArrayList<DialogNodeWidget> = ArrayList()
     var selectedNode: DialogNodeWidget? = null
 
     override fun init() {
-        rootNodeWidget = loadNodeAndChildren(branch.rootNode)
+        rootNodeWidget = branch.nodes[0]?.let { loadNodeAndChildren(it) }
         NodePositioner.layoutTree(rootNodeWidget!!)
 
         addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
@@ -60,9 +61,9 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     }
 
     private fun saveChanges() {
-        val rootNode = rootNodeWidget?.serializeNodeAndChildren()
-        if (rootNode != null) {
-            branch.rootNode = rootNode
+        branch.nodes.clear()
+        nodeWidgets.forEach {
+            branch.nodes[it.nodeId] = it.serializeNodeAndChildren()
         }
         NetworkHandler.CHANNEL.sendToServer(UpdateBranchPacket(branchPath, branch.serialize(CompoundTag())))
     }
@@ -136,17 +137,24 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
 
     private fun loadNodeAndChildren(node: DialogNode, parent: DialogNodeWidget? = null): DialogNodeWidget {
         val widget = createWidgetForNode(node, parent)
-        node.children.forEach { widget.children.add(loadNodeAndChildren(it, widget)) }
-        this.children.add(widget)
+        node.children.forEach { widget.children.add(loadNodeAndChildren(branch.nodes[it]!!, widget)) }
         return widget
     }
 
-    private fun createWidgetForNode(node: DialogNode, parent: DialogNodeWidget?): DialogNodeWidget {
-        return DialogNodeWidget(width / 2, height / 2, node.content, node.nodeType, node.nodeId, parent, this)
+    fun createWidgetForNode(node: DialogNode, parent: DialogNodeWidget?): DialogNodeWidget {
+        val widget = DialogNodeWidget(width / 2, height / 2, node.content, node.nodeType, node.nodeId, parent, this)
+        addChild(widget)
+        nodeWidgets.add(widget)
+        return widget
     }
 
-    fun addChild(child: DialogNodeWidget) {
+    private fun addChild(child: DialogNodeWidget) {
         children.add(child)
+    }
+
+    fun removeChild(child: DialogNodeWidget) {
+        children.remove(child)
+        nodeWidgets.remove(child)
     }
 
     fun createSubMenu(mouseX: Int, mouseY: Int, widget: AbstractWidget) {

@@ -12,6 +12,7 @@ import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
 import ryanv.talkative.client.gui.editor.BranchEditorScreen
 import ryanv.talkative.common.data.Actor
 import ryanv.talkative.common.data.tree.DialogBranch
+import ryanv.talkative.common.network.s2c.DialogPacket
 
 class TalkativeClient {
 
@@ -35,6 +36,12 @@ class TalkativeClient {
             val screen = Minecraft.getInstance().screen
             if(screen is BranchDirectoryScreen)
                 screen.loadBranchList(list)
+        }
+
+        fun processDialogPacket(packet: DialogPacket) {
+            val currentScreen = Minecraft.getInstance().screen
+            if(currentScreen is DialogScreen)
+                currentScreen.loadDialog(packet.speaker, packet.contents, packet.responses)
         }
     }
 

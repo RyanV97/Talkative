@@ -11,7 +11,7 @@ public class NBTConstants {
     public static final String MARKER_OUTLINE = "colour_outline";
 
     public static final String BRANCH_REFERENCES = "branch_references";
-    public static final String BRANCH_ROOT = "branch_root";
+    public static final String BRANCH_NODES = "branch_nodes";
     public static final String BRANCH_FILE = "branch_file";
     public static final String BRANCH_PRIORITY = "branch_priority";
 

@@ -29,7 +29,7 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
     fun serializeNodeAndChildren(): DialogNode {
         val node = serializeNode()
         for(child in children) {
-            node.children.add(child.serializeNodeAndChildren())
+            node.children.add(child.nodeId)
         }
         return node
     }
@@ -39,15 +39,13 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
     }
 
     fun addChild(type: DialogNode.NodeType, id: Int) {
-        val child = DialogNodeWidget(x, y, "Hello World!", type, id, this, parentScreen)
+        val child = parentScreen.createWidgetForNode(DialogNode(nodeType = type, nodeId = id), this)
         children.add(child)
-        parentScreen.addChild(child)
     }
 
     fun removeChild(child: DialogNodeWidget) {
-        if(children.remove(child)) {
-            parentScreen.children().remove(child)
-        }
+        if(children.remove(child))
+            parentScreen.removeChild(child)
     }
 
     //Rendering

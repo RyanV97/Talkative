@@ -14,6 +14,7 @@ import ryanv.talkative.common.network.c2s.AddBranchPacket
 import ryanv.talkative.common.network.c2s.CreateBranchPacket
 import ryanv.talkative.common.network.c2s.RemoveBranchPacket
 import ryanv.talkative.common.network.c2s.UpdateBranchPacket
+import ryanv.talkative.common.network.s2c.DialogPacket
 import ryanv.talkative.common.network.s2c.OpenActorUIPacket
 
 class NetworkHandler {
@@ -34,6 +35,7 @@ class NetworkHandler {
             //Server -> Client
             CHANNEL.register(OpenEditorPacket_S2C::class.java, OpenEditorPacket_S2C::encode, ::OpenEditorPacket_S2C, OpenEditorPacket_S2C::process)
             CHANNEL.register(OpenActorUIPacket::class.java, OpenActorUIPacket::encode, ::OpenActorUIPacket, OpenActorUIPacket::process)
+            CHANNEL.register(DialogPacket::class.java, DialogPacket::encode, ::DialogPacket, DialogPacket::process)
         }
     }
 }

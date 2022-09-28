@@ -3,7 +3,6 @@ package ryanv.talkative.common.util
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import ryanv.talkative.common.consts.NBTConstants
-import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
 import java.io.File
@@ -20,7 +19,7 @@ class FileUtil {
             val branchTag = CompoundTag()
 
             val rootNode = DialogNode(nodeId = 0, content = "Hello World!")
-            branchTag.put(NBTConstants.BRANCH_ROOT, rootNode.serialize(CompoundTag()))
+            branchTag.put(NBTConstants.BRANCH_NODES, rootNode.serialize(CompoundTag()))
 
             //ToDo: Do a Exists check to handle overwriting
             file.parentFile.mkdirs()
