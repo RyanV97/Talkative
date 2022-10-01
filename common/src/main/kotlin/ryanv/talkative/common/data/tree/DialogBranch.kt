@@ -10,6 +10,10 @@ class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {
         return ++field
     }
 
+    fun addNode(node: DialogNode) {
+        nodes[node.nodeId] = node
+    }
+
     fun serialize(tag: CompoundTag): CompoundTag {
         val nodeList = CompoundTag()
         nodes.forEach { (id, node) ->
@@ -20,9 +24,14 @@ class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {
     }
 
     companion object {
-        fun deserialize(tag: CompoundTag): DialogBranch {
-            var nodes = HashMap<Int, DialogNode>()
-            var nodeList = tag.get(NBTConstants.BRANCH_NODES) as CompoundTag
+        fun deserialize(tag: CompoundTag): DialogBranch? {
+            val nodes = HashMap<Int, DialogNode>()
+            val nodeList = tag.get(NBTConstants.BRANCH_NODES) as CompoundTag
+            if(!nodeList.contains("0")) {
+                //uh oh, no root? :c
+                //Throw exception
+                return null
+            }
             nodeList.allKeys.forEach {
                 val id: Int = it.toInt()
                 val node = DialogNode.deserialize(nodeList.get(it) as CompoundTag)

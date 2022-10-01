@@ -137,7 +137,7 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
 
     private fun loadNodeAndChildren(node: DialogNode, parent: DialogNodeWidget? = null): DialogNodeWidget {
         val widget = createWidgetForNode(node, parent)
-        node.children.forEach { widget.children.add(loadNodeAndChildren(branch.nodes[it]!!, widget)) }
+        node.getChildren().forEach { widget.children.add(loadNodeAndChildren(branch.nodes[it]!!, widget)) }
         return widget
     }
 

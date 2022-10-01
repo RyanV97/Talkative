@@ -16,11 +16,9 @@ class FileUtil {
 
         fun createBranchAtPath(path: String) {
             val file = File(DIR_BRANCH.toFile(), "$path.branch")
-            val branchTag = CompoundTag()
-
-            val rootNode = DialogNode(nodeId = 0, content = "Hello World!")
-            branchTag.put(NBTConstants.BRANCH_NODES, rootNode.serialize(CompoundTag()))
-
+            val branch = DialogBranch()
+            branch.addNode(DialogNode(nodeId = 0))
+            val branchTag = branch.serialize(CompoundTag())
             //ToDo: Do a Exists check to handle overwriting
             file.parentFile.mkdirs()
             NbtIo.writeCompressed(branchTag, file)
@@ -42,7 +40,6 @@ class FileUtil {
         }
 
         fun getBranchFromPath(path: String): DialogBranch? {
-            //ToDo: This is wrong, it deserializes the Reference, should deserialize an actual Branch.
             return getBranchDataFromPath(path)?.let { DialogBranch.deserialize(it) }
         }
 

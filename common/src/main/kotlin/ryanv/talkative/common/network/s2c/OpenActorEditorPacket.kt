@@ -9,7 +9,7 @@ import ryanv.talkative.common.data.Actor
 import ryanv.talkative.common.network.TalkativePacket
 import java.util.function.Supplier
 
-class OpenActorUIPacket(val id: Int, val tag: CompoundTag?): TalkativePacket {
+class OpenActorEditorPacket(val id: Int, val tag: CompoundTag?): TalkativePacket {
     constructor(buf: FriendlyByteBuf): this(buf.readInt(), buf.readNbt())
 
     override fun encode(buf: FriendlyByteBuf) {
@@ -21,6 +21,6 @@ class OpenActorUIPacket(val id: Int, val tag: CompoundTag?): TalkativePacket {
         val level = ctx.get().player.level
         val entity = level.getEntity(id)
         if(level.isClientSide && entity is LivingEntity && tag != null)
-            TalkativeClient.openActorEditor(entity, Actor().deserialize(tag))
+            TalkativeClient.openActorEditor(entity, Actor.deserialize(tag))
     }
 }

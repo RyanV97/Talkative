@@ -8,8 +8,7 @@ import ryanv.talkative.api.IActorEntity
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.network.TalkativePacket
-import ryanv.talkative.common.network.bi.SyncBranchListPacket
-import ryanv.talkative.common.network.s2c.OpenActorUIPacket
+import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
 import java.util.function.Supplier
 
 /**
@@ -31,7 +30,7 @@ class AddBranchPacket(val id: Int, val path: String): TalkativePacket {
             if(entity is IActorEntity) {
                 val branchRef = BranchReference(path)
                 entity.actorData.dialogBranches.add(branchRef)
-                NetworkHandler.CHANNEL.sendToPlayer(player as ServerPlayer, OpenActorUIPacket(id, entity.actorData.serialize(CompoundTag())))
+                NetworkHandler.CHANNEL.sendToPlayer(player as ServerPlayer, OpenActorEditorPacket(id, entity.actorData.serialize(CompoundTag())))
             }
         }
     }

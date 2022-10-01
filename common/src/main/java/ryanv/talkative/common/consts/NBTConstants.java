@@ -19,6 +19,7 @@ public class NBTConstants {
     public static final String NODE_TYPE = "node_type";
     public static final String NODE_CONTENT = "node_contents";
     public static final String NODE_CHILDREN = "node_children";
+    public static final String NODE_CHILD_TYPE = "node_child_type";
 
     public static final String CONDITIONAL = "conditional";
     public static final String CONDITIONAL_EXPRESSIONS = "expressions";

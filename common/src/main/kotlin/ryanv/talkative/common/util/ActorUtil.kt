@@ -15,8 +15,7 @@ object ActorUtil {
 
     @JvmStatic
     fun deserialize(entityData: IActorEntity, tag: CompoundTag?) {
-        val data = Actor()
-        data.deserialize(tag!!)
+        val data = Actor.deserialize(tag!!)
         entityData.actorData = data
     }
 

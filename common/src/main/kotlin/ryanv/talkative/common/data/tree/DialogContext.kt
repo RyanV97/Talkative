@@ -8,7 +8,7 @@ class DialogContext(var currentNode: DialogNode) {
     val indexPath = ArrayList<Int>()
 
     fun traverse(index: Int) {
-        if(currentNode.children.isNotEmpty() && currentNode.children.size > index) {
+        if(currentNode.getChildren().isNotEmpty() && currentNode.getChildren().size > index) {
             indexPath.add(index)
             //currentNode = currentNode.children[index] - broken since changing child structure
             //Send Node to Client first

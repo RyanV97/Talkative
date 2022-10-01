@@ -5,10 +5,9 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.api.IActorEntity
-import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.network.TalkativePacket
-import ryanv.talkative.common.network.s2c.OpenActorUIPacket
+import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
 import java.util.function.Supplier
 
 class RemoveBranchPacket(val id: Int, val index: Int): TalkativePacket {
@@ -26,7 +25,7 @@ class RemoveBranchPacket(val id: Int, val index: Int): TalkativePacket {
             val entity = level.getEntity(id)
             if(entity is IActorEntity) {
                 entity.actorData.dialogBranches.removeAt(index)
-                NetworkHandler.CHANNEL.sendToPlayer(player as ServerPlayer, OpenActorUIPacket(id, entity.actorData.serialize(CompoundTag())))
+                NetworkHandler.CHANNEL.sendToPlayer(player as ServerPlayer, OpenActorEditorPacket(id, entity.actorData.serialize(CompoundTag())))
             }
         }
     }

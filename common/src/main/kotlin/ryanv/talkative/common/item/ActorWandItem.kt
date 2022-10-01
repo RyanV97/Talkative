@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack
 import ryanv.talkative.api.IActorEntity
 import ryanv.talkative.common.data.Actor
 import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.s2c.OpenActorUIPacket
+import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
 
 class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
 
@@ -25,7 +25,7 @@ class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
             entity.actorData = Actor()
 
         //ToDo: Replace with proper Server-Side check
-        NetworkHandler.CHANNEL.sendToPlayer(player as ServerPlayer, OpenActorUIPacket(livingEntity.id, entity.actorData.serialize(CompoundTag())))
+        NetworkHandler.CHANNEL.sendToPlayer(player as ServerPlayer, OpenActorEditorPacket(livingEntity.id, entity.actorData.serialize(CompoundTag())))
 
         return InteractionResult.PASS
     }

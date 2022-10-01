@@ -14,7 +14,6 @@ import ryanv.talkative.common.network.bi.SyncBranchListPacket
 import ryanv.talkative.common.network.c2s.CreateBranchPacket
 
 class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: StringSelectionList.StringEntry?) -> Unit): TalkativeScreen(parent, TextComponent.EMPTY) {
-
     lateinit var list: StringSelectionList
     var selectedEntry: StringSelectionList.StringEntry? = null
 
@@ -26,6 +25,7 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
             onConfirm(selectedEntry)
             onClose()
         })
+
         addButton(Button(listRight, height - 20, 70, 20, TextComponent("New Branch")) {
             popup = PopupWidget((width / 2) - 155, (height / 2) - 15, 310, 30, this)
                 .textField(5, 5, width = 195, defaultString = getSelectedPath())

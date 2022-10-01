@@ -9,14 +9,13 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.world.entity.LivingEntity
 import ryanv.talkative.client.gui.TalkativeScreen
-import ryanv.talkative.client.gui.popup.PopupWidget
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.TalkativeList
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
 import ryanv.talkative.common.data.Actor
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.bi.OpenEditorPacket_C2S
+import ryanv.talkative.common.network.bi.OpenBranchEditorPacket_C2S
 import ryanv.talkative.common.network.c2s.AddBranchPacket
 import ryanv.talkative.common.network.c2s.RemoveBranchPacket
 
@@ -25,21 +24,26 @@ class ActorEditorScreen(val actorEntity: LivingEntity, val actor: Actor? = null)
     private var details: BranchDetailsWidget? = null
 
     override fun init() {
+        super.init()
         addButton(Button(5, height - 25, 75, 20, TextComponent("Add Branch")) {
-            popup = PopupWidget((width / 2) - 200, (height / 2) - 100, 400, 200, this, "New Branch")
-                .title(TextComponent("Add Branch"))
-                .label(0, 11, "Branch File Location:")
-                .button(235, 5, "...", width = 20) {
-                    minecraft?.setScreen(BranchDirectoryScreen(this) {
-                        popup!!.getAllTextFields()[0].value = it?.value
-                    })
-                }
-                .textField(110, 5)
-                .button(0, 180, "Cancel") { closePopup() }
-                .button(350, 180, "Confirm") {
-                    val path = popup!!.getAllTextFields()[0].value
-                    addBranchToActor(path)
-                }
+            minecraft?.setScreen(BranchDirectoryScreen(this) {
+                if(it!!.value.isNotBlank())
+                    addBranchToActor(it.value)
+            })
+//            popup = PopupWidget((width / 2) - 200, (height / 2) - 100, 400, 200, this, "New Branch")
+//                .title(TextComponent("Add Branch"))
+//                .label(0, 11, "Branch File Location:")
+//                .button(235, 5, "...", width = 20) {
+//                    minecraft?.setScreen(BranchDirectoryScreen(this) {
+//                        popup!!.getAllTextFields()[0].value = it?.value
+//                    })
+//                }
+//                .textField(110, 5)
+//                .button(0, 180, "Cancel") { closePopup() }
+//                .button(350, 180, "Confirm") {
+//                    val path = popup!!.getAllTextFields()[0].value
+//                    addBranchToActor(path)
+//                }
         })
 
         list = addWidget(TalkativeList(minecraft, 0, height - 30, 0, width / 2))
@@ -121,10 +125,10 @@ class ActorEditorScreen(val actorEntity: LivingEntity, val actor: Actor? = null)
             conditionalList.clear()
             children.clear()
             addChild(Button(x, 0, 50, 20, TextComponent("Edit")) {
-                NetworkHandler.CHANNEL.sendToServer(OpenEditorPacket_C2S(branch!!.fileString))
+                NetworkHandler.CHANNEL.sendToServer(OpenBranchEditorPacket_C2S(branch!!.fileString))
             })
             addChild(Button(x, 20, 50, 20, TextComponent("Remove")) {
-                NetworkHandler.CHANNEL.sendToServer(RemoveBranchPacket(parent.actorEntity.id, parent.list!!.indexOf(parent.list!!.selected)))
+                NetworkHandler.CHANNEL.sendToServer(RemoveBranchPacket(parent.actorEntity.id, parent.list!!.indexOf(parent.list!!.selectedEntry)))
             })
             addChild(EditBox(font, x + 50, 0, 20, 20, TextComponent("Priority")))
             // Conditional

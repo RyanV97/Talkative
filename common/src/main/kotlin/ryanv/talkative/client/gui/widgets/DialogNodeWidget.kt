@@ -29,7 +29,7 @@ class DialogNodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: 
     fun serializeNodeAndChildren(): DialogNode {
         val node = serializeNode()
         for(child in children) {
-            node.children.add(child.nodeId)
+            node.addChild(child.nodeId, child.nodeType)
         }
         return node
     }

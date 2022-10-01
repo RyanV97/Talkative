@@ -8,6 +8,7 @@ import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.DialogList
+import ryanv.talkative.common.data.tree.DialogNode
 
 class DialogScreen: Screen(TextComponent("NPC Dialog")) {
 
@@ -22,8 +23,6 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         dialogEntryList!!.renderEntryBackground = false
 
         addButton(dialogEntryList)
-
-        dialogEntryList!!.addChild(DialogEntry(TextComponent("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."), TextComponent("Speaker"), this))
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
@@ -35,13 +34,12 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         fill(poseStack, 0, 0, width, height, 0x66000000)
     }
 
-    fun loadDialog(speaker: TextComponent, dialog: String, responses: ListTag? = null) {
-        dialogEntryList?.addChild(DialogEntry(TextComponent(dialog), speaker, this, false))
-        if(responses != null) {
-            val array: Array<String> = emptyArray()
-            for(tag in responses)
-                array.plus((tag as StringTag).asString)
-            dialogEntryList?.addChild(ResponsesWidget(this, array))
+    fun loadDialog(node: DialogNode, responses: Array<String>?) {
+        //ToDo: Add Speaker to DialogNode
+        val speaker = TextComponent("Speaker")
+        dialogEntryList?.addChild(DialogEntry(TextComponent(node.content), speaker, this, true))
+        if(!responses.isNullOrEmpty()) {
+            dialogEntryList?.addChild(ResponsesWidget(this, responses))
         }
     }
 
