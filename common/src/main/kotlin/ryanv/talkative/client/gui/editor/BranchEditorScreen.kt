@@ -65,6 +65,7 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
         nodeWidgets.forEach {
             branch.nodes[it.nodeId] = it.serializeNodeAndChildren()
         }
+        println(branch.serialize(CompoundTag()))
         NetworkHandler.CHANNEL.sendToServer(UpdateBranchPacket(branchPath, branch.serialize(CompoundTag())))
     }
 

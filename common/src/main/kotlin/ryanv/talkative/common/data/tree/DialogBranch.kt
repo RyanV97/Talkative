@@ -1,17 +1,34 @@
 package ryanv.talkative.common.data.tree
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.common.consts.NBTConstants
 
 class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {
 
     var highestId: Int = 0
     get() {
-        return ++field
+        field += 1
+        return field
     }
 
     fun addNode(node: DialogNode) {
         nodes[node.nodeId] = node
+    }
+
+    fun getChildNodeForPlayer(parentId: Int, player: ServerPlayer): DialogNode? {
+        return getChildNodeForPlayer(nodes[parentId], player)
+    }
+
+    fun getChildNodeForPlayer(parent: DialogNode?, player: ServerPlayer): DialogNode? {
+        var node: DialogNode? = null
+        parent?.getChildren()?.forEach {
+            val child = nodes[it]
+            if(child?.conditional == null) { // || child?.conditional!!.eval()) {
+                node = child
+            }
+        }
+        return node
     }
 
     fun serialize(tag: CompoundTag): CompoundTag {
@@ -20,6 +37,8 @@ class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {
             nodeList.put(id.toString(), node.serialize(CompoundTag()))
         }
         tag.put(NBTConstants.BRANCH_NODES, nodeList)
+        if(nodes.isNotEmpty())
+            tag.putInt(NBTConstants.BRANCH_HIGH_ID, nodes.maxByOrNull { it.key }!!.key)
         return tag
     }
 
@@ -37,7 +56,13 @@ class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {
                 val node = DialogNode.deserialize(nodeList.get(it) as CompoundTag)
                 nodes[id] = node
             }
-            return DialogBranch(nodes)
+            var highestId = 0
+            if(tag.contains(NBTConstants.BRANCH_HIGH_ID)) {
+                highestId = tag.getInt(NBTConstants.BRANCH_HIGH_ID)
+            }
+            val branch = DialogBranch(nodes)
+            branch.highestId = highestId
+            return branch
         }
     }
 }

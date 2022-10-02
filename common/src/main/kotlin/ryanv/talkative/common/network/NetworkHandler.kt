@@ -25,6 +25,7 @@ class NetworkHandler {
             CHANNEL.register(RemoveBranchPacket::class.java, RemoveBranchPacket::encode, ::RemoveBranchPacket, RemoveBranchPacket::process)
             CHANNEL.register(UpdateBranchPacket::class.java, UpdateBranchPacket::encode, ::UpdateBranchPacket, UpdateBranchPacket::process)
             CHANNEL.register(DialogResponsePacket::class.java, DialogResponsePacket::encode, ::DialogResponsePacket, DialogResponsePacket::process)
+            CHANNEL.register(FinishConversationPacket::class.java, FinishConversationPacket::encode, ::FinishConversationPacket, FinishConversationPacket::process)
 
             //Server -> Client
             CHANNEL.register(OpenBranchEditorPacket_S2C::class.java, OpenBranchEditorPacket_S2C::encode, ::OpenBranchEditorPacket_S2C, OpenBranchEditorPacket_S2C::process)

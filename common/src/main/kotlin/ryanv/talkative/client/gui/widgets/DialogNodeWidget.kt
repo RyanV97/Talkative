@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.font.TextFieldHelper
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.editor.BranchEditorScreen
 import ryanv.talkative.client.util.NodePositioner

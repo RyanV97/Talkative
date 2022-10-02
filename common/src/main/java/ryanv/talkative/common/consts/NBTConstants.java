@@ -14,6 +14,7 @@ public class NBTConstants {
     public static final String BRANCH_NODES = "branch_nodes";
     public static final String BRANCH_FILE = "branch_file";
     public static final String BRANCH_PRIORITY = "branch_priority";
+    public static final String BRANCH_HIGH_ID = "branch_highest_id";
 
     public static final String NODE_ID = "node_id";
     public static final String NODE_TYPE = "node_type";

@@ -3,7 +3,9 @@ package ryanv.talkative.common.network.c2s
 import me.shedaniel.architectury.networking.NetworkManager
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
+import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.network.TalkativePacket
+import ryanv.talkative.common.network.s2c.DialogPacket
 import ryanv.talkative.common.util.FileUtil
 import ryanv.talkative.server.ConversationManager
 import java.util.function.Supplier
@@ -22,7 +24,9 @@ class DialogResponsePacket(private val responseId: Int): TalkativePacket {
             if(ConversationManager.isInConversation(player)) {
                 val branch = FileUtil.getBranchFromPath(ConversationManager.getConversation(player)!!.branchPath)
                 if (branch != null && branch.nodes.contains(responseId)) {
-                    val node = branch.nodes[responseId]
+                    val node = branch.getChildNodeForPlayer(responseId, player)
+                    if(node != null)
+                        NetworkHandler.CHANNEL.sendToPlayer(player, DialogPacket(node, node.getResponses(branch)))
                     //ToDo: Continue progressing to next node (via coniditonals eventually)
                 }
             }

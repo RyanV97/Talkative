@@ -8,7 +8,11 @@ import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.DialogList
+import ryanv.talkative.common.data.Response
 import ryanv.talkative.common.data.tree.DialogNode
+import ryanv.talkative.common.network.NetworkHandler
+import ryanv.talkative.common.network.c2s.DialogResponsePacket
+import ryanv.talkative.common.network.c2s.FinishConversationPacket
 
 class DialogScreen: Screen(TextComponent("NPC Dialog")) {
 
@@ -34,7 +38,7 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         fill(poseStack, 0, 0, width, height, 0x66000000)
     }
 
-    fun loadDialog(node: DialogNode, responses: Array<String>?) {
+    fun loadDialog(node: DialogNode, responses: List<Response>?) {
         //ToDo: Add Speaker to DialogNode
         val speaker = TextComponent("Speaker")
         dialogEntryList?.addChild(DialogEntry(TextComponent(node.content), speaker, this, true))
@@ -43,9 +47,10 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         }
     }
 
-    fun onResponse(response: String) {
+    fun onResponse(response: Response) {
         dialogEntryList?.remove(dialogEntryList!!.getSize() - 1)
-        dialogEntryList?.addChild(DialogEntry(TextComponent(response), TextComponent("Player"), this, false))
+        dialogEntryList?.addChild(DialogEntry(TextComponent(response.contents), TextComponent("Player"), this, false))
+        NetworkHandler.CHANNEL.sendToServer(DialogResponsePacket(response.id))
     }
 
     override fun tick() {
@@ -55,6 +60,11 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
             }
             pendingTasks.clear()
         }
+    }
+
+    override fun onClose() {
+        NetworkHandler.CHANNEL.sendToServer(FinishConversationPacket())
+        super.onClose()
     }
 
     class DialogEntry(val contents: TextComponent, val speaker: TextComponent, val parentScreen: DialogScreen, val speakerOnRight: Boolean = true): NestedWidget(0, 0, 0, 0, null) {
@@ -77,10 +87,10 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
         }
     }
 
-    class ResponsesWidget(val parent: DialogScreen, responses: Array<String>): NestedWidget(0, 0, 0, 10 + responses.size * 21, null) {
+    class ResponsesWidget(val parent: DialogScreen, responses: List<Response>): NestedWidget(0, 0, 0, 10 + responses.size * 21, null) {
         init {
             for(response in responses) {
-                addChild(Button((width / 2) - 50, height - 30, 150, 20, TextComponent(response)) {
+                addChild(Button((width / 2) - 50, height - 30, 150, 20, TextComponent(response.contents)) {
                     parent.pendingTasks.add {
                         parent.onResponse(response)
                     }

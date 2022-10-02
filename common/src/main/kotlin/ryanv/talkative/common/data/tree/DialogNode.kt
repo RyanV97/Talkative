@@ -3,6 +3,7 @@ package ryanv.talkative.common.data.tree
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntArrayTag
 import ryanv.talkative.common.consts.NBTConstants
+import ryanv.talkative.common.data.Response
 import ryanv.talkative.common.data.conditional.Conditional
 
 class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String = "Hello World", var conditional: Conditional? = null, val nodeId: Int) {
@@ -29,13 +30,13 @@ class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String =
         return childType
     }
 
-    fun getResponses(branch: DialogBranch): Array<String>? {
+    fun getResponses(branch: DialogBranch): List<Response>? {
         if(childType != NodeType.Response)
             return null
-        var list: Array<String> = emptyArray()
+        var list = ArrayList<Response>()
         children.forEach {
             //ToDo: Conditional Check
-            list = list.plus(branch.nodes[it]!!.content)
+            list.add(Response(it, branch.nodes[it]!!.content))
         }
         return list
     }
