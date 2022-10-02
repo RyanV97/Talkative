@@ -18,6 +18,7 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
     var selectedEntry: StringSelectionList.StringEntry? = null
 
     override fun init() {
+        super.init()
         var listRight = width - (width / 3)
         list = addWidget(StringSelectionList(minecraft, 0, height, 0, listRight, ::onSelectionChange))
 

@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component
 //Original Code provided by DenimRed - https://github.com/DenimRed/
 open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Component?) :
     AbstractWidget(x, y, width, height, title) {
-    protected val children: MutableList<AbstractWidget> = ArrayList()
+    val children: MutableList<AbstractWidget> = ArrayList()
     protected var maxWidth = Int.MAX_VALUE
         set(value) {
             field = value
@@ -25,6 +25,8 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
         } else {
             children.add(child)
         }
+        if(child is NestedWidget)
+            child.recalculateChildren()
         return child
     }
 

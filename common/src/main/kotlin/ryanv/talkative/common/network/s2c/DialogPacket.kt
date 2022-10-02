@@ -38,7 +38,7 @@ class DialogPacket(val node: DialogNode, var responses: List<Response>?): Talkat
         }
 
         private fun decodeResponses(tag: CompoundTag): List<Response>? {
-            var responses = ArrayList<Response>()
+            val responses = ArrayList<Response>()
             if(tag.contains("list")) {
                 val list = tag.getList("list", 10)
                 list.forEach {

@@ -28,6 +28,7 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     var selectedNode: DialogNodeWidget? = null
 
     override fun init() {
+        super.init()
         rootNodeWidget = branch.nodes[0]?.let { loadNodeAndChildren(it) }
         NodePositioner.layoutTree(rootNodeWidget!!)
 

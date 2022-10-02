@@ -9,12 +9,14 @@ import ryanv.talkative.common.network.bi.SyncBranchListPacket
 import ryanv.talkative.common.network.c2s.*
 import ryanv.talkative.common.network.s2c.DialogPacket
 import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
+import ryanv.talkative.common.network.s2c.OpenConditionalEditorPacket
 
 class NetworkHandler {
     companion object {
         val CHANNEL: NetworkChannel = NetworkChannel.create(ResourceLocation(Talkative.MOD_ID, "main"))
 
         fun init() {
+            //ToDo: Check all these for permission checks v
             //Bi-directional
             CHANNEL.register(CreateBranchPacket::class.java, CreateBranchPacket::encode, ::CreateBranchPacket, CreateBranchPacket::process)
             CHANNEL.register(SyncBranchListPacket::class.java, SyncBranchListPacket::encode, ::SyncBranchListPacket, SyncBranchListPacket::process)
@@ -25,11 +27,13 @@ class NetworkHandler {
             CHANNEL.register(RemoveBranchPacket::class.java, RemoveBranchPacket::encode, ::RemoveBranchPacket, RemoveBranchPacket::process)
             CHANNEL.register(UpdateBranchPacket::class.java, UpdateBranchPacket::encode, ::UpdateBranchPacket, UpdateBranchPacket::process)
             CHANNEL.register(DialogResponsePacket::class.java, DialogResponsePacket::encode, ::DialogResponsePacket, DialogResponsePacket::process)
+            CHANNEL.register(UpdateConditionalPacket::class.java, UpdateConditionalPacket::encode, ::UpdateConditionalPacket, UpdateConditionalPacket::process)
             CHANNEL.register(FinishConversationPacket::class.java, FinishConversationPacket::encode, ::FinishConversationPacket, FinishConversationPacket::process)
 
             //Server -> Client
             CHANNEL.register(OpenBranchEditorPacket_S2C::class.java, OpenBranchEditorPacket_S2C::encode, ::OpenBranchEditorPacket_S2C, OpenBranchEditorPacket_S2C::process)
             CHANNEL.register(OpenActorEditorPacket::class.java, OpenActorEditorPacket::encode, ::OpenActorEditorPacket, OpenActorEditorPacket::process)
+            CHANNEL.register(OpenConditionalEditorPacket::class.java, OpenConditionalEditorPacket::encode, ::OpenConditionalEditorPacket, OpenConditionalEditorPacket::process)
             CHANNEL.register(DialogPacket::class.java, DialogPacket::encode, ::DialogPacket, DialogPacket::process)
         }
     }

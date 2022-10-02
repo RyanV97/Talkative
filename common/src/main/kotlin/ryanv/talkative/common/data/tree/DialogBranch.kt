@@ -2,6 +2,7 @@ package ryanv.talkative.common.data.tree
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
+import ryanv.talkative.api.IConditional
 import ryanv.talkative.common.consts.NBTConstants
 
 class DialogBranch(var nodes: HashMap<Int, DialogNode> = HashMap()) {

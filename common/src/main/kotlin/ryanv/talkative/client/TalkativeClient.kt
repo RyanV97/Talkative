@@ -1,6 +1,7 @@
 package ryanv.talkative.client
 
 import net.minecraft.client.Minecraft
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
@@ -10,6 +11,7 @@ import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
 import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
 import ryanv.talkative.client.gui.editor.BranchEditorScreen
+import ryanv.talkative.client.gui.editor.ConditionalEditorScreen
 import ryanv.talkative.common.data.Actor
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
@@ -33,6 +35,10 @@ class TalkativeClient {
             if(Minecraft.getInstance().screen is ActorEditorScreen)
                 parent = Minecraft.getInstance().screen as ActorEditorScreen
             Minecraft.getInstance().setScreen(BranchEditorScreen(parent, path, branch))
+        }
+
+        fun openConditionalEditor(actorId: Int, holderData: CompoundTag) {
+            Minecraft.getInstance().setScreen(ConditionalEditorScreen(Minecraft.getInstance().screen, actorId, holderData))
         }
 
         fun loadBranchList(list: ListTag?) {

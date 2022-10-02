@@ -23,7 +23,13 @@ public class NBTConstants {
     public static final String NODE_CHILD_TYPE = "node_child_type";
 
     public static final String CONDITIONAL = "conditional";
+    public static final String CONDITIONAL_PRIORITY = "priority";
     public static final String CONDITIONAL_EXPRESSIONS = "expressions";
-    public static final String EXPRESSION_TYPE = "type";
+    public static final String CONDITIONAL_HOLDER_TYPE = "type";
+    public static final String CONDITIONAL_HOLDER_BRANCH = "branch_path";
+    public static final String CONDITIONAL_HOLDER_ID = "id";
+    public static final String EXPRESSION_PROP = "property";
+    public static final String EXPRESSION_VALUE = "value";
+    public static final String EXPRESSION_OPERATION = "operation";
 
 }

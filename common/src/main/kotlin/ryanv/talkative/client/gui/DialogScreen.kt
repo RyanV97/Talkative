@@ -20,6 +20,7 @@ class DialogScreen: Screen(TextComponent("NPC Dialog")) {
     private val pendingTasks = ArrayList<Runnable>()
 
     override fun init() {
+        super.init()
         val mid = width / 2
         val listWidth = width - (width / 2)
         dialogEntryList = DialogList(this, mid - (listWidth / 2), 0, listWidth, height, height)

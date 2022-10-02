@@ -12,6 +12,7 @@ import ryanv.talkative.common.network.s2c.DialogPacket
 import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
 import ryanv.talkative.common.util.FileUtil
 import ryanv.talkative.server.ConversationManager
+import java.awt.TextComponent
 
 class EntityEventHandler {
 

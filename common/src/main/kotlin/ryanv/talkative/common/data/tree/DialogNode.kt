@@ -2,11 +2,12 @@ package ryanv.talkative.common.data.tree
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntArrayTag
+import ryanv.talkative.api.IConditional
 import ryanv.talkative.common.consts.NBTConstants
 import ryanv.talkative.common.data.Response
 import ryanv.talkative.common.data.conditional.Conditional
 
-class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String = "Hello World", var conditional: Conditional? = null, val nodeId: Int) {
+class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String = "Hello World", private var conditional: Conditional? = null, val nodeId: Int): IConditional {
     private var children: ArrayList<Int> = ArrayList()
     private var childType: NodeType? = null
 
@@ -28,6 +29,18 @@ class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String =
 
     fun getChildType(): NodeType? {
         return childType
+    }
+
+    override fun getConditionalType(): IConditional.Type {
+        return IConditional.Type.NODE
+    }
+
+    override fun getConditional(): Conditional? {
+        return conditional
+    }
+
+    fun setConditional(field: Conditional) {
+        conditional = field
     }
 
     fun getResponses(branch: DialogBranch): List<Response>? {
@@ -73,5 +86,14 @@ class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String =
     }
 
     enum class NodeType { Dialog, Response }
+
+    override fun getData(): CompoundTag {
+        val tag = CompoundTag()
+        tag.putString(NBTConstants.CONDITIONAL_HOLDER_TYPE, conditionalType.toString())
+        tag.putInt(NBTConstants.CONDITIONAL_HOLDER_ID, nodeId)
+        if(conditional != null)
+            tag.put(NBTConstants.CONDITIONAL, conditional!!.serialize(CompoundTag()))
+        return tag
+    }
 
 }

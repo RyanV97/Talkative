@@ -1,63 +1,54 @@
 package ryanv.talkative.common.data.conditional
 
 import net.minecraft.nbt.CompoundTag
-import ryanv.talkative.common.data.tree.DialogContext
+import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.common.consts.NBTConstants
 
 abstract class Expression {
-
-    abstract val type: Int
     val not: Boolean = false
     val or: Boolean = false
 
-    abstract fun eval(context: DialogContext): Boolean
+    abstract fun eval(player: ServerPlayer): Boolean
 
-    class GenericExpression(val valueA: Comparable<Any>, val valueB: Comparable<Any>, val operation: Operation): Expression() {
-        override val type: Int = 0
-        override fun eval(context: DialogContext): Boolean {
-            return when(operation) {
-                Operation.LESS_THAN -> valueA < valueB
-                Operation.LESS_EQUAL -> valueA <= valueB
-                Operation.EQUALS -> valueA == valueB
-                Operation.GREATER_EQUAL -> valueA >= valueB
-                Operation.GREATER_THAN -> valueA > valueB
-                else -> false
+    class IntExpression(val propertyName: String, val valueB: Int, val operation: Operation): Expression() {
+        override fun eval(player: ServerPlayer): Boolean {
+            val scoreboard = player.scoreboard
+            if(scoreboard.hasObjective(propertyName)) {
+                println("Scoreboard has Objective")
+                val objective = scoreboard.getObjective(propertyName)
+                if(scoreboard.hasPlayerScore(player.scoreboardName, objective)) {
+                    println("Scoreboard has Score")
+                    val valueA = scoreboard.getOrCreatePlayerScore(player.scoreboardName, scoreboard.getObjective(propertyName)).score
+                    println("ValA: $valueA - $operation - ValB: $valueB")
+                    return when (operation) {
+                        Operation.LESS_THAN -> valueA < valueB
+                        Operation.LESS_EQUAL -> valueA <= valueB
+                        Operation.EQUALS -> valueA == valueB
+                        Operation.GREATER_EQUAL -> valueA >= valueB
+                        Operation.GREATER_THAN -> valueA > valueB
+                        else -> false
+                    }
+                }
             }
+            return false
         }
-    }
 
-    class StringExpression(val valueA: String = "", val valueB: String = "", val operation: Operation): Expression() {
-        override val type: Int = 1
-        override fun eval(context: DialogContext): Boolean {
-            return when(operation) {
-                Operation.EQUALS -> valueA == valueB
-                Operation.CONTAINS -> valueA.contains(valueB, ignoreCase = false)
-                Operation.CONTAINS_IGNORE -> valueA.contains(valueB, ignoreCase = true)
-                else -> false
+        fun serialize(tag: CompoundTag): CompoundTag {
+            tag.putString(NBTConstants.EXPRESSION_PROP, propertyName)
+            tag.putInt(NBTConstants.EXPRESSION_VALUE, valueB)
+            tag.putString(NBTConstants.EXPRESSION_OPERATION, operation.toString())
+            return tag
+        }
+
+        companion object {
+            fun deserialize(tag: CompoundTag): IntExpression? {
+                return IntExpression(tag.getString(NBTConstants.EXPRESSION_PROP), tag.getInt(NBTConstants.EXPRESSION_VALUE), Operation.valueOf(tag.getString(NBTConstants.EXPRESSION_OPERATION)))
             }
         }
     }
 
     enum class Operation {
         EQUALS, LESS_THAN, LESS_EQUAL, GREATER_THAN, GREATER_EQUAL, CONTAINS, CONTAINS_IGNORE
-    }
-
-    fun serialize(tag: CompoundTag): CompoundTag {
-        tag.putInt(NBTConstants.EXPRESSION_TYPE, this.type)
-        return tag
-    }
-
-    companion object {
-        fun deserialize(tag: CompoundTag): Expression? {
-            var expression: Expression? = null
-
-            when (tag.getInt(NBTConstants.EXPRESSION_TYPE)) {
-                //0 -> expression = GenericExpression()
-                //1 -> expression = StringExpression()
-            }
-
-            return expression
-        }
     }
 
 }

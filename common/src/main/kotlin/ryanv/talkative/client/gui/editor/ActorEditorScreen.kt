@@ -8,6 +8,8 @@ import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.world.entity.LivingEntity
+import ryanv.talkative.api.IConditional
+import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.TalkativeList
@@ -18,6 +20,7 @@ import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.network.bi.OpenBranchEditorPacket_C2S
 import ryanv.talkative.common.network.c2s.AddBranchPacket
 import ryanv.talkative.common.network.c2s.RemoveBranchPacket
+import ryanv.talkative.common.network.s2c.OpenConditionalEditorPacket
 
 class ActorEditorScreen(val actorEntity: LivingEntity, val actor: Actor? = null): TalkativeScreen(null, TextComponent("Actor Editor")) {
     private var list: TalkativeList<BranchListEntry>? = null
@@ -127,12 +130,13 @@ class ActorEditorScreen(val actorEntity: LivingEntity, val actor: Actor? = null)
             addChild(Button(x, 0, 50, 20, TextComponent("Edit")) {
                 NetworkHandler.CHANNEL.sendToServer(OpenBranchEditorPacket_C2S(branch!!.fileString))
             })
+            addChild(Button(x, 40, 100, 20, TextComponent("Edit Conditional")) {
+                val holderData = (branch as IConditional).data
+                NetworkHandler.CHANNEL.sendToServer(OpenConditionalEditorPacket(parent.actorEntity.id, holderData))
+            })
             addChild(Button(x, 20, 50, 20, TextComponent("Remove")) {
                 NetworkHandler.CHANNEL.sendToServer(RemoveBranchPacket(parent.actorEntity.id, parent.list!!.indexOf(parent.list!!.selectedEntry)))
             })
-            addChild(EditBox(font, x + 50, 0, 20, 20, TextComponent("Priority")))
-            // Conditional
-            //            conditionalList.add()
         }
     }
 }
