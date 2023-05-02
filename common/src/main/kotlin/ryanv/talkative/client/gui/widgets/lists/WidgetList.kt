@@ -33,9 +33,9 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
                 }
             }
         }
-    protected var scrollBarWidth = 8
-    protected var scrollBarLeft = false
-    protected var scrolling = false
+    private var scrollBarWidth = 8
+    private var scrollBarLeft = false
+    private var scrolling = false
 
     var renderBackground: Boolean = true
     var renderEntryBackground: Boolean = true
@@ -65,7 +65,7 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
 
     override fun recalculateChildren() {
         totalHeight = 0
-        for(child in children) {
+        for (child in children) {
             adjustChild(child)
             totalHeight += child.height
         }
@@ -165,19 +165,18 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        if(renderBackground)
+        if (renderBackground)
             fill(poseStack, x, y, x + width, y + height, 0x66000000)
-        if(totalHeight > height)
+        if (totalHeight > height)
             renderScrollBar(poseStack)
         ScissorUtil.start(x, y, width, height)
         var i = 0
         val size: Int = children.size
         while (i < size) {
             val child: AbstractWidget = children.get(i)
-            GuiComponent.drawString(poseStack, Minecraft.getInstance().font, "${child.y}", x - 20, child.y, 0xFFFFFF)
             if (isWidgetWithin(child)) {
                 val color = Color.HSBtoRGB(0.0f, 0.0f, if (i % 2 == 0) 0.1f else 0.2f) and 0x66FFFFFF
-                if(renderEntryBackground)
+                if (renderEntryBackground)
                     fill(poseStack, x, child.y, x + width, child.y + child.height, color)
             }
             i++

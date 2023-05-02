@@ -1,27 +1,12 @@
 package ryanv.talkative.common.data.tree
 
 import net.minecraft.nbt.CompoundTag
-import ryanv.talkative.api.IConditional
 import ryanv.talkative.common.data.conditional.Conditional
-import ryanv.talkative.common.consts.NBTConstants
+import ryanv.talkative.common.util.NBTConstants
 
-class BranchReference(var fileString: String, var branchPriority: Int = 0, private var conditional: Conditional? = null): IConditional {
-
-    override fun getConditionalType(): IConditional.Type {
-        return IConditional.Type.BRANCH
-    }
-
-    fun setConditional(value: Conditional) {
-        this.conditional = value
-    }
-
-    override fun getConditional(): Conditional? {
-        return conditional
-    }
-
-    override fun getData(): CompoundTag {
+class BranchReference(var fileString: String, var branchPriority: Int = 0, var conditional: Conditional? = null) {
+    fun getData(): CompoundTag {
         val tag = CompoundTag()
-        tag.putString(NBTConstants.CONDITIONAL_HOLDER_TYPE, conditionalType.toString())
         tag.putString(NBTConstants.CONDITIONAL_HOLDER_BRANCH, fileString)
         if(conditional != null)
             tag.put(NBTConstants.CONDITIONAL, conditional!!.serialize(CompoundTag()))

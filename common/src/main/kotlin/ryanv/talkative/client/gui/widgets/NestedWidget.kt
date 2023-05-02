@@ -15,6 +15,7 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
             field = value
             setWidth(width)
         }
+
     protected fun <T : AbstractWidget> addChild(child: T): T {
         return this.addChild(child, false)
     }
@@ -25,7 +26,7 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
         } else {
             children.add(child)
         }
-        if(child is NestedWidget)
+        if (child is NestedWidget)
             child.recalculateChildren()
         return child
     }
@@ -41,6 +42,12 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
     protected fun swapChild(oldChild: AbstractWidget, newChild: AbstractWidget) {
         children.remove(oldChild)
         children.add(newChild)
+    }
+
+    fun setPos(x: Int, y: Int) {
+        this.x = x
+        this.y = y
+        recalculateChildren()
     }
 
     fun setX(x: Int) {

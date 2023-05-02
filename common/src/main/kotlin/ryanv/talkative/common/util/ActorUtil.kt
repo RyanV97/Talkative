@@ -1,27 +1,26 @@
 package ryanv.talkative.common.util
 
 import net.minecraft.nbt.CompoundTag
-import ryanv.talkative.api.IActorEntity
-import ryanv.talkative.common.data.Actor
-import ryanv.talkative.common.consts.NBTConstants
+import ryanv.talkative.api.ActorEntity
+import ryanv.talkative.common.data.ServerActorData
 
 object ActorUtil {
 
     @JvmStatic
-    fun serialize(entityData: IActorEntity, tag: CompoundTag) {
+    fun serialize(entityData: ActorEntity, tag: CompoundTag) {
         tag.putInt(NBTConstants.ACTOR_DATA_VERSION, 1)
         entityData.actorData.serialize(tag)
     }
 
     @JvmStatic
-    fun deserialize(entityData: IActorEntity, tag: CompoundTag?) {
-        val data = Actor.deserialize(tag!!)
+    fun deserialize(entityData: ActorEntity, tag: CompoundTag?) {
+        val data = ServerActorData.deserialize(tag!!)
         entityData.actorData = data
     }
 
     @JvmStatic
-    fun legacyDeserialize(entityData: IActorEntity, tag: CompoundTag?) {
-        val data = Actor()
+    fun legacyDeserialize(entityData: ActorEntity, tag: CompoundTag?) {
+        val data = ServerActorData()
 
         //Load Old Data
         entityData.actorData = data

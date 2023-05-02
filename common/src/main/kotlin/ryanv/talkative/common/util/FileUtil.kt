@@ -1,8 +1,9 @@
 package ryanv.talkative.common.util
 
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtIo
-import ryanv.talkative.common.consts.NBTConstants
+import net.minecraft.nbt.StringTag
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
 import java.io.File
@@ -38,6 +39,14 @@ object FileUtil {
         return paths
     }
 
+    fun getBranchListCompound(): CompoundTag {
+        val tag = CompoundTag()
+        val list = ListTag()
+        getBranchFilePaths().forEach { list.add(StringTag.valueOf(it)) }
+        tag.put("branchList", list)
+        return tag
+    }
+
     fun getBranchFromPath(path: String): DialogBranch? {
         return getBranchDataFromPath(path)?.let { DialogBranch.deserialize(it) }
     }
@@ -52,5 +61,9 @@ object FileUtil {
     fun saveBranchData(path: String, data: CompoundTag) {
         val file = File(DIR_BRANCH.toFile(), "$path.branch")
         NbtIo.writeCompressed(data, file)
+    }
+
+    fun deleteBranchAtPath(path: String) {
+        //ToDo Delete Branch File
     }
 }

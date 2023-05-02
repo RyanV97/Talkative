@@ -6,15 +6,12 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.network.chat.TextComponent
-import ryanv.talkative.api.IConditional
 import ryanv.talkative.client.gui.TalkativeScreen
-import ryanv.talkative.client.gui.widgets.ConditionalWidget
+import ryanv.talkative.client.gui.editor.widgets.ConditionalWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
-import ryanv.talkative.common.consts.NBTConstants
-import ryanv.talkative.common.data.conditional.Conditional
-import ryanv.talkative.common.data.conditional.Expression
+import ryanv.talkative.common.util.NBTConstants
 import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.c2s.UpdateConditionalPacket
+import ryanv.talkative.common.network.serverbound.UpdateConditionalPacket
 
 class ConditionalEditorScreen(parent: Screen?, val actorId: Int, val holderData: CompoundTag): TalkativeScreen(parent, TextComponent("Conditional Editor")) {
     private var priorityBox: EditBox? = null
@@ -45,7 +42,7 @@ class ConditionalEditorScreen(parent: Screen?, val actorId: Int, val holderData:
 
     fun onSave() {
         holderData.put(NBTConstants.CONDITIONAL, serializeConditional(CompoundTag()))
-        NetworkHandler.CHANNEL.sendToServer(UpdateConditionalPacket(actorId, holderData))
+        UpdateConditionalPacket(actorId, holderData).sendToServer()
     }
 
     fun serializeConditional(tag: CompoundTag): CompoundTag {

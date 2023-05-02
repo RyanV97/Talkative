@@ -4,7 +4,15 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ObjectSelectionList
 
-open class TalkativeList<out E: TalkativeList.TalkativeListEntry>(val minecraft: Minecraft?, top: Int, height: Int, left: Int, width: Int, entryHeight: Int = minecraft!!.font.lineHeight + 7): ObjectSelectionList<TalkativeList.TalkativeListEntry>(minecraft, width, height, top, top + height, entryHeight) {
+open class TalkativeList<out E : TalkativeList.TalkativeListEntry>(
+    val minecraft: Minecraft?,
+    top: Int,
+    height: Int,
+    left: Int,
+    width: Int,
+    entryHeight: Int = minecraft!!.font.lineHeight + 7,
+    private val entryWidth: Int = width - 10
+) : ObjectSelectionList<TalkativeList.TalkativeListEntry>(minecraft, width, height, top, top + height, entryHeight) {
 
     var selectedEntry: TalkativeListEntry? = null
     var enableBackground: Boolean = true
@@ -13,10 +21,6 @@ open class TalkativeList<out E: TalkativeList.TalkativeListEntry>(val minecraft:
         setRenderBackground(false)
         setRenderTopAndBottom(false)
         setLeftPos(left)
-    }
-
-    override fun getScrollbarPosition(): Int {
-        return rowRight - 6
     }
 
     override fun renderBackground(poseStack: PoseStack?) {
@@ -34,6 +38,18 @@ open class TalkativeList<out E: TalkativeList.TalkativeListEntry>(val minecraft:
                 return index
         }
         return -1
+    }
+
+    override fun getScrollbarPosition(): Int {
+        return rowRight
+    }
+
+    override fun getRowLeft(): Int {
+        return x0 + width / 2 - this.rowWidth / 2
+    }
+
+    override fun getRowWidth(): Int {
+        return entryWidth
     }
 
     abstract class TalkativeListEntry(val minecraft: Minecraft, val parent: TalkativeList<TalkativeListEntry>, private var onSelectionChange: ((selection: TalkativeListEntry) -> Unit?)?): Entry<TalkativeListEntry>() {

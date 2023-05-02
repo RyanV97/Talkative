@@ -3,7 +3,6 @@ package ryanv.talkative.common.data
 import net.minecraft.nbt.CompoundTag
 
 class Response(val id: Int, val contents: String) {
-
     fun serialize(tag: CompoundTag): CompoundTag {
         tag.putInt("id", id)
         tag.putString("contents", contents)
@@ -15,5 +14,4 @@ class Response(val id: Int, val contents: String) {
             return Response(tag.getInt("id"), tag.getString("contents"))
         }
     }
-
 }

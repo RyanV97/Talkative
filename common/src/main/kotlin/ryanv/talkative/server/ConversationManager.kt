@@ -1,28 +1,30 @@
 package ryanv.talkative.server
 
 import net.minecraft.server.level.ServerPlayer
-import ryanv.talkative.api.IActorEntity
-import ryanv.talkative.common.data.tree.DialogNode
-import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.s2c.DialogPacket
+import ryanv.talkative.api.ActorEntity
+import ryanv.talkative.common.data.ServerActorData
+import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.util.FileUtil
+import ryanv.talkative.common.util.RefCountMap
 import java.util.UUID
 
 object ConversationManager {
     private val conversations = HashMap<UUID, Conversation>()
+    private val loadedBranches = RefCountMap<String, DialogBranch>()
 
-    fun startConversation(player: ServerPlayer, actor: IActorEntity) {
-        if(isInConversation(player))
+    fun startConversation(player: ServerPlayer, actor: ActorEntity) {
+        if (isInConversation(player))
             return
-        val branchRef = actor.actorData.getBranchForPlayer(player)
-        if (branchRef != null) {
-            val branch = FileUtil.getBranchFromPath(branchRef.fileString)
+
+        (actor.actorData as ServerActorData).getBranchForPlayer(player)?.let { branchRef ->
+            val branch = loadedBranches[branchRef.fileString] ?: loadBranch(branchRef.fileString)
             if (branch != null) {
-                val rootNode = branch.nodes[0]
-                val responses = rootNode!!.getResponses(branch)
-                val conversation = Conversation(branchRef.fileString)
+                val conversation = Conversation(player, actor, branchRef.fileString)
                 conversations[player.uuid] = conversation
-                conversation.progressConversation(player, rootNode, responses)
+                conversation.startConversation()
+            }
+            else {
+                //Branch Not Found or failed to create. Throw Error or Exception?
             }
         }
     }
@@ -36,6 +38,25 @@ object ConversationManager {
     }
 
     fun endConversation(player: ServerPlayer) {
-        conversations.remove(player.uuid)?.end(player)
+        conversations.remove(player.uuid)?.let {
+            endConversation(player)
+            unregisterBranchReference(it.getBranchPath(), it)
+        }
+    }
+
+    private fun loadBranch(path: String): RefCountMap.ReferenceValue<DialogBranch>? {
+        FileUtil.getBranchFromPath(path)?.let {
+            loadedBranches.put(path, it)
+            return loadedBranches[path]
+        }
+        return null
+    }
+
+    fun registerBranchReference(path: String, reference: Any): (() -> DialogBranch)? {
+        return loadedBranches.registerReference(path, reference)
+    }
+
+    fun unregisterBranchReference(path: String, reference: Any) {
+        loadedBranches.unregisterReference(path, reference)
     }
 }

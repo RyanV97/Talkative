@@ -1,40 +1,61 @@
 package ryanv.talkative.common.network
 
 import me.shedaniel.architectury.networking.NetworkChannel
+import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.Talkative
-import ryanv.talkative.common.network.bi.OpenBranchEditorPacket_C2S
-import ryanv.talkative.common.network.bi.OpenBranchEditorPacket_S2C
-import ryanv.talkative.common.network.bi.SyncBranchListPacket
-import ryanv.talkative.common.network.c2s.*
-import ryanv.talkative.common.network.s2c.DialogPacket
-import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
-import ryanv.talkative.common.network.s2c.OpenConditionalEditorPacket
+import ryanv.talkative.common.network.clientbound.SyncBranchListPacket
+import ryanv.talkative.common.network.clientbound.DialogPacket
+import ryanv.talkative.common.network.clientbound.OpenActorEditorPacket
+import ryanv.talkative.common.network.clientbound.OpenBranchEditorPacket
+import ryanv.talkative.common.network.clientbound.OpenConditionalEditorPacket
+import ryanv.talkative.common.network.serverbound.*
+import ryanv.talkative.common.network.serverbound.RequestBranchForEditPacket
 
-class NetworkHandler {
-    companion object {
-        val CHANNEL: NetworkChannel = NetworkChannel.create(ResourceLocation(Talkative.MOD_ID, "main"))
+object NetworkHandler {
+    private val CHANNEL: NetworkChannel = NetworkChannel.create(ResourceLocation(Talkative.MOD_ID, "network"))
 
-        fun init() {
-            //ToDo: Check all these for permission checks v
-            //Bi-directional
-            CHANNEL.register(CreateBranchPacket::class.java, CreateBranchPacket::encode, ::CreateBranchPacket, CreateBranchPacket::process)
-            CHANNEL.register(SyncBranchListPacket::class.java, SyncBranchListPacket::encode, ::SyncBranchListPacket, SyncBranchListPacket::process)
+    fun init() {
+        //Serverbound
+        CHANNEL.register(AttachBranchPacket::class.java, AttachBranchPacket::encode, ::AttachBranchPacket, ServerPacketHandler::processPacket)
+        CHANNEL.register(DialogResponsePacket::class.java, DialogResponsePacket::encode, ::DialogResponsePacket, ServerPacketHandler::processPacket)
+        CHANNEL.register(FinishConversationPacket::class.java, FinishConversationPacket::encode, ::FinishConversationPacket,ServerPacketHandler::processPacket)
+        CHANNEL.register(RequestBranchForEditPacket::class.java, RequestBranchForEditPacket::encode, ::RequestBranchForEditPacket, ServerPacketHandler::processPacket)
+        CHANNEL.register(UpdateBranchPacket::class.java, UpdateBranchPacket::encode, ::UpdateBranchPacket, ServerPacketHandler::processPacket)
+        CHANNEL.register(UpdateConditionalPacket::class.java, UpdateConditionalPacket::encode, ::UpdateConditionalPacket, ServerPacketHandler::processPacket)
+        CHANNEL.register(UnAttachBranchPacket::class.java, UnAttachBranchPacket::encode, ::UnAttachBranchPacket, ServerPacketHandler::processPacket)
+        CHANNEL.register(RequestBranchListPacket::class.java, RequestBranchListPacket::encode, ::RequestBranchListPacket, ServerPacketHandler::processPacket)
 
-            //Client -> Server
-            CHANNEL.register(OpenBranchEditorPacket_C2S::class.java, OpenBranchEditorPacket_C2S::encode, ::OpenBranchEditorPacket_C2S, OpenBranchEditorPacket_C2S::process)
-            CHANNEL.register(AddBranchPacket::class.java, AddBranchPacket::encode, ::AddBranchPacket, AddBranchPacket::process)
-            CHANNEL.register(RemoveBranchPacket::class.java, RemoveBranchPacket::encode, ::RemoveBranchPacket, RemoveBranchPacket::process)
-            CHANNEL.register(UpdateBranchPacket::class.java, UpdateBranchPacket::encode, ::UpdateBranchPacket, UpdateBranchPacket::process)
-            CHANNEL.register(DialogResponsePacket::class.java, DialogResponsePacket::encode, ::DialogResponsePacket, DialogResponsePacket::process)
-            CHANNEL.register(UpdateConditionalPacket::class.java, UpdateConditionalPacket::encode, ::UpdateConditionalPacket, UpdateConditionalPacket::process)
-            CHANNEL.register(FinishConversationPacket::class.java, FinishConversationPacket::encode, ::FinishConversationPacket, FinishConversationPacket::process)
+        //Clientbound
+        CHANNEL.register(DialogPacket::class.java, DialogPacket::encode, ::DialogPacket, ClientPacketHandler::processPacket)
+        CHANNEL.register(OpenActorEditorPacket::class.java, OpenActorEditorPacket::encode, ::OpenActorEditorPacket, ClientPacketHandler::processPacket)
+        CHANNEL.register(OpenBranchEditorPacket::class.java, OpenBranchEditorPacket::encode, ::OpenBranchEditorPacket, ClientPacketHandler::processPacket)
+        CHANNEL.register(OpenConditionalEditorPacket::class.java, OpenConditionalEditorPacket::encode, ::OpenConditionalEditorPacket, ClientPacketHandler::processPacket)
+        CHANNEL.register(SyncBranchListPacket::class.java, SyncBranchListPacket::encode, ::SyncBranchListPacket, ClientPacketHandler::processPacket)
+    }
 
-            //Server -> Client
-            CHANNEL.register(OpenBranchEditorPacket_S2C::class.java, OpenBranchEditorPacket_S2C::encode, ::OpenBranchEditorPacket_S2C, OpenBranchEditorPacket_S2C::process)
-            CHANNEL.register(OpenActorEditorPacket::class.java, OpenActorEditorPacket::encode, ::OpenActorEditorPacket, OpenActorEditorPacket::process)
-            CHANNEL.register(OpenConditionalEditorPacket::class.java, OpenConditionalEditorPacket::encode, ::OpenConditionalEditorPacket, OpenConditionalEditorPacket::process)
-            CHANNEL.register(DialogPacket::class.java, DialogPacket::encode, ::DialogPacket, DialogPacket::process)
+    interface TalkativePacket {
+        fun encode(buf: FriendlyByteBuf)
+
+        interface ServerboundTalkativePacket : TalkativePacket {
+            fun sendToServer() {
+                CHANNEL.sendToServer(this)
+            }
+
+            fun permissionCheck(player: ServerPlayer): Boolean
+        }
+
+        interface ClientboundTalkativePacket : TalkativePacket {
+            fun sendToPlayer(player: ServerPlayer) {
+                CHANNEL.sendToPlayer(player, this)
+            }
+
+            fun sendToPlayers(players: Collection<ServerPlayer>) {
+                players.forEach {
+                    CHANNEL.sendToPlayer(it, this)
+                }
+            }
         }
     }
 }

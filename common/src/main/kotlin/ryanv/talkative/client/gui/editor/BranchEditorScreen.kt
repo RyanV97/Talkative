@@ -8,13 +8,13 @@ import net.minecraft.client.gui.components.Button
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.TalkativeScreen
-import ryanv.talkative.client.gui.widgets.DialogNodeWidget
+import ryanv.talkative.client.gui.editor.widgets.NodeWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
 import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
 import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.c2s.UpdateBranchPacket
+import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -23,13 +23,13 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     var offsetY: Int = 0
     var zoomScale: Float = 1.0F
 
-    var rootNodeWidget: DialogNodeWidget? = null
-    var nodeWidgets: ArrayList<DialogNodeWidget> = ArrayList()
-    var selectedNode: DialogNodeWidget? = null
+    var rootNodeWidget: NodeWidget? = null
+    var nodeWidgets: ArrayList<NodeWidget> = ArrayList()
+    var selectedNode: NodeWidget? = null
 
     override fun init() {
         super.init()
-        rootNodeWidget = branch.nodes[0]?.let { loadNodeAndChildren(it) }
+        rootNodeWidget = branch.getNode(0)?.let { loadNodeAndChildren(it) }
         NodePositioner.layoutTree(rootNodeWidget!!)
 
         addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
@@ -62,12 +62,11 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     }
 
     private fun saveChanges() {
-        branch.nodes.clear()
+        branch.clearNodes()
         nodeWidgets.forEach {
-            branch.nodes[it.nodeId] = it.serializeNodeAndChildren()
+            branch.addNode(it.serializeNodeAndChildren())
         }
-        println(branch.serialize(CompoundTag()))
-        NetworkHandler.CHANNEL.sendToServer(UpdateBranchPacket(branchPath, branch.serialize(CompoundTag())))
+        UpdateBranchPacket(branchPath, UpdateBranchPacket.UpdateAction.MODIFY, branch.serialize(CompoundTag())).sendToServer()
     }
 
     override fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
@@ -137,30 +136,34 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
         return false
     }
 
-    private fun loadNodeAndChildren(node: DialogNode, parent: DialogNodeWidget? = null): DialogNodeWidget {
+    private fun loadNodeAndChildren(node: DialogNode, parent: NodeWidget? = null): NodeWidget {
         val widget = createWidgetForNode(node, parent)
-        node.getChildren().forEach { widget.children.add(loadNodeAndChildren(branch.nodes[it]!!, widget)) }
+        node.getChildren().forEach { widget.children.add(loadNodeAndChildren(branch.getNode(it)!!, widget)) }
         return widget
     }
 
-    fun createWidgetForNode(node: DialogNode, parent: DialogNodeWidget?): DialogNodeWidget {
-        val widget = DialogNodeWidget(width / 2, height / 2, node.content, node.nodeType, node.nodeId, parent, this)
+    fun createWidgetForNode(node: DialogNode, parent: NodeWidget?): NodeWidget {
+        val widget = NodeWidget(width / 2, height / 2, node.content, node.nodeType, node.nodeId, parent, this)
         addChild(widget)
         nodeWidgets.add(widget)
         return widget
     }
 
-    private fun addChild(child: DialogNodeWidget) {
+    private fun addChild(child: NodeWidget) {
         children.add(child)
     }
 
-    fun removeChild(child: DialogNodeWidget) {
+    fun removeChild(child: NodeWidget) {
         children.remove(child)
         nodeWidgets.remove(child)
     }
 
+    override fun onClose() {
+        minecraft?.setScreen(parent)
+    }
+
     fun createSubMenu(mouseX: Int, mouseY: Int, widget: AbstractWidget) {
-        if (widget is DialogNodeWidget) {
+        if (widget is NodeWidget) {
             val actionMap = HashMap<String, () -> Unit>()
 
             if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Dialog))

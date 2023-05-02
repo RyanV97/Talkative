@@ -3,7 +3,7 @@ package ryanv.talkative.common.data.conditional
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.server.level.ServerPlayer
-import ryanv.talkative.common.consts.NBTConstants
+import ryanv.talkative.common.util.NBTConstants
 
 class Conditional: ArrayList<Expression>() {
     var priority: Int = 0
@@ -11,6 +11,7 @@ class Conditional: ArrayList<Expression>() {
     fun eval(player: ServerPlayer): Boolean {
         if(isEmpty())
             return true
+
         var output: Boolean? = null
         for (expression in this) {
             val result = expression.not != expression.eval(player)
@@ -56,5 +57,9 @@ class Conditional: ArrayList<Expression>() {
 
             return conditional
         }
+    }
+
+    enum class Type {
+        BRANCH, OTHER
     }
 }

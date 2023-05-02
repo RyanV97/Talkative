@@ -2,7 +2,7 @@ package ryanv.talkative.common.data.conditional
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
-import ryanv.talkative.common.consts.NBTConstants
+import ryanv.talkative.common.util.NBTConstants
 
 abstract class Expression {
     val not: Boolean = false
@@ -42,7 +42,9 @@ abstract class Expression {
 
         companion object {
             fun deserialize(tag: CompoundTag): IntExpression? {
-                return IntExpression(tag.getString(NBTConstants.EXPRESSION_PROP), tag.getInt(NBTConstants.EXPRESSION_VALUE), Operation.valueOf(tag.getString(NBTConstants.EXPRESSION_OPERATION)))
+                return IntExpression(tag.getString(NBTConstants.EXPRESSION_PROP), tag.getInt(
+                    NBTConstants.EXPRESSION_VALUE), Operation.valueOf(tag.getString(
+                    NBTConstants.EXPRESSION_OPERATION)))
             }
         }
     }

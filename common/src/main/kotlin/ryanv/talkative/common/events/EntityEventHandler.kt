@@ -4,30 +4,27 @@ import me.shedaniel.architectury.event.events.InteractionEvent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import ryanv.talkative.api.IActorEntity
-import ryanv.talkative.common.data.tree.DialogNode
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import ryanv.talkative.api.ActorEntity
 import ryanv.talkative.common.item.ActorWandItem
-import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.s2c.DialogPacket
-import ryanv.talkative.common.network.s2c.OpenActorEditorPacket
-import ryanv.talkative.common.util.FileUtil
 import ryanv.talkative.server.ConversationManager
-import java.awt.TextComponent
 
-class EntityEventHandler {
+object EntityEventHandler {
 
-    companion object {
-        fun init() {
-            InteractionEvent.INTERACT_ENTITY.register { player, livingEntity, hand ->
-                if(player.level.isClientSide || player.mainHandItem.item is ActorWandItem || hand == InteractionHand.OFF_HAND)
-                    return@register InteractionResult.PASS
-                val entity: IActorEntity = livingEntity as IActorEntity
-                if(entity.actorData != null) {
-                    ConversationManager.startConversation(player as ServerPlayer, entity)
-                }
-                InteractionResult.PASS
-            }
-        }
+    fun init() {
+        InteractionEvent.INTERACT_ENTITY.register(::entityInteractEvent)
+    }
+
+    private fun entityInteractEvent(player: Player, livingEntity: Entity, hand: InteractionHand): InteractionResult {
+        if (player.level!!.isClientSide || player.mainHandItem.item is ActorWandItem || hand == InteractionHand.OFF_HAND)
+            return InteractionResult.PASS
+
+        val entity: ActorEntity = livingEntity as ActorEntity
+        if (entity.actorData != null)
+            ConversationManager.startConversation(player as ServerPlayer, entity)
+
+        return InteractionResult.PASS
     }
 
 }

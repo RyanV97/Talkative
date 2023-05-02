@@ -1,16 +1,17 @@
 package ryanv.talkative.client.gui
 
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import ryanv.talkative.client.gui.popup.PopupWidget
+import ryanv.talkative.client.gui.widgets.popup.PopupWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
 
 abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(title) {
-
     var popup: PopupWidget? = null
     var submenu: SubmenuWidget? = null
+
+    private var centerX: Int = 0
+    private var centerY: Int = 0
 
     init {
         isDragging = true
@@ -18,6 +19,8 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
 
     override fun init() {
         super.init()
+        centerX = width / 2
+        centerY = height /2
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
@@ -30,24 +33,24 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     }
 
     override fun keyPressed(keyCode: Int, j: Int, k: Int): Boolean {
-        if(popup == null || !popup!!.keyPressed(keyCode, j, k))
-            if(submenu == null || !submenu!!.keyPressed(keyCode, j, k))
-                    if(!onKeyPressed(keyCode, j, k))
-                        return super.keyPressed(keyCode, j, k)
+        if (popup == null || !popup!!.keyPressed(keyCode, j, k))
+            if (submenu == null || !submenu!!.keyPressed(keyCode, j, k))
+                if (!onKeyPressed(keyCode, j, k))
+                    return super.keyPressed(keyCode, j, k)
         return true
     }
 
     override fun charTyped(char: Char, i: Int): Boolean {
-        if(popup == null || !popup!!.charTyped(char, i))
-            if(submenu == null || !submenu!!.charTyped(char, i))
-                if(!onCharTyped(char, i))
+        if (popup == null || !popup!!.charTyped(char, i))
+            if (submenu == null || !submenu!!.charTyped(char, i))
+                if (!onCharTyped(char, i))
                     return super.charTyped(char, i)
         return true
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        if(popup == null || !popup!!.mouseClicked(mouseX, mouseY, mouseButton))
-            if(submenu == null || !submenu!!.mouseClicked(mouseX, mouseY, mouseButton)) {
+        if (popup == null || !popup!!.mouseClicked(mouseX, mouseY, mouseButton))
+            if (submenu == null || !submenu!!.mouseClicked(mouseX, mouseY, mouseButton)) {
                 closeSubmenu()
                 if (!onMouseClick(mouseX, mouseY, mouseButton))
                     if (!super.mouseClicked(mouseX, mouseY, mouseButton))
@@ -63,9 +66,9 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     }
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        if(popup == null || !popup!!.mouseReleased(mouseX, mouseY, mouseButton))
-            if(submenu == null || !submenu!!.mouseReleased(mouseX, mouseY, mouseButton)) {
-                if(!onMouseRelease(mouseX, mouseY, mouseButton))
+        if (popup == null || !popup!!.mouseReleased(mouseX, mouseY, mouseButton))
+            if (submenu == null || !submenu!!.mouseReleased(mouseX, mouseY, mouseButton)) {
+                if (!onMouseRelease(mouseX, mouseY, mouseButton))
                     getChildAt(mouseX, mouseY).filter { guiEventListener ->
                         guiEventListener.mouseReleased(mouseX, mouseY, mouseButton)
                     }
@@ -88,11 +91,27 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         submenu = null
     }
 
-    abstract fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean
-    abstract fun onCharTyped(char: Char, i: Int): Boolean
-    abstract fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean
-    abstract fun onMouseDrag(mouseX: Double, mouseY: Double, mouseButton: Int, distanceX: Double, distanceY: Double): Boolean
-    abstract fun onMouseRelease(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean
-    abstract fun onMouseScroll(mouseX: Double, mouseY: Double, scrollAmount: Double): Boolean
+    open fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
+        return false
+    }
 
+    open fun onCharTyped(char: Char, i: Int): Boolean {
+        return false
+    }
+
+    open fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
+        return false
+    }
+
+    open fun onMouseDrag(mouseX: Double, mouseY: Double, mouseButton: Int, distanceX: Double, distanceY: Double): Boolean {
+        return false
+    }
+
+    open fun onMouseRelease(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
+        return false
+    }
+
+    open fun onMouseScroll(mouseX: Double, mouseY: Double, scrollAmount: Double): Boolean {
+        return false
+    }
 }
