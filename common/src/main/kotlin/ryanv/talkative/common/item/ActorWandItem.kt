@@ -20,11 +20,11 @@ class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
             return InteractionResult.FAIL
 
         val entity: ActorEntity = livingEntity as ActorEntity
-        if(entity.actorData == null)
-            entity.actorData = ActorData()
+        if (entity.getActorData() == null)
+            entity.setActorData(ActorData())
 
         //ToDo: Replace with proper Server-Side check
-        OpenActorEditorPacket(livingEntity.id, entity.actorData.serialize(CompoundTag())).sendToPlayer(player as ServerPlayer)
+        OpenActorEditorPacket(livingEntity.id, entity.getActorData()?.serialize(CompoundTag())).sendToPlayer(player as ServerPlayer)
 
         return InteractionResult.PASS
     }

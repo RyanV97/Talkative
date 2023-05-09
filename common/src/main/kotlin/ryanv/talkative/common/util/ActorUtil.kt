@@ -9,13 +9,13 @@ object ActorUtil {
     @JvmStatic
     fun serialize(entityData: ActorEntity, tag: CompoundTag) {
         tag.putInt(NBTConstants.ACTOR_DATA_VERSION, 1)
-        entityData.actorData.serialize(tag)
+        entityData.getActorData()?.serialize(tag)
     }
 
     @JvmStatic
     fun deserialize(entityData: ActorEntity, tag: CompoundTag?) {
         val data = ActorData.deserialize(tag!!)
-        entityData.actorData = data
+        entityData.setActorData(data)
     }
 
     @JvmStatic
@@ -23,7 +23,7 @@ object ActorUtil {
         val data = ActorData()
 
         //Load Old Data
-        entityData.actorData = data
+        entityData.setActorData(data)
     }
 
 }

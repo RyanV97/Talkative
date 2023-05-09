@@ -20,19 +20,19 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
         super(entityType, level);
     }
 
-    private ActorData serverActorDataData;
+    private ActorData actorData;
 
     public ActorData getActorData() {
-        return serverActorDataData;
+        return actorData;
     }
 
     public void setActorData(ActorData serverActorDataData) {
-        this.serverActorDataData = serverActorDataData;
+        this.actorData = serverActorDataData;
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("HEAD"))
     private void saveTalkativeData(CompoundTag entityTag, CallbackInfo ci) {
-        if(this.level.isClientSide || this.serverActorDataData == null)
+        if (this.level.isClientSide || this.actorData == null)
             return;
 
         CompoundTag dataTag = new CompoundTag();
@@ -42,11 +42,11 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
     private void loadTalkativeData(CompoundTag compoundTag, CallbackInfo ci) {
-        if(this.level.isClientSide || !compoundTag.contains(NBTConstants.ACTOR_DATA))
+        if (this.level.isClientSide || !compoundTag.contains(NBTConstants.ACTOR_DATA))
             return;
 
         CompoundTag tag = compoundTag.getCompound(NBTConstants.ACTOR_DATA);
-        if(tag.contains(NBTConstants.ACTOR_DATA_VERSION))
+        if (tag.contains(NBTConstants.ACTOR_DATA_VERSION))
             ActorUtil.deserialize(this, tag);
         else
             ActorUtil.legacyDeserialize(this, tag);

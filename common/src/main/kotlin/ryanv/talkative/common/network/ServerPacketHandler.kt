@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.api.ActorEntity
-import ryanv.talkative.common.data.ActorData
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
 import ryanv.talkative.common.network.clientbound.OpenActorEditorPacket
@@ -48,8 +47,8 @@ object ServerPacketHandler {
         val entity = player.level.getEntity(packet.entityId)
         if (entity is ActorEntity) {
             val branchRef = BranchReference(packet.path)
-            (entity.actorData as ActorData).dialogBranches.add(branchRef)
-            OpenActorEditorPacket(packet.entityId, entity.actorData.serialize(CompoundTag())).sendToPlayer(player as ServerPlayer)
+            entity.getActorData()?.dialogBranches?.add(branchRef)
+            OpenActorEditorPacket(packet.entityId, entity.getActorData()?.serialize(CompoundTag())).sendToPlayer(player as ServerPlayer)
         }
     }
 
@@ -71,8 +70,8 @@ object ServerPacketHandler {
         val player = ctx.player as ServerPlayer
         val entity = player.level.getEntity(packet.entityId)
         if (entity is ActorEntity) {
-            (entity.actorData as ActorData).dialogBranches.removeAt(packet.index)
-            OpenActorEditorPacket(packet.entityId, entity.actorData.serialize(CompoundTag())).sendToPlayer(player)
+            entity.getActorData()?.dialogBranches?.removeAt(packet.index)
+            OpenActorEditorPacket(packet.entityId, entity.getActorData()?.serialize(CompoundTag())).sendToPlayer(player)
         }
     }
 
@@ -105,8 +104,7 @@ object ServerPacketHandler {
         val level = ctx.player.level
         val actorEntity = level.getEntity(packet.actorId) as ActorEntity
 
-        actorEntity.let { actor ->
-            val actorData = actor.actorData as ActorData
+        actorEntity.getActorData()?.let { actorData ->
             actorData.dialogBranches[packet.branchIndex].setConditional(packet.conditional)
             UpdateActorDataScreenPacket(actorData).sendToPlayer(ctx.player as ServerPlayer)
         }

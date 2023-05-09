@@ -16,7 +16,7 @@ object ConversationManager {
         if (isInConversation(player))
             return
 
-        (actor.actorData as ActorData).getBranchForPlayer(player)?.let { branchRef ->
+        actor.getActorData()?.getBranchForPlayer(player)?.let { branchRef ->
             val branch = loadedBranches[branchRef.fileString] ?: loadBranch(branchRef.fileString)
             if (branch != null) {
                 val conversation = Conversation(player, actor, branchRef.fileString)
