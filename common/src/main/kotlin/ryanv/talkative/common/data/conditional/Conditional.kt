@@ -36,7 +36,7 @@ class Conditional : ArrayList<Evaluable>(), Evaluable {
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
         val list = ListTag()
         for (e in this) {
-            val expression = e as Expression.IntExpression
+            val expression = e as IntExpression
             list.add(expression.serialize(CompoundTag()))
         }
         tag.put(NBTConstants.CONDITIONAL_EXPRESSIONS, list)
@@ -55,7 +55,7 @@ class Conditional : ArrayList<Evaluable>(), Evaluable {
                 return null
 
             for (expressionTag in list) {
-                Expression.IntExpression.deserialize(expressionTag as CompoundTag)?.let { conditional.add(it) }
+                IntExpression.deserialize(expressionTag as CompoundTag)?.let { conditional.add(it) }
             }
             return conditional
         }

@@ -15,7 +15,7 @@ import ryanv.talkative.client.gui.editor.widgets.evaluable.ExpressionWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
 import ryanv.talkative.client.util.ConditionalContext
 import ryanv.talkative.common.data.conditional.Conditional
-import ryanv.talkative.common.data.conditional.Expression
+import ryanv.talkative.common.data.conditional.IntExpression
 import ryanv.talkative.common.network.serverbound.UpdateBranchConditionalPacket
 import ryanv.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 
@@ -34,7 +34,7 @@ class ConditionalEditorScreen(parent: Screen?, private val context: ConditionalC
         addButton(entryList)
 
         addButton(Button(width - 20,2,15,15, TextComponent("+").withStyle { it.withColor(ChatFormatting.GREEN) }) {
-            val expression = Expression.IntExpression("", 0, Expression.Operation.EQUALS)
+            val expression = IntExpression("", 0, IntExpression.Operation.EQUALS)
             entryList.addChild(ExpressionWidget(this, expression, width, 25, Minecraft.getInstance().font))
         })
 
@@ -51,7 +51,7 @@ class ConditionalEditorScreen(parent: Screen?, private val context: ConditionalC
     override fun refresh() {
         context.refresh()
         context.conditional?.forEach {
-            if (it is Expression) entryList.addChild(ExpressionWidget(this, it, width, 25, Minecraft.getInstance().font))
+            if (it is IntExpression) entryList.addChild(ExpressionWidget(this, it, width, 25, Minecraft.getInstance().font))
             //else  entryList?.addChild(ExpressionWidget(this, , width, 50, Minecraft.getInstance().font)) - Sub-Conditionals
         }
     }
