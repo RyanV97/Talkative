@@ -3,8 +3,8 @@ package ryanv.talkative.client.gui
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import ryanv.talkative.client.gui.widgets.popup.PopupWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
+import ryanv.talkative.client.gui.widgets.popup.PopupWidget
 
 abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(title) {
     var popup: PopupWidget? = null
@@ -26,7 +26,7 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(poseStack, mouseX, mouseY, delta)
         submenu?.render(poseStack, mouseX, mouseY, delta)
-        if(popup != null) {
+        if (popup != null) {
             renderBackground(poseStack)
             popup!!.render(poseStack, mouseX, mouseY, delta)
         }
@@ -81,6 +81,10 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         //Check Popup
         onMouseScroll(mouseX, mouseY, scrollAmount)
         return super.mouseScrolled(mouseX, mouseY, scrollAmount)
+    }
+
+    override fun onClose() {
+        minecraft?.setScreen(parent)
     }
 
     fun closePopup() {

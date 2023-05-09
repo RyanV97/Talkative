@@ -2,11 +2,11 @@ package ryanv.talkative.common.data.tree
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntArrayTag
-import ryanv.talkative.common.util.NBTConstants
-import ryanv.talkative.common.data.Response
+import ryanv.talkative.api.ConditionalHolder
 import ryanv.talkative.common.data.conditional.Conditional
+import ryanv.talkative.common.util.NBTConstants
 
-class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String = "Hello World", var conditional: Conditional? = null, val nodeId: Int) {
+class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String = "Hello World", private var conditional: Conditional? = null, val nodeId: Int) : ConditionalHolder {
     private var children: ArrayList<Int> = ArrayList()
     private var childType: NodeType? = null
 
@@ -36,6 +36,14 @@ class DialogNode(var nodeType: NodeType = NodeType.Dialog, var content: String =
         }
 
         return list
+    }
+
+    override fun getConditional(): Conditional? {
+        return conditional
+    }
+
+    override fun setConditional(newConditional: Conditional?) {
+        conditional = newConditional
     }
 
     fun serialize(tag: CompoundTag): CompoundTag {

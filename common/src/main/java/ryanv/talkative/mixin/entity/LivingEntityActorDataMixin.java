@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ryanv.talkative.api.ActorData;
 import ryanv.talkative.api.ActorEntity;
+import ryanv.talkative.common.data.ActorData;
 import ryanv.talkative.common.util.ActorUtil;
 import ryanv.talkative.common.util.NBTConstants;
 

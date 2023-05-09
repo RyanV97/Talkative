@@ -5,12 +5,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.Checkbox
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.TextComponent
-import ryanv.talkative.api.ActorData
+import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
+import ryanv.talkative.common.data.ActorData
 
-class GeneralEditorTab(x: Int, y: Int, width: Int, height: Int, actor: ActorData, parent: ActorEditorScreen) :
-    EditorTab(x, y, width, height, actor, parent, TextComponent("General Actor Settings")) {
-    val overrideDisplayName: Checkbox = addChild(Checkbox(0,0, 20, 20, TextComponent("Override Entity Name"), actor.shouldOverrideDisplayName()))
+class GeneralEditorTab(x: Int, y: Int, width: Int, height: Int, parent: ActorEditorScreen) :
+    EditorTab(x, y, width, height, parent, TextComponent("General Actor Settings")) {
+    val overrideDisplayName: Checkbox = addChild(Checkbox(0,0, 20, 20, TextComponent("Override Entity Name"), TalkativeClient.editingActorData?.shouldOverrideDisplayName() ?: false))
     val actorDisplayName: EditBox = addChild(EditBox(Minecraft.getInstance().font, 0,0, 150, 20, TextComponent("Actor Display Name")))
 
     init {
@@ -20,6 +21,9 @@ class GeneralEditorTab(x: Int, y: Int, width: Int, height: Int, actor: ActorData
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
         actorDisplayName.setEditable(overrideDisplayName.selected())
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
+    }
+
+    override fun refresh() {
     }
 
     override fun recalculateChildren() {

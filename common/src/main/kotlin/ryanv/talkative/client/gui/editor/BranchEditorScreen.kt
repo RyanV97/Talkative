@@ -13,7 +13,6 @@ import ryanv.talkative.client.gui.widgets.SubmenuWidget
 import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
-import ryanv.talkative.common.network.NetworkHandler
 import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
 import kotlin.math.ceil
 import kotlin.math.floor

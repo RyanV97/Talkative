@@ -1,23 +1,19 @@
 package ryanv.talkative.client.gui.editor
 
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.nbt.ListTag
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.TalkativeScreen
-import ryanv.talkative.client.gui.widgets.popup.PopupWidget
 import ryanv.talkative.client.gui.widgets.lists.StringSelectionList
-import ryanv.talkative.client.gui.widgets.lists.TalkativeList
-import ryanv.talkative.common.network.clientbound.SyncBranchListPacket
+import ryanv.talkative.client.gui.widgets.popup.PopupWidget
 import ryanv.talkative.common.network.serverbound.RequestBranchListPacket
 import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
 
 class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: StringSelectionList.StringEntry?) -> Unit) : TalkativeScreen(parent, TextComponent.EMPTY) {
     private lateinit var list: StringSelectionList
-    private var selectedEntry: StringSelectionList.StringEntry? = null
-
     private lateinit var confirmButton: Button
 
     override fun init() {
@@ -25,10 +21,10 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
 
         val listRight = width - (width / 3)
 
-        list = addWidget(StringSelectionList(0, height, 0, listRight, ::onSelectionChange))
+        list = addWidget(StringSelectionList(this, 0, 20, listRight, height - 20, ::onSelectionChange))
 
         confirmButton = addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Confirm")) {
-            onConfirm(selectedEntry)
+            onConfirm(list.selectedEntry)
             onClose()
         })
         confirmButton.active = false
@@ -47,15 +43,16 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
         RequestBranchListPacket().sendToServer()
     }
 
-    fun loadBranchList(list: ListTag?) {
-        this.list.children().clear()
-        list?.forEach {
-            this.list.addEntry(it.asString)
+    fun loadBranchList(listTag: ListTag?) {
+        list.clear()
+        listTag?.forEach {
+            list.addEntry(it.asString)
         }
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(poseStack)
+        GuiComponent.drawCenteredString(poseStack, font, "Available Branches", width / 2, 6, 0xFFFFFF)
         list.render(poseStack, mouseX, mouseY, delta)
         super.render(poseStack, mouseX, mouseY, delta)
     }
@@ -70,12 +67,10 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
     }
 
     private fun getSelectedPath(): String {
-        return if (selectedEntry != null) selectedEntry!!.value else ""
+        return if (list.selectedEntry != null) list.selectedEntry!!.value else ""
     }
 
-    private fun onSelectionChange(selection: TalkativeList.TalkativeListEntry?) {
-        selectedEntry = selection as StringSelectionList.StringEntry?
+    private fun onSelectionChange(selection: StringSelectionList.StringEntry?) {
         confirmButton.active = true
     }
-
 }

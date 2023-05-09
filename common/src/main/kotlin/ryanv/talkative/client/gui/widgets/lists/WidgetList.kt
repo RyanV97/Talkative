@@ -1,15 +1,13 @@
 package ryanv.talkative.client.gui.widgets.lists
 
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiComponent
-import ryanv.talkative.client.util.ScissorUtil
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.util.Mth
 import ryanv.talkative.client.gui.widgets.NestedWidget
+import ryanv.talkative.client.util.ScissorUtil
 import java.awt.Color
 
 //Original Code provided by DenimRed - https://github.com/DenimRed/
@@ -44,8 +42,8 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
         super.addChild(widget)
         adjustChild(widget)
         totalHeight += widget.height
-//        if(height <= 0)
-//            height = totalHeight
+        if (height <= 0)
+            height = totalHeight
     }
 
     fun remove(i: Int) {
@@ -90,6 +88,12 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
         scrollTo(0.0)
         clearChildren()
         totalHeight = 0
+    }
+
+    fun setSize(newWidth: Int, newHeight: Int) {
+        width = newWidth
+        height = newHeight
+        recalculateChildren()
     }
 
     fun scrollTo(pos: Double) {

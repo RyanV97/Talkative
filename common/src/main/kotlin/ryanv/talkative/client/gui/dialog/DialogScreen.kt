@@ -8,7 +8,6 @@ import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.dialog.widgets.DialogList
 import ryanv.talkative.client.gui.dialog.widgets.ResponsesWidget
 import ryanv.talkative.client.gui.widgets.NestedWidget
-import ryanv.talkative.common.data.Response
 import ryanv.talkative.common.network.serverbound.DialogResponsePacket
 import ryanv.talkative.common.network.serverbound.FinishConversationPacket
 

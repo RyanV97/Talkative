@@ -2,7 +2,7 @@ package ryanv.talkative.common.util
 
 import net.minecraft.nbt.CompoundTag
 import ryanv.talkative.api.ActorEntity
-import ryanv.talkative.common.data.ServerActorData
+import ryanv.talkative.common.data.ActorData
 
 object ActorUtil {
 
@@ -14,13 +14,13 @@ object ActorUtil {
 
     @JvmStatic
     fun deserialize(entityData: ActorEntity, tag: CompoundTag?) {
-        val data = ServerActorData.deserialize(tag!!)
+        val data = ActorData.deserialize(tag!!)
         entityData.actorData = data
     }
 
     @JvmStatic
     fun legacyDeserialize(entityData: ActorEntity, tag: CompoundTag?) {
-        val data = ServerActorData()
+        val data = ActorData()
 
         //Load Old Data
         entityData.actorData = data

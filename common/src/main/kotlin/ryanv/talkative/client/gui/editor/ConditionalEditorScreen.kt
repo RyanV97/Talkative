@@ -1,102 +1,93 @@
 package ryanv.talkative.client.gui.editor
 
+import com.mojang.blaze3d.vertex.PoseStack
+import kotlinx.coroutines.Runnable
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
 import net.minecraft.network.chat.TextComponent
+import org.lwjgl.glfw.GLFW
+import ryanv.talkative.client.gui.ActorDataScreen
 import ryanv.talkative.client.gui.TalkativeScreen
-import ryanv.talkative.client.gui.editor.widgets.ConditionalWidget
+import ryanv.talkative.client.gui.editor.widgets.evaluable.ExpressionWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
-import ryanv.talkative.common.util.NBTConstants
-import ryanv.talkative.common.network.NetworkHandler
-import ryanv.talkative.common.network.serverbound.UpdateConditionalPacket
+import ryanv.talkative.client.util.ConditionalContext
+import ryanv.talkative.common.data.conditional.Conditional
+import ryanv.talkative.common.data.conditional.Expression
+import ryanv.talkative.common.network.serverbound.UpdateBranchConditionalPacket
+import ryanv.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 
-class ConditionalEditorScreen(parent: Screen?, val actorId: Int, val holderData: CompoundTag): TalkativeScreen(parent, TextComponent("Conditional Editor")) {
-    private var priorityBox: EditBox? = null
-    private var conditionalList: WidgetList<ConditionalEditorScreen>? = null
+class ConditionalEditorScreen(parent: Screen?, private val context: ConditionalContext) : TalkativeScreen(parent, TextComponent("Conditional Editor")), ActorDataScreen {
+    private var entryList: WidgetList<ConditionalEditorScreen> = WidgetList(this, 0, 20, 0, 0)
     private val pendingTasks = ArrayList<Runnable>()
+
+    init {
+        entryList.renderBackground = false
+        refresh()
+    }
 
     override fun init() {
         super.init()
-        priorityBox = addButton(EditBox(font, width - 60, height - 20, 20, 20, TextComponent.EMPTY))
-        if(conditionalList == null) {
-            conditionalList = addButton(WidgetList(this, 0, 0, width, height - 20))
-            deserializeConditional(holderData.getCompound(NBTConstants.CONDITIONAL))
-        }
+        entryList.setSize(width - 5, height - 20)
+        addButton(entryList)
 
-        addButton(Button(width - 20, height - 20, 20, 20, TextComponent("New")) {
-            conditionalList?.addChild(ConditionalWidget(this, 0, 0, width, 30, font))
+        addButton(Button(width - 20,2,15,15, TextComponent("+").withStyle { it.withColor(ChatFormatting.GREEN) }) {
+            val expression = Expression.IntExpression("", 0, Expression.Operation.EQUALS)
+            entryList.addChild(ExpressionWidget(this, expression, width, 25, Minecraft.getInstance().font))
         })
-        addButton(Button(width - 40, height - 20, 20, 20, TextComponent("Save")) {
-            onSave()
+
+        addButton(Button(width - 60, 0, 40, 20, TextComponent("Save")) {
+            when (context) {
+                is ConditionalContext.BranchConditionalContext -> UpdateBranchConditionalPacket(context.actorId, context.branchIndex, createConditional())
+                is ConditionalContext.NodeConditionalContext -> UpdateNodeConditionalPacket(context.branchPath, context.nodeId, createConditional())
+                else -> null
+            }?.sendToServer()
+            onClose()
         })
     }
 
-    fun deleteEntry(entry: ConditionalWidget) {
-        pendingTasks.add {
-            conditionalList?.remove(entry)
+    override fun refresh() {
+        context.refresh()
+        context.conditional?.forEach {
+            if (it is Expression) entryList.addChild(ExpressionWidget(this, it, width, 25, Minecraft.getInstance().font))
+            //else  entryList?.addChild(ExpressionWidget(this, , width, 50, Minecraft.getInstance().font)) - Sub-Conditionals
         }
     }
 
-    fun onSave() {
-        holderData.put(NBTConstants.CONDITIONAL, serializeConditional(CompoundTag()))
-        UpdateConditionalPacket(actorId, holderData).sendToServer()
-    }
-
-    fun serializeConditional(tag: CompoundTag): CompoundTag {
-        tag.putInt(NBTConstants.CONDITIONAL_PRIORITY, priorityBox!!.value!!.toInt())
-
-        val list = ListTag()
-        conditionalList?.children?.forEach {
-            val conditionalWidget = it as ConditionalWidget
-            list.add(conditionalWidget.serialize(CompoundTag()))
-        }
-        tag.put(NBTConstants.CONDITIONAL_EXPRESSIONS, list)
-
-        return tag
-    }
-
-    fun deserializeConditional(tag: CompoundTag) {
-        priorityBox?.value = tag.getInt(NBTConstants.CONDITIONAL_PRIORITY).toString()
-
-        val list = tag.getList(NBTConstants.CONDITIONAL_EXPRESSIONS, 10)
-        list.forEach {
-            conditionalList?.addChild(ConditionalWidget.deserialize(this, it as CompoundTag))
-        }
-    }
-
-    override fun tick() {
-        if(pendingTasks.isNotEmpty()) {
-            for(task in pendingTasks) {
-                task.run()
-            }
-            pendingTasks.clear()
-        }
+    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(poseStack)
+        fill(poseStack, 0, 0, width, 20, -1072689136)
+        GuiComponent.drawString(poseStack, minecraft?.font, "Scoreboard Objective", 5, 7, 0xFFFFFF)
+        GuiComponent.drawString(poseStack, minecraft?.font, "Value", 160, 7, 0xFFFFFF)
+        super.render(poseStack, mouseX, mouseY, delta)
     }
 
     override fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
+        when (keyCode) {
+            GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER, GLFW.GLFW_KEY_SPACE -> return true
+        }
         return false
     }
 
-    override fun onCharTyped(char: Char, i: Int): Boolean {
-        return false
+    fun createConditional(): Conditional? {
+        if (entryList.children.isEmpty())
+            return null
+
+        val conditional = Conditional()
+        entryList.children.forEach { widget ->
+            val expression = widget as ExpressionWidget
+            expression.getModifiedEvaluable()?.let { conditional.add(it) }
+        }
+        return if (conditional.isEmpty()) null else conditional
     }
 
-    override fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        return false
+    override fun tick() {
+        pendingTasks.forEach { it.run() }
     }
 
-    override fun onMouseDrag(mouseX: Double, mouseY: Double, mouseButton: Int, distanceX: Double, distanceY: Double): Boolean {
-        return false
-    }
-
-    override fun onMouseRelease(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        return false
-    }
-
-    override fun onMouseScroll(mouseX: Double, mouseY: Double, scrollAmount: Double): Boolean {
-        return false
+    fun deleteEntry(entry: ExpressionWidget) {
+        pendingTasks.add { entryList.remove(entry) }
     }
 }

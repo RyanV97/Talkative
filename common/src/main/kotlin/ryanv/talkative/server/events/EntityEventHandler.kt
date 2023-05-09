@@ -1,4 +1,4 @@
-package ryanv.talkative.common.events
+package ryanv.talkative.server.events
 
 import me.shedaniel.architectury.event.events.InteractionEvent
 import net.minecraft.server.level.ServerPlayer
@@ -8,12 +8,12 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import ryanv.talkative.api.ActorEntity
 import ryanv.talkative.common.item.ActorWandItem
-import ryanv.talkative.server.ConversationManager
+import ryanv.talkative.server.conversations.ConversationManager
 
 object EntityEventHandler {
 
     fun init() {
-        InteractionEvent.INTERACT_ENTITY.register(::entityInteractEvent)
+        InteractionEvent.INTERACT_ENTITY.register(EntityEventHandler::entityInteractEvent)
     }
 
     private fun entityInteractEvent(player: Player, livingEntity: Entity, hand: InteractionHand): InteractionResult {

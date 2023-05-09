@@ -6,20 +6,21 @@ import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
 import net.minecraft.network.chat.TextComponent
-import ryanv.talkative.api.ActorData
+import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
 import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
+import ryanv.talkative.client.gui.editor.ConditionalEditorScreen
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
-import ryanv.talkative.common.data.ServerActorData
+import ryanv.talkative.client.util.ConditionalContext
+import ryanv.talkative.common.data.ActorData
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.serverbound.AttachBranchPacket
 import ryanv.talkative.common.network.serverbound.RequestBranchForEditPacket
 import ryanv.talkative.common.network.serverbound.UnAttachBranchPacket
 
-class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, actor: ActorData, parent: ActorEditorScreen) :
-    EditorTab(x, y, width, height, actor, parent, TextComponent("Actor Branches")) {
-
+class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, parent: ActorEditorScreen) :
+    EditorTab(x, y, width, height, parent, TextComponent("Actor Branches")) {
     private var list: WidgetList<ActorEditorScreen> = addChild(WidgetList(parent, x, y, width, height - 30, TextComponent("Attached Branches List")))
     private var details: BranchDetailsWidget = addChild(BranchDetailsWidget(this, x + (width / 2), y, width / 2, height))
 
@@ -36,8 +37,7 @@ class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, actor: Actor
         populateBranchList()
     }
 
-    override fun refresh(newData: ServerActorData) {
-        super.refresh(newData)
+    override fun refresh() {
         details.setBranch(null, null)
         populateBranchList()
     }
@@ -46,7 +46,7 @@ class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, actor: Actor
         list.width = width / 2
         list.clear()
         var index = 0
-        (actorData as ServerActorData).dialogBranches.forEach {
+        TalkativeClient.editingActorData?.dialogBranches?.forEach {
             list.addChild(BranchListEntry(this, index++, it))
         }
         list.recalculateChildren()
@@ -100,11 +100,13 @@ class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, actor: Actor
                 addChild(Button(x, y, 70, 20, TextComponent("Edit Branch")) {
                     RequestBranchForEditPacket(branch!!.fileString).sendToServer()
                 })
-//            addChild(Button(x, 40, 100, 20, TextComponent("Edit Conditional")) {
-//                val holderData =
-//                NetworkHandler.CHANNEL.sendToServer(OpenConditionalEditorPacket(parent.actorEntity.id, holderData))
-//            })
-                addChild(Button(x, y + 20, 60, 20, TextComponent("Un-Attach")) {
+
+                addChild(Button(x, y + 20, 100, 20, TextComponent("Edit Conditional")) {
+                    val context = ConditionalContext.BranchConditionalContext(parentTab.parentScreen.actorEntity.id, branchIndex!!, branch!!.getConditional())
+                    Minecraft.getInstance().setScreen(ConditionalEditorScreen(parentTab.parentScreen, context))
+                })
+
+                addChild(Button(x, y + 40, 60, 20, TextComponent("Un-Attach")) {
                     UnAttachBranchPacket(parentTab.parentScreen.actorEntity.id, branchIndex!!).sendToServer()
                 })
             }

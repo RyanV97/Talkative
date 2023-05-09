@@ -12,7 +12,7 @@ object NBTConstants {
     const val BRANCH_REFERENCES = "branch_references"
     const val BRANCH_NODES = "branch_nodes"
     const val BRANCH_FILE = "branch_file"
-    const val BRANCH_PRIORITY = "branch_priority"
+    const val BRANCH_INDEX = "branch_index"
     const val BRANCH_HIGH_ID = "branch_highest_id"
 
     const val NODE_ID = "node_id"
@@ -22,7 +22,6 @@ object NBTConstants {
     const val NODE_CHILD_TYPE = "node_child_type"
 
     const val CONDITIONAL = "conditional"
-    const val CONDITIONAL_PRIORITY = "priority"
     const val CONDITIONAL_EXPRESSIONS = "expressions"
     const val CONDITIONAL_HOLDER_BRANCH = "branch_path"
     const val CONDITIONAL_HOLDER_ID = "id"

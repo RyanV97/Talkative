@@ -10,8 +10,7 @@ import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import ryanv.talkative.api.ActorEntity
-import ryanv.talkative.common.data.ServerActorData
-import ryanv.talkative.common.network.NetworkHandler
+import ryanv.talkative.common.data.ActorData
 import ryanv.talkative.common.network.clientbound.OpenActorEditorPacket
 
 class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
@@ -22,7 +21,7 @@ class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
 
         val entity: ActorEntity = livingEntity as ActorEntity
         if(entity.actorData == null)
-            entity.actorData = ServerActorData()
+            entity.actorData = ActorData()
 
         //ToDo: Replace with proper Server-Side check
         OpenActorEditorPacket(livingEntity.id, entity.actorData.serialize(CompoundTag())).sendToPlayer(player as ServerPlayer)

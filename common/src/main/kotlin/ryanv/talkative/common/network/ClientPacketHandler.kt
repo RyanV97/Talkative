@@ -4,20 +4,16 @@ import me.shedaniel.architectury.networking.NetworkManager
 import me.shedaniel.architectury.utils.NbtType
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.LivingEntity
+import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.dialog.DialogScreen
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
 import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
 import ryanv.talkative.client.gui.editor.BranchEditorScreen
-import ryanv.talkative.client.gui.editor.ConditionalEditorScreen
-import ryanv.talkative.common.data.ServerActorData
+import ryanv.talkative.common.data.ActorData
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
-import ryanv.talkative.common.network.clientbound.SyncBranchListPacket
-import ryanv.talkative.common.network.clientbound.DialogPacket
-import ryanv.talkative.common.network.clientbound.OpenActorEditorPacket
-import ryanv.talkative.common.network.clientbound.OpenBranchEditorPacket
-import ryanv.talkative.common.network.clientbound.OpenConditionalEditorPacket
+import ryanv.talkative.common.network.clientbound.*
 import java.util.function.Supplier
 
 object ClientPacketHandler {
@@ -27,8 +23,8 @@ object ClientPacketHandler {
             is DialogPacket -> context.queue { processDialog(packet) }
             is OpenActorEditorPacket -> context.queue { processOpenActorEditor(packet, context) }
             is OpenBranchEditorPacket -> context.queue { processOpenBranchEditor(packet) }
-            is OpenConditionalEditorPacket -> context.queue { processOpenConditionalEditorPacket(packet) }
             is SyncBranchListPacket -> context.queue { processSyncBranchList(packet) }
+            is UpdateActorDataScreenPacket -> context.queue { processUpdateActorDataScreen(packet) }
         }
     }
 
@@ -46,11 +42,10 @@ object ClientPacketHandler {
 
     private fun processOpenActorEditor(packet: OpenActorEditorPacket, ctx: NetworkManager.PacketContext) {
         ctx.player.level.getEntity(packet.id)?.let {
-            if (it is LivingEntity && packet.tag != null)
-                if (Minecraft.getInstance().screen is ActorEditorScreen)
-                    (Minecraft.getInstance().screen as ActorEditorScreen).updateData(ServerActorData.deserialize(packet.tag))
-                else
-                    Minecraft.getInstance().setScreen(ActorEditorScreen(it, ServerActorData.deserialize(packet.tag)))
+            if (it is LivingEntity && packet.tag != null) {
+                TalkativeClient.editingActorData = ActorData.deserialize(packet.tag)
+                Minecraft.getInstance().setScreen(ActorEditorScreen(it))
+            }
         }
     }
 
@@ -58,18 +53,13 @@ object ClientPacketHandler {
         if (packet.data != null) {
             val branch = DialogBranch.deserialize(packet.data)
             if (branch != null) {
+                val screen = Minecraft.getInstance().screen
                 var parent: TalkativeScreen? = null
-                if (Minecraft.getInstance().screen is ActorEditorScreen)
-                    parent = Minecraft.getInstance().screen as ActorEditorScreen
-
+                if (screen is ActorEditorScreen)
+                    parent = screen
                 Minecraft.getInstance().setScreen(BranchEditorScreen(parent, packet.path, branch))
             }
         }
-    }
-
-    private fun processOpenConditionalEditorPacket(packet: OpenConditionalEditorPacket) {
-        Minecraft.getInstance()
-            .setScreen(ConditionalEditorScreen(Minecraft.getInstance().screen, packet.actorId, packet.holderData))
     }
 
     private fun processSyncBranchList(packet: SyncBranchListPacket) {
@@ -77,5 +67,9 @@ object ClientPacketHandler {
         val screen = Minecraft.getInstance().screen
         if (screen is BranchDirectoryScreen)
             screen.loadBranchList(list)
+    }
+
+    private fun processUpdateActorDataScreen(packet: UpdateActorDataScreenPacket) {
+        TalkativeClient.editingActorData = packet.actorData
     }
 }

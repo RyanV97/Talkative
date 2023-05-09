@@ -3,11 +3,10 @@ package ryanv.talkative.common.data
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.server.level.ServerPlayer
-import ryanv.talkative.api.ActorData
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.util.NBTConstants
 
-class ServerActorData : ActorData {
+class ActorData {
     var markerData: MarkerData? = MarkerData()
     var dialogBranches: ArrayList<BranchReference> = ArrayList()
 
@@ -22,20 +21,20 @@ class ServerActorData : ActorData {
     fun getBranchForPlayer(player: ServerPlayer): BranchReference? {
         var branch: BranchReference? = null
         dialogBranches.forEach {
-            if(it.conditional == null || it.conditional!!.eval(player)) {
-                if(branch == null || branch!!.branchPriority < it.branchPriority)
+            if(it.getConditional() == null || it.getConditional()!!.eval(player)) {
+                if(branch == null || branch!!.actorBranchIndex < it.actorBranchIndex)
                     branch = it
             }
         }
         return branch
     }
 
-    override fun shouldOverrideDisplayName(): Boolean {
+    fun shouldOverrideDisplayName(): Boolean {
         //ToDo Implement This
         return true
     }
 
-    override fun serialize(tag: CompoundTag): CompoundTag {
+    fun serialize(tag: CompoundTag): CompoundTag {
         tag.put(NBTConstants.MARKER_DATA, markerData?.serialize(CompoundTag()))
         val tagList = ListTag()
         for (branch in dialogBranches) {
@@ -46,8 +45,8 @@ class ServerActorData : ActorData {
     }
 
     companion object {
-        fun deserialize(tag: CompoundTag): ServerActorData {
-            val serverActorData = ServerActorData()
+        fun deserialize(tag: CompoundTag): ActorData {
+            val serverActorData = ActorData()
             serverActorData.markerData = MarkerData.deserialize(tag.getCompound(NBTConstants.MARKER_DATA))
             val tagList = tag.getList(NBTConstants.BRANCH_REFERENCES, 10)
             for (branchTag in tagList)

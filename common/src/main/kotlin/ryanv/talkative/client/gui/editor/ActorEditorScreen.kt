@@ -3,14 +3,16 @@ package ryanv.talkative.client.gui.editor
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.world.entity.LivingEntity
+import ryanv.talkative.client.TalkativeClient
+import ryanv.talkative.client.gui.ActorDataScreen
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.editor.tabs.ActorBranchEditorTab
 import ryanv.talkative.client.gui.editor.tabs.EditorTab
 import ryanv.talkative.client.gui.editor.tabs.GeneralEditorTab
 import ryanv.talkative.client.gui.editor.widgets.ActorTabsWidget
-import ryanv.talkative.common.data.ServerActorData
+import ryanv.talkative.common.data.ActorData
 
-class ActorEditorScreen(val actorEntity: LivingEntity, var actorData: ServerActorData) : TalkativeScreen(null, TextComponent("Actor Editor")) {
+class ActorEditorScreen(val actorEntity: LivingEntity) : TalkativeScreen(null, TextComponent("Actor Editor")), ActorDataScreen {
     private lateinit var tabsWidget: ActorTabsWidget
     private var activeTab: EditorTab? = null
 
@@ -19,8 +21,8 @@ class ActorEditorScreen(val actorEntity: LivingEntity, var actorData: ServerActo
 
         val tabsHeight = 30
         tabsWidget = addButton(ActorTabsWidget(this, 0, 0, width, tabsHeight))
-        tabsWidget.addTab(TextComponent("General"), GeneralEditorTab(0, tabsHeight + 5, width, height - tabsHeight + 5, actorData, this))
-        tabsWidget.addTab(TextComponent("Branches"), ActorBranchEditorTab(0, tabsHeight + 5, width, height - tabsHeight + 5, actorData, this))
+        tabsWidget.addTab(TextComponent("General"), GeneralEditorTab(0, tabsHeight + 5, width, height - tabsHeight + 5, this))
+        tabsWidget.addTab(TextComponent("Branches"), ActorBranchEditorTab(0, tabsHeight + 5, width, height - tabsHeight + 5, this))
 //        tabsWidget.addTab(TextComponent("Markers"), NestedWidget(0, 20, width, height - 20, TextComponent("Actor Marker Settings")))
 //        tabsWidget.addTab(TextComponent("Global"), NestedWidget(0, 20, width, height - 20, TextComponent("Actor Marker Settings")))
 
@@ -28,19 +30,19 @@ class ActorEditorScreen(val actorEntity: LivingEntity, var actorData: ServerActo
         //ToDo Add a button for when Simple Museum is installed, to open that menu
     }
 
-    fun updateData(newData: ServerActorData) {
-        actorData = newData
-        activeTab?.refresh(newData)
-    }
-
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(poseStack)
-//        activeTab?.render(poseStack, mouseX, mouseY, delta)
         super.render(poseStack, mouseX, mouseY, delta)
     }
 
     override fun renderBackground(poseStack: PoseStack?) {
         fill(poseStack, 0, 0, width, height, -1072689136)
+    }
+
+    override fun refresh() {
+        for (i in 0 until tabsWidget.children.size) {
+            tabsWidget.getTab(i)?.refresh()
+        }
     }
 
     fun changeTab(newTab: EditorTab) {
@@ -52,6 +54,6 @@ class ActorEditorScreen(val actorEntity: LivingEntity, var actorData: ServerActo
         newTab.setPos(0, 20)
         newTab.width = width
         newTab.height = height - 20
-        newTab.refresh(actorData)
+        newTab.refresh()
     }
 }

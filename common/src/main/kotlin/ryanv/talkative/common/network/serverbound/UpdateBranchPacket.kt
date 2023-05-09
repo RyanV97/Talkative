@@ -7,7 +7,7 @@ import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
 
 class UpdateBranchPacket(val path: String, val action: UpdateAction, val data: CompoundTag?) : TalkativePacket.ServerboundTalkativePacket {
     constructor(path: String, action: UpdateAction) : this(path, action, null)
-    constructor(buf: FriendlyByteBuf): this(buf.readUtf(), buf.readEnum(UpdateAction::class.java), buf.readNbt()!!)
+    constructor(buf: FriendlyByteBuf) : this(buf.readUtf(), buf.readEnum(UpdateAction::class.java), buf.readNbt()!!)
 
     override fun permissionCheck(player: ServerPlayer): Boolean {
         return player.hasPermissions(3)
@@ -16,7 +16,7 @@ class UpdateBranchPacket(val path: String, val action: UpdateAction, val data: C
     override fun encode(buf: FriendlyByteBuf) {
         buf.writeUtf(path)
         buf.writeEnum(action)
-        buf.writeNbt(data)
+        buf.writeNbt(data ?: CompoundTag())
     }
 
     enum class UpdateAction {

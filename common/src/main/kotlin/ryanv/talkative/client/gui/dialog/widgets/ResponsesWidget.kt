@@ -6,16 +6,12 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractButton
-import net.minecraft.client.gui.components.Button
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.resources.ResourceLocation
 import ryanv.talkative.Talkative
 import ryanv.talkative.client.gui.dialog.DialogScreen
-import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
-import ryanv.talkative.common.data.Response
-import ryanv.talkative.common.network.serverbound.FinishConversationPacket
 
 class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: Int) :
     WidgetList<DialogScreen>(parent, x, y, width, height, null) {

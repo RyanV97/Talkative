@@ -1,4 +1,4 @@
-package ryanv.talkative.server
+package ryanv.talkative.server.conversations
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
 import net.minecraft.network.chat.Component

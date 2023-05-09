@@ -32,7 +32,7 @@ class DialogBranch(private val nodes: Int2ReferenceOpenHashMap<DialogNode> = Int
         var node: DialogNode? = null
         parent?.getChildren()?.forEach {
             val child = nodes[it]
-            if (child?.conditional == null) { // || child?.conditional!!.eval()) {
+            if (child?.getConditional() == null || child.getConditional()!!.eval(player)) {
                 node = child
             }
         }

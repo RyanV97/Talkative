@@ -1,12 +1,12 @@
-package ryanv.talkative.server
+package ryanv.talkative.server.conversations
 
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.api.ActorEntity
-import ryanv.talkative.common.data.ServerActorData
+import ryanv.talkative.common.data.ActorData
 import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.util.FileUtil
 import ryanv.talkative.common.util.RefCountMap
-import java.util.UUID
+import java.util.*
 
 object ConversationManager {
     private val conversations = HashMap<UUID, Conversation>()
@@ -16,7 +16,7 @@ object ConversationManager {
         if (isInConversation(player))
             return
 
-        (actor.actorData as ServerActorData).getBranchForPlayer(player)?.let { branchRef ->
+        (actor.actorData as ActorData).getBranchForPlayer(player)?.let { branchRef ->
             val branch = loadedBranches[branchRef.fileString] ?: loadBranch(branchRef.fileString)
             if (branch != null) {
                 val conversation = Conversation(player, actor, branchRef.fileString)

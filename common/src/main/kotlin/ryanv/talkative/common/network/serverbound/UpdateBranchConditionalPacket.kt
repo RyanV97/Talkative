@@ -1,12 +1,12 @@
 package ryanv.talkative.common.network.serverbound
 
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
+import ryanv.talkative.common.data.conditional.Conditional
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
 
-class UpdateConditionalPacket(val actorId: Int, val holderData: CompoundTag): TalkativePacket.ServerboundTalkativePacket {
-    constructor(buf: FriendlyByteBuf): this(buf.readInt(), buf.readNbt()!!)
+class UpdateBranchConditionalPacket(val actorId: Int, val branchIndex: Int, val conditional: Conditional?) : TalkativePacket.ServerboundTalkativePacket {
+    constructor(buf: FriendlyByteBuf) : this(buf.readInt(), buf.readInt(), Conditional.deserialize(buf.readNbt()))
 
     override fun permissionCheck(player: ServerPlayer): Boolean {
         return player.hasPermissions(3)
@@ -14,6 +14,7 @@ class UpdateConditionalPacket(val actorId: Int, val holderData: CompoundTag): Ta
 
     override fun encode(buf: FriendlyByteBuf) {
         buf.writeInt(actorId)
-        buf.writeNbt(holderData)
+        buf.writeInt(branchIndex)
+        buf.writeNbt(conditional?.serialize())
     }
 }

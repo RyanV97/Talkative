@@ -2,7 +2,6 @@ package ryanv.talkative.client.gui.editor.widgets
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.components.Button.OnPress
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
