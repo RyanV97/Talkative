@@ -39,7 +39,7 @@ class DialogBranch(private val nodes: Int2ReferenceOpenHashMap<DialogNode> = Int
         return node
     }
 
-    fun serialize(tag: CompoundTag): CompoundTag {
+    fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
         val nodeList = CompoundTag()
         nodes.forEach { (id, node) ->
             nodeList.put(id.toString(), node.serialize(CompoundTag()))

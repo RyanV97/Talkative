@@ -29,6 +29,7 @@ object NetworkHandler {
         CHANNEL.register(OpenActorEditorPacket::class.java, OpenActorEditorPacket::encode, ::OpenActorEditorPacket, ClientPacketHandler::processPacket)
         CHANNEL.register(OpenBranchEditorPacket::class.java, OpenBranchEditorPacket::encode, ::OpenBranchEditorPacket, ClientPacketHandler::processPacket)
         CHANNEL.register(UpdateActorDataScreenPacket::class.java, UpdateActorDataScreenPacket::encode, ::UpdateActorDataScreenPacket, ClientPacketHandler::processPacket)
+        CHANNEL.register(UpdateEditingBranchPacket::class.java, UpdateEditingBranchPacket::encode, ::UpdateEditingBranchPacket, ClientPacketHandler::processPacket)
         CHANNEL.register(SyncBranchListPacket::class.java, SyncBranchListPacket::encode, ::SyncBranchListPacket, ClientPacketHandler::processPacket)
     }
 

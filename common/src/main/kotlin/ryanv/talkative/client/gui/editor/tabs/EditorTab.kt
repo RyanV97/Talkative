@@ -6,7 +6,6 @@ import net.minecraft.client.gui.GuiComponent
 import net.minecraft.network.chat.Component
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
 import ryanv.talkative.client.gui.widgets.NestedWidget
-import ryanv.talkative.common.data.ActorData
 
 abstract class EditorTab(x: Int, y: Int, width: Int, height: Int, val parentScreen: ActorEditorScreen, title: Component) : NestedWidget(x, y, width, height, title) {
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {

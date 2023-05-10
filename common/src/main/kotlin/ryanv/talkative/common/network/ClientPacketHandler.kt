@@ -1,6 +1,7 @@
 package ryanv.talkative.common.network
 
 import me.shedaniel.architectury.networking.NetworkManager
+import me.shedaniel.architectury.platform.Platform
 import me.shedaniel.architectury.utils.NbtType
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.LivingEntity
@@ -9,9 +10,7 @@ import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.dialog.DialogScreen
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
 import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
-import ryanv.talkative.client.gui.editor.BranchEditorScreen
-import ryanv.talkative.common.data.ActorData
-import ryanv.talkative.common.data.tree.DialogBranch
+import ryanv.talkative.client.gui.editor.BranchNodeEditorScreen
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
 import ryanv.talkative.common.network.clientbound.*
 import java.util.function.Supplier
@@ -26,6 +25,7 @@ object ClientPacketHandler {
             is OpenBranchEditorPacket -> context.queue { processOpenBranchEditor(packet) }
             is SyncBranchListPacket -> context.queue { processSyncBranchList(packet) }
             is UpdateActorDataScreenPacket -> context.queue { processUpdateActorDataScreen(packet) }
+            is UpdateEditingBranchPacket -> context.queue { processUpdateEditingBranch(packet) }
         }
     }
 
@@ -42,25 +42,20 @@ object ClientPacketHandler {
     }
 
     private fun processOpenActorEditor(packet: OpenActorEditorPacket, ctx: NetworkManager.PacketContext) {
-        ctx.player.level.getEntity(packet.id)?.let {
-            if (it is LivingEntity && packet.tag != null) {
-                TalkativeClient.editingActorData = ActorData.deserialize(packet.tag)
+        ctx.player.level.getEntity(packet.entityId)?.let {
+            if (it is LivingEntity) {
+                TalkativeClient.editingActorData = packet.actorData
                 Minecraft.getInstance().setScreen(ActorEditorScreen(it))
             }
         }
     }
 
     private fun processOpenBranchEditor(packet: OpenBranchEditorPacket) {
-        if (packet.data != null) {
-            val branch = DialogBranch.deserialize(packet.data)
-            if (branch != null) {
-                val screen = Minecraft.getInstance().screen
-                var parent: TalkativeScreen? = null
-                if (screen is ActorEditorScreen)
-                    parent = screen
-                Minecraft.getInstance().setScreen(BranchEditorScreen(parent, packet.path, branch))
-            }
-        }
+        val screen = Minecraft.getInstance().screen
+        val parent: TalkativeScreen? = if (screen is ActorEditorScreen) screen else null
+        TalkativeClient.editingBranch = packet.branch
+        TalkativeClient.editingBranchPath = packet.path
+        Minecraft.getInstance().setScreen(BranchNodeEditorScreen(parent))
     }
 
     private fun processSyncBranchList(packet: SyncBranchListPacket) {
@@ -72,5 +67,10 @@ object ClientPacketHandler {
 
     private fun processUpdateActorDataScreen(packet: UpdateActorDataScreenPacket) {
         TalkativeClient.editingActorData = packet.actorData
+    }
+
+    private fun processUpdateEditingBranch(packet: UpdateEditingBranchPacket) {
+        TalkativeClient.editingBranchPath = packet.branchPath
+        TalkativeClient.editingBranch = packet.branch
     }
 }

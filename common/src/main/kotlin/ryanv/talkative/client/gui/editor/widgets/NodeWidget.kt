@@ -6,12 +6,12 @@ import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.font.TextFieldHelper
 import net.minecraft.network.chat.TextComponent
-import ryanv.talkative.client.gui.editor.BranchEditorScreen
+import ryanv.talkative.client.TalkativeClient
+import ryanv.talkative.client.gui.editor.BranchNodeEditorScreen
 import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogNode
 
-class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: NodeWidget?, private val parentScreen: BranchEditorScreen): AbstractWidget(x, y, 121, 25, TextComponent("Dialog Node")) {
-
+class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: NodeWidget?, private val parentScreen: BranchNodeEditorScreen): AbstractWidget(x, y, 121, 25, TextComponent("Dialog Node")) {
     val minecraft: Minecraft = Minecraft.getInstance()
 
     private val text = TextComponent(contents)
@@ -28,14 +28,14 @@ class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: Dialog
 
     fun serializeNodeAndChildren(): DialogNode {
         val node = serializeNode()
-        for(child in children) {
+        for (child in children) {
             node.addChild(child.nodeId, child.nodeType)
         }
         return node
     }
 
     private fun serializeNode(): DialogNode {
-        return DialogNode(nodeType, contents, nodeId = nodeId)
+        return DialogNode(nodeType, contents, TalkativeClient.editingBranch?.getNode(nodeId)?.getConditional(), nodeId)
     }
 
     fun addChild(type: DialogNode.NodeType, id: Int) {

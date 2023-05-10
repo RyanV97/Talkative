@@ -4,15 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.world.entity.LivingEntity
 import ryanv.talkative.client.TalkativeClient
-import ryanv.talkative.client.gui.ActorDataScreen
+import ryanv.talkative.client.gui.DataScreen
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.editor.tabs.ActorBranchEditorTab
 import ryanv.talkative.client.gui.editor.tabs.EditorTab
 import ryanv.talkative.client.gui.editor.tabs.GeneralEditorTab
 import ryanv.talkative.client.gui.editor.widgets.ActorTabsWidget
-import ryanv.talkative.common.data.ActorData
 
-class ActorEditorScreen(val actorEntity: LivingEntity) : TalkativeScreen(null, TextComponent("Actor Editor")), ActorDataScreen {
+class ActorEditorScreen(val actorEntity: LivingEntity) : TalkativeScreen(null, TextComponent("Actor Editor")), DataScreen {
     private lateinit var tabsWidget: ActorTabsWidget
     private var activeTab: EditorTab? = null
 
@@ -40,8 +39,8 @@ class ActorEditorScreen(val actorEntity: LivingEntity) : TalkativeScreen(null, T
     }
 
     override fun refresh() {
-        for (i in 0 until tabsWidget.children.size) {
-            tabsWidget.getTab(i)?.refresh()
+        tabsWidget.children.forEachIndexed { index, _ ->
+            tabsWidget.getTab(index)?.refresh()
         }
     }
 

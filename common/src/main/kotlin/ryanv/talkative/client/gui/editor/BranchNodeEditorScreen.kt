@@ -7,29 +7,33 @@ import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.TextComponent
+import ryanv.talkative.client.TalkativeClient
+import ryanv.talkative.client.gui.DataScreen
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.editor.widgets.NodeWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
+import ryanv.talkative.client.util.ConditionalContext
 import ryanv.talkative.client.util.NodePositioner
-import ryanv.talkative.common.data.tree.DialogBranch
 import ryanv.talkative.common.data.tree.DialogNode
 import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
+import ryanv.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: String, private val branch: DialogBranch): TalkativeScreen(parent, TextComponent("Dialog Tree Editor")) {
-    var offsetX: Int = 0
-    var offsetY: Int = 0
-    var zoomScale: Float = 1.0F
-
+class BranchNodeEditorScreen(parent: TalkativeScreen?) : TalkativeScreen(parent, TextComponent("Dialog Tree Editor")), DataScreen {
     var rootNodeWidget: NodeWidget? = null
     var nodeWidgets: ArrayList<NodeWidget> = ArrayList()
     var selectedNode: NodeWidget? = null
 
+    var offsetX: Int = 0
+    var offsetY: Int = 0
+    var zoomScale: Float = 1.0F
+
     override fun init() {
         super.init()
-        rootNodeWidget = branch.getNode(0)?.let { loadNodeAndChildren(it) }
-        NodePositioner.layoutTree(rootNodeWidget!!)
+        TalkativeClient.editingBranch?.let {
+            refresh()
+        }
 
         addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
             saveChanges()
@@ -47,8 +51,6 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(poseStack)
-//        GuiComponent.drawString(poseStack, font, "$offsetX, $offsetY", 0, 1, 0xFFFFFF)
-//        GuiComponent.drawString(poseStack, font, zoomScale.toString(), 0, 12, 0xFFFFFF)
 
         RenderSystem.pushMatrix()
         RenderSystem.scalef(zoomScale, zoomScale, 1.0F)
@@ -61,11 +63,11 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     }
 
     private fun saveChanges() {
-        branch.clearNodes()
         nodeWidgets.forEach {
-            branch.addNode(it.serializeNodeAndChildren())
+            val newNode = it.serializeNodeAndChildren();
+            TalkativeClient.editingBranch?.addNode(newNode)
         }
-        UpdateBranchPacket(branchPath, UpdateBranchPacket.UpdateAction.MODIFY, branch.serialize(CompoundTag())).sendToServer()
+        UpdateBranchPacket(TalkativeClient.editingBranchPath!!, UpdateBranchPacket.UpdateAction.MODIFY, TalkativeClient.editingBranch?.serialize(CompoundTag())).sendToServer()
     }
 
     override fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
@@ -77,8 +79,8 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     }
 
     override fun onMouseDrag(mouseX: Double, mouseY: Double, mouseButton: Int, diffX: Double, diffY: Double): Boolean {
-        if(mouseButton == 2) {
-            if(!isDragging)
+        if (mouseButton == 2) {
+            if (!isDragging)
                 isDragging = true
 
             offsetX += when (diffX > 0) {
@@ -100,23 +102,24 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
     }
 
     override fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
-        if(selectedNode != null) {
+        if (selectedNode != null) {
             val textEntry = selectedNode!!.textEntry
-            if(isSelectAll(keyCode))
+            if (isSelectAll(keyCode))
                 textEntry.selectAll()
-            if(isCut(keyCode))
+            if (isCut(keyCode))
                 textEntry.cut()
-            if(isCopy(keyCode))
+            if (isCopy(keyCode))
                 textEntry.copy()
-            if(isPaste(keyCode))
+            if (isPaste(keyCode))
                 textEntry.paste()
-            if(keyCode == 257 || keyCode == 335)
+            if (keyCode == 257 || keyCode == 335)
                 textEntry.insertText("\n")
-            when(keyCode) {
+            when (keyCode) {
                 256 -> {
                     selectedNode = null
                     focused = null
                 }
+
                 259 -> textEntry.removeCharsFromCursor(-1)
                 261 -> textEntry.removeCharsFromCursor(1)
                 262 -> textEntry.moveByChars(1, hasShiftDown())
@@ -137,24 +140,35 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
 
     private fun loadNodeAndChildren(node: DialogNode, parent: NodeWidget? = null): NodeWidget {
         val widget = createWidgetForNode(node, parent)
-        node.getChildren().forEach { widget.children.add(loadNodeAndChildren(branch.getNode(it)!!, widget)) }
+        node.getChildren().forEach { widget.children.add(loadNodeAndChildren(TalkativeClient.editingBranch?.getNode(it)!!, widget)) }
         return widget
     }
 
     fun createWidgetForNode(node: DialogNode, parent: NodeWidget?): NodeWidget {
         val widget = NodeWidget(width / 2, height / 2, node.content, node.nodeType, node.nodeId, parent, this)
         addChild(widget)
-        nodeWidgets.add(widget)
         return widget
     }
 
     private fun addChild(child: NodeWidget) {
         children.add(child)
+        nodeWidgets.add(child)
     }
 
     fun removeChild(child: NodeWidget) {
         children.remove(child)
         nodeWidgets.remove(child)
+    }
+
+    fun clearNodes() {
+        children.removeIf { it is NodeWidget }
+        nodeWidgets.clear()
+    }
+
+    override fun refresh() {
+        clearNodes()
+        rootNodeWidget = TalkativeClient.editingBranch!!.getNode(0)?.let { loadNodeAndChildren(it) }
+        NodePositioner.layoutTree(rootNodeWidget!!)
     }
 
     override fun onClose() {
@@ -168,23 +182,35 @@ class BranchEditorScreen(parent: TalkativeScreen?, private val branchPath: Strin
             if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Dialog))
                 actionMap["New Child (Dialog)"] = {
                     println("Make New Dialog Child")
-                    widget.addChild(DialogNode.NodeType.Dialog, branch.highestId)
+                    widget.addChild(DialogNode.NodeType.Dialog, TalkativeClient.editingBranch!!.highestId)
                     NodePositioner.layoutTree(rootNodeWidget!!)
                     closeSubmenu()
                 }
             if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Response))
                 actionMap["New Child (Response)"] = {
                     println("Make New Response Child")
-                    widget.addChild(DialogNode.NodeType.Response, branch.highestId)
+                    widget.addChild(DialogNode.NodeType.Response, TalkativeClient.editingBranch!!.highestId)
                     NodePositioner.layoutTree(rootNodeWidget!!)
                     closeSubmenu()
                 }
+
+            actionMap["Edit Conditional"] = {
+                val context = ConditionalContext.NodeContext(TalkativeClient.editingBranchPath!!, widget.nodeId, TalkativeClient.editingBranch?.getNode(widget.nodeId)?.getConditional())
+                val popupSize = height - 10
+                val popupX = (width / 2) - (popupSize / 2)
+                popup = ConditionalEditorPopup(this, popupX, 10, popupSize, popupSize, context) {
+                    val newContext = it as ConditionalContext.NodeContext
+                    UpdateNodeConditionalPacket(newContext.branchPath, newContext.nodeId, newContext.conditional).sendToServer()
+                    closePopup()
+                }
+                closeSubmenu()
+            }
 
             actionMap["Copy Node ID"] = {
                 minecraft?.keyboardHandler?.clipboard = widget.nodeId.toString()
             }
 
-            if(rootNodeWidget!! != widget) {
+            if (rootNodeWidget!! != widget) {
                 if (widget.children.isEmpty())
                     actionMap["Remove Node"] = {
                         println("Delete Node")

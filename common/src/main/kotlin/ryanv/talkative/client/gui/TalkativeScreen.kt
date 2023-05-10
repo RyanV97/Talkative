@@ -1,5 +1,6 @@
 package ryanv.talkative.client.gui
 
+import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
@@ -27,8 +28,12 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         super.render(poseStack, mouseX, mouseY, delta)
         submenu?.render(poseStack, mouseX, mouseY, delta)
         if (popup != null) {
+            poseStack?.pushPose()
+            GlStateManager._enableDepthTest()
+            poseStack?.translate(0.0, 0.0, 100.0)
             renderBackground(poseStack)
             popup!!.render(poseStack, mouseX, mouseY, delta)
+            poseStack?.popPose()
         }
     }
 
@@ -69,8 +74,8 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         if (popup == null || !popup!!.mouseReleased(mouseX, mouseY, mouseButton))
             if (submenu == null || !submenu!!.mouseReleased(mouseX, mouseY, mouseButton)) {
                 if (!onMouseRelease(mouseX, mouseY, mouseButton))
-                    getChildAt(mouseX, mouseY).filter { guiEventListener ->
-                        guiEventListener.mouseReleased(mouseX, mouseY, mouseButton)
+                    getChildAt(mouseX, mouseY).filter {
+                        it.mouseReleased(mouseX, mouseY, mouseButton)
                     }
             }
         isDragging = false
@@ -78,9 +83,14 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
     }
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollAmount: Double): Boolean {
-        //Check Popup
-        onMouseScroll(mouseX, mouseY, scrollAmount)
-        return super.mouseScrolled(mouseX, mouseY, scrollAmount)
+        if (popup == null || !popup!!.mouseScrolled(mouseX, mouseY, scrollAmount))
+            if (submenu == null || !submenu!!.mouseScrolled(mouseX, mouseY, scrollAmount)) {
+                if (!onMouseScroll(mouseX, mouseY, scrollAmount))
+                    getChildAt(mouseX, mouseY).filter {
+                        it.mouseScrolled(mouseX, mouseY, scrollAmount)
+                    }
+            }
+        return true
     }
 
     override fun onClose() {
@@ -93,6 +103,10 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
 
     fun closeSubmenu() {
         submenu = null
+    }
+
+    override fun tick() {
+        popup?.tick()
     }
 
     open fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {

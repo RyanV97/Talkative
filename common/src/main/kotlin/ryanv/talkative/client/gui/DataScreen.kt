@@ -1,5 +1,5 @@
 package ryanv.talkative.client.gui
 
-interface ActorDataScreen {
+interface DataScreen {
     fun refresh()
 }

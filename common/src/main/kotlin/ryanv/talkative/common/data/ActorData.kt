@@ -34,7 +34,7 @@ class ActorData {
         return true
     }
 
-    fun serialize(tag: CompoundTag): CompoundTag {
+    fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
         tag.put(NBTConstants.MARKER_DATA, markerData?.serialize(CompoundTag()))
         val tagList = ListTag()
         for (branch in dialogBranches) {

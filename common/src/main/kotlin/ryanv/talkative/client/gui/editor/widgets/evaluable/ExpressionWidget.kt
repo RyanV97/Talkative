@@ -1,16 +1,15 @@
 package ryanv.talkative.client.gui.editor.widgets.evaluable
 
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.api.Evaluable
-import ryanv.talkative.client.gui.editor.ConditionalEditorScreen
+import ryanv.talkative.client.gui.editor.ConditionalEditorPopup
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.common.data.conditional.IntExpression
 
-class ExpressionWidget(parent: ConditionalEditorScreen, val expression: IntExpression, width: Int, height: Int, font: Font) : NestedWidget(0,0, width,height, TextComponent.EMPTY), EvaluableWidget {
+class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpression, width: Int, height: Int, font: Font) : NestedWidget(0,0, width,height, TextComponent.EMPTY), EvaluableWidget {
     val propertyBox: EditBox
     val operationButton: Button
     val valueBox: EditBox
@@ -33,17 +32,12 @@ class ExpressionWidget(parent: ConditionalEditorScreen, val expression: IntExpre
     init {
         propertyBox = addChild(EditBox(font, 0, 0, 120, 20, TextComponent.EMPTY))
         operationButton = addChild(Button(0, 0, 22, 20, TextComponent("=="), ::cycleOperation))
-        valueBox = addChild(EditBox(font, 0, 0, 60, 20, TextComponent.EMPTY))
+        valueBox = addChild(EditBox(font, 0, 0, 40, 20, TextComponent.EMPTY))
         valueBox.setFilter { return@setFilter it.toIntOrNull() != null || it.isBlank() }
         deleteButton = addChild(Button(0, 0, 20, 20, TextComponent("X")) { parent.deleteEntry(this) })
         propertyBox.value = expression.propertyName
         operation = expression.operation
         valueBox.value = expression.valueB.toString()
-    }
-
-    override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        fill(poseStack, x, y, x + width, y + height, 0x11FFFFFF.toInt())
-        super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
 
     override fun recalculateChildren() {
@@ -55,7 +49,7 @@ class ExpressionWidget(parent: ConditionalEditorScreen, val expression: IntExpre
         operationButton.y = yPos
         valueBox.x = xPos + 153
         valueBox.y = yPos
-        deleteButton.x = x + width - 25
+        deleteButton.x = x + width - 20
         deleteButton.y = yPos
     }
 

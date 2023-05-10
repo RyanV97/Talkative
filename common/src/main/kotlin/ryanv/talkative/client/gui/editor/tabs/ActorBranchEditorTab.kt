@@ -9,15 +9,15 @@ import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
 import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
-import ryanv.talkative.client.gui.editor.ConditionalEditorScreen
+import ryanv.talkative.client.gui.editor.ConditionalEditorPopup
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
 import ryanv.talkative.client.util.ConditionalContext
-import ryanv.talkative.common.data.ActorData
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.serverbound.AttachBranchPacket
 import ryanv.talkative.common.network.serverbound.RequestBranchForEditPacket
 import ryanv.talkative.common.network.serverbound.UnAttachBranchPacket
+import ryanv.talkative.common.network.serverbound.UpdateBranchConditionalPacket
 
 class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, parent: ActorEditorScreen) :
     EditorTab(x, y, width, height, parent, TextComponent("Actor Branches")) {
@@ -81,8 +81,8 @@ class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, parent: Acto
     }
 
     class BranchDetailsWidget(val parentTab: ActorBranchEditorTab, x: Int, y: Int, width: Int, height: Int) : NestedWidget(x, y, width, height, TextComponent("Branch Details")) {
-        private var branchIndex: Int? = null
         private var branch: BranchReference? = null
+        private var branchIndex: Int? = null
 
         fun setBranch(branch: BranchReference?, index: Int?) {
             this.branch = branch
@@ -102,13 +102,23 @@ class ActorBranchEditorTab(x: Int, y: Int, width: Int, height: Int, parent: Acto
                 })
 
                 addChild(Button(x, y + 20, 100, 20, TextComponent("Edit Conditional")) {
-                    val context = ConditionalContext.BranchConditionalContext(parentTab.parentScreen.actorEntity.id, branchIndex!!, branch!!.getConditional())
-                    Minecraft.getInstance().setScreen(ConditionalEditorScreen(parentTab.parentScreen, context))
+                    parentTab.parentScreen.popup = createPopup()
                 })
 
                 addChild(Button(x, y + 40, 60, 20, TextComponent("Un-Attach")) {
                     UnAttachBranchPacket(parentTab.parentScreen.actorEntity.id, branchIndex!!).sendToServer()
                 })
+            }
+        }
+
+        private fun createPopup(): ConditionalEditorPopup {
+            val context = ConditionalContext.BranchContext(parentTab.parentScreen.actorEntity.id, branchIndex!!, branch!!.getConditional())
+            val popupSize = parentTab.parentScreen.height - 10
+            val popupX = (parentTab.width / 2) - (popupSize / 2)
+            return ConditionalEditorPopup(parentTab.parentScreen, popupX, 10, popupSize, popupSize, context) {
+                val newContext = it as ConditionalContext.BranchContext
+                UpdateBranchConditionalPacket(newContext.actorId, newContext.branchIndex, newContext.conditional).sendToServer()
+                parentTab.parentScreen.closePopup()
             }
         }
     }

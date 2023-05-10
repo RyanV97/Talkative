@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.editor.ActorEditorScreen
-import ryanv.talkative.common.data.ActorData
 
 class GeneralEditorTab(x: Int, y: Int, width: Int, height: Int, parent: ActorEditorScreen) :
     EditorTab(x, y, width, height, parent, TextComponent("General Actor Settings")) {

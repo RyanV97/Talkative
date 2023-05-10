@@ -21,9 +21,7 @@ object EntityEventHandler {
             return InteractionResult.PASS
 
         val entity: ActorEntity = livingEntity as ActorEntity
-        if (entity.getActorData() != null)
-            ConversationManager.startConversation(player as ServerPlayer, entity)
-
+        if (entity.getActorData() != null) ConversationManager.startConversation(player as ServerPlayer, entity)
         return InteractionResult.PASS
     }
 

@@ -1,6 +1,7 @@
 package ryanv.talkative.common.network
 
 import me.shedaniel.architectury.networking.NetworkManager.PacketContext
+import me.shedaniel.architectury.platform.Platform
 import net.minecraft.ChatFormatting
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.TextComponent
@@ -8,10 +9,7 @@ import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.api.ActorEntity
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
-import ryanv.talkative.common.network.clientbound.OpenActorEditorPacket
-import ryanv.talkative.common.network.clientbound.OpenBranchEditorPacket
-import ryanv.talkative.common.network.clientbound.SyncBranchListPacket
-import ryanv.talkative.common.network.clientbound.UpdateActorDataScreenPacket
+import ryanv.talkative.common.network.clientbound.*
 import ryanv.talkative.common.network.serverbound.*
 import ryanv.talkative.common.util.FileUtil
 import ryanv.talkative.server.conversations.ConversationManager
@@ -39,7 +37,7 @@ object ServerPacketHandler {
             is RequestBranchForEditPacket -> context.queue { processRequestBranchForEdit(packet, context) }
             is UpdateBranchPacket -> context.queue { processUpdateBranch(packet, context) }
             is UpdateBranchConditionalPacket -> context.queue { processUpdateBranchConditional(packet, context) }
-            is UpdateNodeConditionalPacket -> context.queue { processUpdateNodeConditional(packet) }
+            is UpdateNodeConditionalPacket -> context.queue { processUpdateNodeConditional(packet, context) }
             is RequestBranchListPacket -> context.queue { processRequestBranchList(context) }
         }
     }
@@ -49,8 +47,10 @@ object ServerPacketHandler {
         val entity = player.level.getEntity(packet.entityId)
         if (entity is ActorEntity) {
             val branchRef = BranchReference(packet.path)
-            entity.getActorData()?.dialogBranches?.add(branchRef)
-            OpenActorEditorPacket(packet.entityId, entity.getActorData()?.serialize(CompoundTag())).sendToPlayer(player as ServerPlayer)
+            entity.getActorData()?.let { actorData ->
+                actorData.dialogBranches.add(branchRef)
+                OpenActorEditorPacket(packet.entityId, actorData).sendToPlayer(player as ServerPlayer)
+            }
         }
     }
 
@@ -72,14 +72,17 @@ object ServerPacketHandler {
         val player = ctx.player as ServerPlayer
         val entity = player.level.getEntity(packet.entityId)
         if (entity is ActorEntity) {
-            entity.getActorData()?.dialogBranches?.removeAt(packet.index)
-            OpenActorEditorPacket(packet.entityId, entity.getActorData()?.serialize(CompoundTag())).sendToPlayer(player)
+            entity.getActorData()?.let { actorData ->
+                actorData.dialogBranches.removeAt(packet.index)
+                OpenActorEditorPacket(packet.entityId, actorData).sendToPlayer(player)
+            }
         }
     }
 
     private fun processRequestBranchForEdit(packet: RequestBranchForEditPacket, ctx: PacketContext) {
-        val branchData = FileUtil.getBranchDataFromPath(packet.path)
-        OpenBranchEditorPacket(packet.path, branchData).sendToPlayer(ctx.player as ServerPlayer)
+        FileUtil.getBranchFromPath(packet.path)?.let { branch ->
+            OpenBranchEditorPacket(packet.path, branch).sendToPlayer(ctx.player as ServerPlayer)
+        }
     }
 
     private fun processUpdateBranch(packet: UpdateBranchPacket, ctx: PacketContext) {
@@ -112,9 +115,12 @@ object ServerPacketHandler {
         }
     }
 
-    private fun processUpdateNodeConditional(packet: UpdateNodeConditionalPacket) {
-        FileUtil.getBranchFromPath(packet.branchPath)?.getNode(packet.nodeId)?.setConditional(packet.conditional)
-        //ToDo Sync changes
+    private fun processUpdateNodeConditional(packet: UpdateNodeConditionalPacket, ctx: PacketContext) {
+        FileUtil.getBranchFromPath(packet.branchPath)?.let { branch ->
+            branch.getNode(packet.nodeId)?.setConditional(packet.conditional)
+            FileUtil.saveBranchData(packet.branchPath, branch.serialize())
+            UpdateEditingBranchPacket(packet.branchPath, branch).sendToPlayer(ctx.player as ServerPlayer)
+        }
     }
 
     private fun processRequestBranchList(ctx: PacketContext) {
