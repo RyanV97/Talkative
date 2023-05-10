@@ -20,6 +20,8 @@ import java.util.function.Supplier
 object ServerPacketHandler {
     fun processPacket(packet: TalkativePacket.ServerboundTalkativePacket, ctx: Supplier<PacketContext>) {
         val context = ctx.get()
+        if (Platform.isDevelopmentEnvironment()) println("Server Received Packet: $packet")
+
         if (!packet.permissionCheck(context.player as ServerPlayer)) {
             context.player.sendMessage(
                 TextComponent("You have insufficient permissions to perform this action.")

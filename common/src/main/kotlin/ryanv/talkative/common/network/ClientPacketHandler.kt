@@ -19,6 +19,7 @@ import java.util.function.Supplier
 object ClientPacketHandler {
     fun processPacket(packet: TalkativePacket.ClientboundTalkativePacket, ctx: Supplier<NetworkManager.PacketContext>) {
         val context = ctx.get()
+        if (Platform.isDevelopmentEnvironment()) println("Client Received Packet: $packet")
         when (packet) {
             is DialogPacket -> context.queue { processDialog(packet) }
             is OpenActorEditorPacket -> context.queue { processOpenActorEditor(packet, context) }
