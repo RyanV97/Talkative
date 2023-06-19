@@ -6,6 +6,9 @@
   "mixins": [
     "entity.LivingEntityActorDataMixin"
   ],
-  "client": [],
+  "client": [
+    "AbstractScrollWidgetAccessor",
+    "AbstractWidgetAccessor"
+  ],
   "server": []
 }

@@ -11,15 +11,15 @@ object NodePositioner {
         //Position Node horizontally based on Column and fixed width
         node.x = column * (node.width + 10)
 
-        if (node.children.isNotEmpty()) {
-            val numOfChildren: Int = node.children.size
+        if (node.childNodes.isNotEmpty()) {
+            val numOfChildren: Int = node.childNodes.size
             for (index in 0 until numOfChildren) {
-                val child: NodeWidget = node.children[index]
+                val child: NodeWidget = node.childNodes[index]
                 var prevSibling: NodeWidget?
 
                 if (index == 0) child.y = node.y
                 else {
-                    prevSibling = node.children[index - 1]
+                    prevSibling = node.childNodes[index - 1]
                     if(prevSibling.y + prevSibling.height > prevSibling.lowestChildY)
                         child.y = prevSibling.y + prevSibling.height + 10
                     else
@@ -27,11 +27,8 @@ object NodePositioner {
                 }
                 layout(child, column + 1)
 
-                if (index == numOfChildren - 1) {
-//                        if(child.lowestChildY < child.y + child.height)
-//                            node.lowestChildY =
+                if (index == numOfChildren - 1)
                     node.lowestChildY = child.lowestChildY
-                }
             }
         }
         if (node.lowestChildY < node.y + node.height) node.lowestChildY = node.y + node.height

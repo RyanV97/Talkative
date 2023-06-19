@@ -31,6 +31,7 @@ class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: 
     fun repopulateResponses(responses: Int2ReferenceOpenHashMap<Component>) {
         clear()
 
+        //ToDo: These don't seem to be in order
         responses.forEach {
             addChild(ResponseButton(it.key, (width / 2) - 50, height - 30, 150, 20, it.value, parent, font))
         }

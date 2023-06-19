@@ -11,6 +11,7 @@ import ryanv.talkative.client.gui.editor.branch.EditBranchesScreen
 class GlobalEditorTab(x: Int, y: Int, width: Int, height: Int, parentScreen: MainEditorScreen) : EditorTab(x, y, width, height, parentScreen, Component.literal("Global Settings")) {
     val editBranchesButton: Button = addChild(Button(x + 10, y + 10, 100, 20, Component.literal("Edit Branches"), ::openBranchScreen))
 
+
     init {
         populateBranchList()
     }

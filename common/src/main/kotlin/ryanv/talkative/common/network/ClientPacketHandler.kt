@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.nbt.Tag
 import net.minecraft.world.entity.LivingEntity
 import ryanv.talkative.client.TalkativeClient
-import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.dialog.DialogScreen
 import ryanv.talkative.client.gui.editor.MainEditorScreen
 import ryanv.talkative.client.gui.editor.branch.BranchDirectoryScreen

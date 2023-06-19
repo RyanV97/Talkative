@@ -1,5 +1,6 @@
 package ryanv.talkative.client.gui.editor.branch
 
+import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.SharedConstants
 import net.minecraft.client.gui.components.AbstractWidget
@@ -18,6 +19,8 @@ import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogNode
 import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
 import ryanv.talkative.common.network.serverbound.UpdateNodeConditionalPacket
+import ryanv.talkative.mixin.AbstractScrollWidgetAccessor
+import ryanv.talkative.mixin.AbstractWidgetAccessor
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -58,6 +61,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
         poseStack.pushPose()
         poseStack.scale(zoomScale, zoomScale, 1.0F)
 
+        GlStateManager._depthMask(false)
         rootNodeWidget?.renderNodeAndChildren(poseStack, mouseX, mouseY, delta)
 
         poseStack.popPose()
@@ -71,14 +75,6 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             TalkativeClient.editingBranch?.addNode(newNode)
         }
         UpdateBranchPacket(TalkativeClient.editingBranchPath!!, UpdateBranchPacket.UpdateAction.MODIFY, TalkativeClient.editingBranch?.serialize(CompoundTag())).sendToServer()
-    }
-
-    override fun onMouseClick(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        return false
-    }
-
-    override fun onMouseRelease(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-        return false
     }
 
     override fun onMouseDrag(mouseX: Double, mouseY: Double, mouseButton: Int, diffX: Double, diffY: Double): Boolean {
@@ -99,51 +95,30 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     }
 
     override fun onMouseScroll(mouseX: Double, mouseY: Double, scrollAmount: Double): Boolean {
+        if (selectedNode != null)
+            return selectedNode!!.editBox.mouseScrolled(mouseX, mouseY, scrollAmount)
+
         val i = (scrollAmount.toFloat() * 0.1F)
         zoomScale = (zoomScale + i).coerceIn(0.2F, 2.0F)
         return true
     }
 
     override fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
-        if (selectedNode != null) {
-            val textEntry = selectedNode!!.textEntry
-            if (isSelectAll(keyCode))
-                textEntry.selectAll()
-            if (isCut(keyCode))
-                textEntry.cut()
-            if (isCopy(keyCode))
-                textEntry.copy()
-            if (isPaste(keyCode))
-                textEntry.paste()
-            if (keyCode == 257 || keyCode == 335)
-                textEntry.insertText("\n")
-            when (keyCode) {
-                256 -> {
-                    selectedNode = null
-                    focused = null
-                }
-
-                259 -> textEntry.removeCharsFromCursor(-1)
-                261 -> textEntry.removeCharsFromCursor(1)
-                262 -> textEntry.moveByChars(1, hasShiftDown())
-                263 -> textEntry.moveByChars(-1, hasShiftDown())
-            }
+        if (selectedNode != null && keyCode == 256) {
+            (selectedNode!!.editBox as AbstractWidgetAccessor).pleaseSetFocused(false)
+            selectedNode = null
             return true
         }
-        return false
+        return selectedNode?.keyPressed(keyCode, j, k) ?: false
     }
 
     override fun onCharTyped(char: Char, i: Int): Boolean {
-        if(selectedNode != null && SharedConstants.isAllowedChatCharacter(char)) {
-            selectedNode!!.textEntry.insertText(char.toString())
-            return true
-        }
-        return false
+        return selectedNode?.editBox?.charTyped(char, i) ?: false
     }
 
     private fun loadNodeAndChildren(node: DialogNode, parent: NodeWidget? = null): NodeWidget {
         val widget = createWidgetForNode(node, parent)
-        node.getChildren().forEach { widget.children.add(loadNodeAndChildren(TalkativeClient.editingBranch?.getNode(it)!!, widget)) }
+        node.getChildren().forEach { widget.childNodes.add(loadNodeAndChildren(TalkativeClient.editingBranch?.getNode(it)!!, widget)) }
         return widget
     }
 
@@ -174,6 +149,10 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
         NodePositioner.layoutTree(rootNodeWidget!!)
     }
 
+    override fun shouldCloseOnEsc(): Boolean {
+        return false
+    }
+
     override fun onClose() {
         minecraft?.setScreen(parent)
     }
@@ -182,14 +161,14 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
         if (widget is NodeWidget) {
             val actionMap = HashMap<String, () -> Unit>()
 
-            if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Dialog))
+            if (widget.childNodes.isEmpty() || (widget.childNodes[0].nodeType == DialogNode.NodeType.Dialog))
                 actionMap["New Child (Dialog)"] = {
                     println("Make New Dialog Child")
                     widget.addChild(DialogNode.NodeType.Dialog, TalkativeClient.editingBranch!!.highestId)
                     NodePositioner.layoutTree(rootNodeWidget!!)
                     closeSubmenu()
                 }
-            if (widget.children.isEmpty() || (widget.children[0].nodeType == DialogNode.NodeType.Response))
+            if (widget.childNodes.isEmpty() || (widget.childNodes[0].nodeType == DialogNode.NodeType.Response))
                 actionMap["New Child (Response)"] = {
                     println("Make New Response Child")
                     widget.addChild(DialogNode.NodeType.Response, TalkativeClient.editingBranch!!.highestId)
@@ -197,24 +176,27 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
                     closeSubmenu()
                 }
 
-            actionMap["Edit Conditional"] = {
-                val context = ConditionalContext.NodeContext(TalkativeClient.editingBranchPath!!, widget.nodeId, TalkativeClient.editingBranch?.getNode(widget.nodeId)?.getConditional())
-                val popupSize = height - 10
-                val popupX = (width / 2) - (popupSize / 2)
-                popup = ConditionalEditorPopup(this, popupX, 10, popupSize, popupSize, context) {
-                    val newContext = it as ConditionalContext.NodeContext
-                    UpdateNodeConditionalPacket(newContext.branchPath, newContext.nodeId, newContext.conditional).sendToServer()
-                    closePopup()
+            if (widget != rootNodeWidget) {
+                actionMap["Edit Conditional"] = {
+                    val context = ConditionalContext.NodeContext(TalkativeClient.editingBranchPath!!, widget.nodeId, TalkativeClient.editingBranch?.getNode(widget.nodeId)?.getConditional())
+                    val popupSize = height - 10
+                    val popupX = (width / 2) - (popupSize / 2)
+                    popup = ConditionalEditorPopup(this, popupX, 10, popupSize, popupSize, context) {
+                        val newContext = it as ConditionalContext.NodeContext
+                        UpdateNodeConditionalPacket(newContext.branchPath, newContext.nodeId, newContext.conditional).sendToServer()
+                        closePopup()
+                    }
+                    closeSubmenu()
                 }
-                closeSubmenu()
             }
 
             actionMap["Copy Node ID"] = {
                 minecraft?.keyboardHandler?.clipboard = widget.nodeId.toString()
+                //ToDo: Visual feedback to confirm that ID was copied
             }
 
             if (rootNodeWidget!! != widget) {
-                if (widget.children.isEmpty())
+                if (widget.childNodes.isEmpty())
                     actionMap["Remove Node"] = {
                         println("Delete Node")
                         widget.parentWidget?.removeChild(widget)
