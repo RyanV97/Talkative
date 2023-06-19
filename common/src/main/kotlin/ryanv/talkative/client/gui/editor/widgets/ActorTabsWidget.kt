@@ -2,25 +2,49 @@ package ryanv.talkative.client.gui.editor.widgets
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
-import ryanv.talkative.client.gui.editor.ActorEditorScreen
+import ryanv.talkative.client.gui.editor.MainEditorScreen
 import ryanv.talkative.client.gui.editor.tabs.EditorTab
 import ryanv.talkative.client.gui.widgets.NestedWidget
 
-class ActorTabsWidget(val parentScreen: ActorEditorScreen, x: Int, y: Int, width: Int, height: Int) : NestedWidget(x, y, width, height, TextComponent.EMPTY) {
-    private var activeTab: Button? = null
+class ActorTabsWidget(x: Int, y: Int, width: Int, height: Int, val onTabChange: (EditorTab?, EditorTab) -> Unit) : NestedWidget(x, y, width, height, Component.empty()) {
+    private var activeTab: EditorTab? = null
+    private var activeTabIndex: Int = -1
 
     fun addTab(text: Component, editorTab: EditorTab) {
         val btnWidth = Minecraft.getInstance().font.width(text) + 10
-        addChild(TabButton(btnWidth, 20, text, editorTab, this))
+        addChild(TabButton(children.size, btnWidth, 20, text, editorTab, this))
         recalculateChildren()
     }
 
+    fun getActiveTab(): EditorTab? {
+        return this.activeTab
+    }
+
     fun getTab(index: Int): EditorTab? {
-        if (index >= children.size)
+        if (index < 0 || index >= children.size)
             return null
         return (children[index] as TabButton).tab
+    }
+
+    fun setActiveTab(index: Int) {
+        if (index < 0 || index >= children.size)
+            return
+        getTab(index)?.let { setActiveTab(index, it) }
+    }
+
+    fun setActiveTab(index: Int, tab: EditorTab) {
+        if (index < 0 || index >= children.size)
+            return
+
+        this.onTabChange(this.activeTab, tab)
+
+        if (this.activeTabIndex >= 0) children[activeTabIndex].active = true
+        children[index].active = false
+
+        this.activeTabIndex = index
+        this.activeTab = tab
     }
 
     override fun recalculateChildren() {
@@ -32,10 +56,15 @@ class ActorTabsWidget(val parentScreen: ActorEditorScreen, x: Int, y: Int, width
         }
     }
 
-    class TabButton(width: Int, height: Int, text: Component, val tab: EditorTab, parentWidget: ActorTabsWidget) : Button(0, 0, width, height, text, {
-        parentWidget.activeTab?.active = true
-        parentWidget.parentScreen.changeTab(tab)
-        parentWidget.activeTab = it
-        it.active = false
-    })
+    fun clear() {
+        clearChildren()
+    }
+
+    fun empty(): Boolean {
+        return children.isEmpty()
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}
+
+    class TabButton(index: Int, width: Int, height: Int, text: Component, val tab: EditorTab, parentWidget: ActorTabsWidget) : Button(0, 0, width, height, text, { parentWidget.setActiveTab(index, tab) })
 }

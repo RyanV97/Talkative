@@ -58,12 +58,17 @@ object FileUtil {
         return null
     }
 
+    fun branchExists(path: String): Boolean {
+        return File(DIR_BRANCH.toFile(), "$path.branch").exists()
+    }
+
     fun saveBranchData(path: String, data: CompoundTag) {
         val file = File(DIR_BRANCH.toFile(), "$path.branch")
         NbtIo.writeCompressed(data, file)
     }
 
     fun deleteBranchAtPath(path: String) {
-        //ToDo Delete Branch File
+        val file = File(DIR_BRANCH.toFile(), "$path.branch")
+        file.delete()
     }
 }

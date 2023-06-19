@@ -16,9 +16,13 @@ class MarkerData(var modelLocation: ResourceLocation = ResourceLocation("talkati
     }
 
     companion object {
-        fun deserialize(tag: CompoundTag): MarkerData {
-            var modelLocation = ResourceLocation(tag.getString(NBTConstants.MARKER_LOCATION))
-            var data = MarkerData(modelLocation)
+        fun deserialize(root: CompoundTag): MarkerData? {
+            if (!root.contains(NBTConstants.MARKER_DATA))
+                return null
+
+            val tag = root.getCompound(NBTConstants.MARKER_DATA)
+            val modelLocation = ResourceLocation(tag.getString(NBTConstants.MARKER_LOCATION))
+            val data = MarkerData(modelLocation)
 
             if (tag.contains(NBTConstants.MARKER_COLOUR))
                 data.baseColour = tag.getInt(NBTConstants.MARKER_COLOUR)

@@ -3,14 +3,16 @@ package ryanv.talkative.client.gui.editor.widgets.evaluable
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.network.chat.Component
 import ryanv.talkative.api.Evaluable
 import ryanv.talkative.client.gui.editor.ConditionalEditorPopup
+import ryanv.talkative.client.gui.editor.widgets.ScoreboardObjectiveTextBox
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.common.data.conditional.IntExpression
 
-class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpression, width: Int, height: Int, font: Font) : NestedWidget(0,0, width,height, TextComponent.EMPTY), EvaluableWidget {
-    val propertyBox: EditBox
+class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpression, width: Int, height: Int, font: Font) : NestedWidget(0,0, width,height, Component.empty()), EvaluableWidget {
+    val propertyBox: ScoreboardObjectiveTextBox
     val operationButton: Button
     val valueBox: EditBox
     val deleteButton: Button
@@ -26,15 +28,15 @@ class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpres
                     IntExpression.Operation.GREATER_THAN -> ">"
                     IntExpression.Operation.GREATER_EQUAL -> ">="
                 }
-            operationButton.message = TextComponent(label)
+            operationButton.message = Component.literal(label)
         }
 
     init {
-        propertyBox = addChild(EditBox(font, 0, 0, 120, 20, TextComponent.EMPTY))
-        operationButton = addChild(Button(0, 0, 22, 20, TextComponent("=="), ::cycleOperation))
-        valueBox = addChild(EditBox(font, 0, 0, 40, 20, TextComponent.EMPTY))
+        propertyBox = addChild(ScoreboardObjectiveTextBox(parent.parent, 0, 0, 120, 20, Component.empty()))
+        operationButton = addChild(Button(0, 0, 22, 20, Component.literal("=="), ::cycleOperation))
+        valueBox = addChild(EditBox(font, 0, 0, 40, 20, Component.empty()))
         valueBox.setFilter { return@setFilter it.toIntOrNull() != null || it.isBlank() }
-        deleteButton = addChild(Button(0, 0, 20, 20, TextComponent("X")) { parent.deleteEntry(this) })
+        deleteButton = addChild(Button(0, 0, 20, 20, Component.literal("X")) { parent.deleteEntry(this) })
         propertyBox.value = expression.propertyName
         operation = expression.operation
         valueBox.value = expression.valueB.toString()
@@ -67,5 +69,8 @@ class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpres
 
     override fun getModifiedEvaluable(): Evaluable? {
         return IntExpression(propertyBox.value, valueBox.value.toIntOrNull() ?: 0, operation)
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
     }
 }

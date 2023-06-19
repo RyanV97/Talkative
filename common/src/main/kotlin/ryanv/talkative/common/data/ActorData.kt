@@ -19,14 +19,11 @@ class ActorData {
     }
 
     fun getBranchForPlayer(player: ServerPlayer): BranchReference? {
-        var branch: BranchReference? = null
         dialogBranches.forEach {
-            if(it.getConditional() == null || it.getConditional()!!.eval(player)) {
-                if(branch == null || branch!!.actorBranchIndex < it.actorBranchIndex)
-                    branch = it
-            }
+            if(it.getConditional() == null || it.getConditional()!!.eval(player))
+                return it
         }
-        return branch
+        return null
     }
 
     fun shouldOverrideDisplayName(): Boolean {
@@ -35,22 +32,31 @@ class ActorData {
     }
 
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
-        tag.put(NBTConstants.MARKER_DATA, markerData?.serialize(CompoundTag()))
-        val tagList = ListTag()
-        for (branch in dialogBranches) {
-            tagList.add(branch.serialize(CompoundTag()))
-        }
-        tag.put(NBTConstants.BRANCH_REFERENCES, tagList)
+        if (markerData != null)
+            tag.put(NBTConstants.MARKER_DATA, markerData!!.serialize(CompoundTag()))
+
+        val branchList = ListTag()
+        for (branch in dialogBranches)
+            branchList.add(branch.serialize(CompoundTag()))
+        tag.put(NBTConstants.BRANCH_REFERENCES, branchList)
+
         return tag
+    }
+
+    fun validate() {
+        dialogBranches.forEach { it.validate() }
     }
 
     companion object {
         fun deserialize(tag: CompoundTag): ActorData {
             val serverActorData = ActorData()
-            serverActorData.markerData = MarkerData.deserialize(tag.getCompound(NBTConstants.MARKER_DATA))
+
+            serverActorData.markerData = MarkerData.deserialize(tag)
+
             val tagList = tag.getList(NBTConstants.BRANCH_REFERENCES, 10)
             for (branchTag in tagList)
                 serverActorData.dialogBranches.add(BranchReference.deserialize(branchTag as CompoundTag))
+
             return serverActorData
         }
     }

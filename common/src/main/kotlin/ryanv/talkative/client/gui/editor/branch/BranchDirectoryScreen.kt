@@ -1,20 +1,19 @@
-package ryanv.talkative.client.gui.editor
+package ryanv.talkative.client.gui.editor.branch
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.nbt.ListTag
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.Component
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.widgets.lists.StringSelectionList
 import ryanv.talkative.client.gui.widgets.popup.PopupWidget
 import ryanv.talkative.common.network.serverbound.RequestBranchListPacket
 import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
 
-class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: StringSelectionList.StringEntry?) -> Unit) : TalkativeScreen(parent, TextComponent.EMPTY) {
-    private lateinit var list: StringSelectionList
-    private lateinit var confirmButton: Button
+abstract class BranchDirectoryScreen(parent: Screen?) : TalkativeScreen(parent, Component.empty()) {
+    protected lateinit var list: StringSelectionList
 
     override fun init() {
         super.init()
@@ -23,15 +22,9 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
 
         list = addWidget(StringSelectionList(this, 0, 20, listRight, height - 20, ::onSelectionChange))
 
-        confirmButton = addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Confirm")) {
-            onConfirm(list.selectedEntry)
-            onClose()
-        })
-        confirmButton.active = false
-
-        addButton(Button(listRight, height - 20, 70, 20, TextComponent("New Branch")) {
+        addRenderableWidget(Button(listRight, height - 20, 70, 20, Component.literal("New Branch")) {
             popup = PopupWidget((width / 2) - 155, (height / 2) - 15, 310, 30, this)
-                .textField(5, 5, width = 195, defaultString = getSelectedPath())
+                .textField(5, 5, width = 195)
                 .button(205, 5, "Save") {
                     createBranch(popup!!.getAllTextFields()[0].value)
                 }
@@ -51,14 +44,10 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(poseStack)
+        renderBackground(poseStack!!)
         GuiComponent.drawCenteredString(poseStack, font, "Available Branches", width / 2, 6, 0xFFFFFF)
         list.render(poseStack, mouseX, mouseY, delta)
         super.render(poseStack, mouseX, mouseY, delta)
-    }
-
-    override fun onClose() {
-        minecraft!!.setScreen(parent)
     }
 
     private fun createBranch(path: String) {
@@ -70,7 +59,5 @@ class BranchDirectoryScreen(parent: Screen?, private var onConfirm: (selection: 
         return if (list.selectedEntry != null) list.selectedEntry!!.value else ""
     }
 
-    private fun onSelectionChange(selection: StringSelectionList.StringEntry?) {
-        confirmButton.active = true
-    }
+    open fun onSelectionChange(selection: StringSelectionList.StringEntry?) {}
 }

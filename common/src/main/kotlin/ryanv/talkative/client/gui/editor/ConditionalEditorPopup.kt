@@ -1,11 +1,10 @@
 package ryanv.talkative.client.gui.editor
 
 import com.mojang.blaze3d.vertex.PoseStack
-import kotlinx.coroutines.Runnable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import org.lwjgl.glfw.GLFW
-import ryanv.talkative.client.gui.DataScreen
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.editor.widgets.evaluable.ExpressionWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
@@ -58,6 +57,9 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, delta: Double): Boolean {
         return entryList.mouseScrolled(mouseX, mouseY, delta)
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
     }
 
     override fun recalculateChildren() {

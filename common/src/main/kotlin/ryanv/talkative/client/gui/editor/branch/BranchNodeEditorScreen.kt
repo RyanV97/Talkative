@@ -1,15 +1,16 @@
-package ryanv.talkative.client.gui.editor
+package ryanv.talkative.client.gui.editor.branch
 
-import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.SharedConstants
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.Component
 import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.DataScreen
 import ryanv.talkative.client.gui.TalkativeScreen
+import ryanv.talkative.client.gui.editor.ConditionalEditorPopup
 import ryanv.talkative.client.gui.editor.widgets.NodeWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
 import ryanv.talkative.client.util.ConditionalContext
@@ -20,44 +21,46 @@ import ryanv.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class BranchNodeEditorScreen(parent: TalkativeScreen?) : TalkativeScreen(parent, TextComponent("Dialog Tree Editor")), DataScreen {
-    var rootNodeWidget: NodeWidget? = null
+class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.literal("Dialog Tree Editor")), DataScreen {
     var nodeWidgets: ArrayList<NodeWidget> = ArrayList()
+    var rootNodeWidget: NodeWidget? = null
     var selectedNode: NodeWidget? = null
 
-    var offsetX: Int = 0
-    var offsetY: Int = 0
+    var offsetX: Int = 100
+    var offsetY: Int = -50
     var zoomScale: Float = 1.0F
 
     override fun init() {
         super.init()
         TalkativeClient.editingBranch?.let {
             refresh()
+            offsetX = rootNodeWidget!!.width / 2
+            offsetY = -(rootNodeWidget!!.height / 2)
         }
 
-        addButton(Button(width - 50, height - 20, 50, 20, TextComponent("Save")) {
+        addRenderableWidget(Button(width - 50, height - 20, 50, 20, Component.literal("Save")) {
             saveChanges()
             onClose()
         })
 
-        addButton(Button(width - 100, height - 20, 50, 20, TextComponent("Discard")) {
+        addRenderableWidget(Button(width - 100, height - 20, 50, 20, Component.literal("Discard")) {
             onClose()
         })
 
-        addButton(Button(width - 150, height - 20, 50, 20, TextComponent("Options")) {
+        addRenderableWidget(Button(width - 150, height - 20, 50, 20, Component.literal("Options")) {
             NodePositioner.layoutTree(rootNodeWidget!!)
         })
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(poseStack)
+        renderBackground(poseStack!!)
 
-        RenderSystem.pushMatrix()
-        RenderSystem.scalef(zoomScale, zoomScale, 1.0F)
+        poseStack.pushPose()
+        poseStack.scale(zoomScale, zoomScale, 1.0F)
 
         rootNodeWidget?.renderNodeAndChildren(poseStack, mouseX, mouseY, delta)
 
-        RenderSystem.popMatrix()
+        poseStack.popPose()
 
         super.render(poseStack, mouseX, mouseY, delta)
     }
@@ -151,17 +154,17 @@ class BranchNodeEditorScreen(parent: TalkativeScreen?) : TalkativeScreen(parent,
     }
 
     private fun addChild(child: NodeWidget) {
-        children.add(child)
+        addWidget(child)
         nodeWidgets.add(child)
     }
 
     fun removeChild(child: NodeWidget) {
-        children.remove(child)
+        removeWidget(child)
         nodeWidgets.remove(child)
     }
 
-    fun clearNodes() {
-        children.removeIf { it is NodeWidget }
+    private fun clearNodes() {
+        children().removeIf { it is NodeWidget }
         nodeWidgets.clear()
     }
 

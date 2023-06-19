@@ -1,6 +1,6 @@
 package ryanv.talkative.common.network
 
-import me.shedaniel.architectury.networking.NetworkChannel
+import dev.architectury.networking.NetworkChannel
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer

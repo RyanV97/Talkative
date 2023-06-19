@@ -1,6 +1,7 @@
 package ryanv.talkative.client.gui.dialog.widgets
 
 import net.minecraft.client.gui.components.AbstractWidget
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import ryanv.talkative.client.gui.dialog.DialogScreen
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
 
@@ -33,5 +34,8 @@ class DialogList(parent: DialogScreen, x: Int, y: Int, width: Int, var maxHeight
             return true
         }
         return false
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
     }
 }

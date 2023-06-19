@@ -23,16 +23,15 @@ configurations {
 
 repositories {
     maven {
-        name = 'kotlinforforge'
-        url = 'https://thedarkcolour.github.io/KotlinForForge/'
+        name = "kotlinforforge"
+        url = "https://thedarkcolour.github.io/KotlinForForge/"
     }
 }
 
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
-    // Remove the next line if you don't want to depend on the API
-    modApi "me.shedaniel:architectury-forge:${rootProject.architectury_version}"
-    implementation 'thedarkcolour:kotlinforforge:1.16.0'
+    modApi "dev.architectury:architectury-forge:${rootProject.architectury_version}"
+    implementation "thedarkcolour:kotlinforforge:${rootProject.kotlin_forge_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }

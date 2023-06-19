@@ -4,14 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.*
-import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
 import net.minecraft.resources.ResourceLocation
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.widgets.NestedWidget
 
-open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) : NestedWidget(x, y, width, height, TextComponent("Popup Window")) {
+open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) : NestedWidget(x, y, width, height, Component.literal("Popup Window")) {
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         fill(poseStack, x, y - 10, x + width, y, 0xFF666666.toInt())
@@ -52,17 +50,17 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
     }
 
     fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: (btn: Button) -> Unit): PopupWidget {
-        addChild(Button(this.x + x, this.y + y, width, height, TextComponent(label), action))
+        addChild(Button(this.x + x, this.y + y, width, height, Component.literal(label), action))
         return this
     }
 
     fun imageButton(x: Int, y: Int, iconTexture: ResourceLocation, textureX: Int = 0, textureY: Int = 0, width: Int = 50, height: Int = 50, texWidth: Int = 256, texHeight: Int = 256, diffTexY: Int = 0, action: Button.OnPress, tooltip: Button.OnTooltip = Button.NO_TOOLTIP): PopupWidget {
-        addChild(ImageButton(x, y, width, height, textureX, textureY, diffTexY, iconTexture, texWidth, texHeight, action, tooltip, TextComponent.EMPTY))
+        addChild(ImageButton(x, y, width, height, textureX, textureY, diffTexY, iconTexture, texWidth, texHeight, action, tooltip, Component.empty()))
         return this
     }
 
     fun textField(x: Int, y: Int, width: Int = 120, height: Int = 20, defaultString: String = ""): PopupWidget {
-        val field = EditBox(Minecraft.getInstance().font, this.x + x, this.y + y, width, height, TextComponent("Text Field"))
+        val field = EditBox(Minecraft.getInstance().font, this.x + x, this.y + y, width, height, Component.literal("Text Field"))
         field.value = defaultString
         addChild(field)
         return this

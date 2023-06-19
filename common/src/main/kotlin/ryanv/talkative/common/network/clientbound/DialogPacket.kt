@@ -3,7 +3,6 @@ package ryanv.talkative.common.network.clientbound
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
 
 class DialogPacket(val dialogLine: Component?, val responses: Int2ReferenceOpenHashMap<Component>?, val exitNode: Boolean) : TalkativePacket.ClientboundTalkativePacket {
@@ -13,7 +12,7 @@ class DialogPacket(val dialogLine: Component?, val responses: Int2ReferenceOpenH
         if (dialogLine != null)
             buf.writeComponent(this.dialogLine)
         else
-            buf.writeComponent(TextComponent.EMPTY)
+            buf.writeComponent(Component.empty())
         writeResponses(responses, buf)
         buf.writeBoolean(exitNode)
     }

@@ -1,6 +1,6 @@
 package ryanv.talkative.server.events
 
-import me.shedaniel.architectury.event.events.LifecycleEvent
+import dev.architectury.event.events.common.LifecycleEvent
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.storage.LevelResource
 import ryanv.talkative.common.util.FileUtil
@@ -8,7 +8,7 @@ import ryanv.talkative.common.util.FileUtil
 object WorldEventHandler {
 
     fun init() {
-        LifecycleEvent.SERVER_WORLD_LOAD.register(WorldEventHandler::serverWorldLoadEvent)
+        LifecycleEvent.SERVER_LEVEL_LOAD.register(WorldEventHandler::serverWorldLoadEvent)
     }
 
     private fun serverWorldLoadEvent(level: ServerLevel) {

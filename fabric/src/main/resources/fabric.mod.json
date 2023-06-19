@@ -19,11 +19,11 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.7.4",
+    "fabricloader": ">=0.14.19",
     "fabric": "*",
-    "minecraft": ">=1.16.4",
-    "architectury": ">=1.1.55",
-    "fabric-language-kotlin": ">=1.6.5+kotlin.1.5.31"
+    "minecraft": ">=1.19.2",
+    "architectury": ">=6.5.77",
+    "fabric-language-kotlin": ">=1.9.5+kotlin.1.8.22"
   },
   "mixins": [
     "talkative.mixins.json"

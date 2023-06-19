@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +24,12 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
     private ActorData actorData;
 
     public ActorData getActorData() {
+        return actorData;
+    }
+
+    public @NotNull ActorData getOrCreateActorData() {
+        if (actorData == null)
+            actorData = new ActorData();
         return actorData;
     }
 

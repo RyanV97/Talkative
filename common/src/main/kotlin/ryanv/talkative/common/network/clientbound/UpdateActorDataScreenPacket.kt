@@ -9,6 +9,7 @@ class UpdateActorDataScreenPacket(val actorData: ActorData) : NetworkHandler.Tal
     constructor(buf: FriendlyByteBuf) : this(ActorData.deserialize(buf.readNbt()!!))
 
     override fun encode(buf: FriendlyByteBuf) {
+        actorData.validate()
         buf.writeNbt(actorData.serialize(CompoundTag()))
     }
 }

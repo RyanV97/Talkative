@@ -6,8 +6,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractButton
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
 import net.minecraft.resources.ResourceLocation
 import ryanv.talkative.Talkative
 import ryanv.talkative.client.gui.dialog.DialogScreen
@@ -64,6 +64,9 @@ class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: 
         }
     }
 
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
+    }
+
     private fun calculateChild(child: ResponseButton): Int {
         child.x = x
         child.y = y + totalHeight
@@ -95,8 +98,8 @@ class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: 
         val font: Font
     ) : AbstractButton(x, y, width, height, contents) {
 
-        override fun renderButton(poseStack: PoseStack?, mouseX: Int, mouseY: Int, partialTicks: Float) {
-            val color: Int = if (isHovered()) 0xFF0096FF.toInt() else 0x960050FF.toInt()
+        override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+            val color: Int = if (isHoveredOrFocused) 0xFF0096FF.toInt() else 0x960050FF.toInt()
 
             fill(poseStack, x, y, x + width, y + height, -267386864)
 
@@ -116,22 +119,31 @@ class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: 
         override fun onPress() {
             parent.onResponse(index, contents)
         }
+
+        override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
+        }
     }
 
-    class ContinueButton(x: Int, y: Int, val parent: DialogScreen) : AbstractButton(x, y, 20, 20, TextComponent.EMPTY) {
+    class ContinueButton(x: Int, y: Int, val parent: DialogScreen) : AbstractButton(x, y, 20, 20, Component.empty()) {
         override fun renderButton(poseStack: PoseStack?, mouseX: Int, mouseY: Int, partialTicks: Float) {
-            Minecraft.getInstance().textureManager.bind(TEX)
+            Minecraft.getInstance().textureManager.bindForSetup(TEX)
             blit(poseStack, x, y, 0, 0, 11, 7)
         }
 
         override fun onPress() {
             parent.onContinue()
         }
+
+        override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
+        }
     }
 
-    class ExitButton(x: Int, y: Int, width: Int, height: Int, val parent: ResponsesWidget): AbstractButton(x, y, width, height, TextComponent("End Conversation")) {
+    class ExitButton(x: Int, y: Int, width: Int, height: Int, val parent: ResponsesWidget): AbstractButton(x, y, width, height, Component.literal("End Conversation")) {
         override fun onPress() {
             parent.parent.onClose()
+        }
+
+        override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
         }
     }
 

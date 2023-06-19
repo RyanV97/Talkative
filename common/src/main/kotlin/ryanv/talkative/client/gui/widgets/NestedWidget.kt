@@ -3,6 +3,7 @@ package ryanv.talkative.client.gui.widgets
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.components.EditBox
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.sounds.SoundManager
 import net.minecraft.network.chat.Component
 
@@ -156,6 +157,9 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
         for (child in children) {
             child.render(poseStack, mouseX, mouseY, partialTicks)
         }
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
     }
 
 //    fun tick() {

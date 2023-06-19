@@ -1,10 +1,9 @@
 package ryanv.talkative.common.network
 
-import me.shedaniel.architectury.networking.NetworkManager.PacketContext
-import me.shedaniel.architectury.platform.Platform
+import dev.architectury.networking.NetworkManager.PacketContext
+import dev.architectury.platform.Platform
 import net.minecraft.ChatFormatting
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.api.ActorEntity
 import ryanv.talkative.common.data.tree.BranchReference
@@ -18,13 +17,13 @@ import java.util.function.Supplier
 object ServerPacketHandler {
     fun processPacket(packet: TalkativePacket.ServerboundTalkativePacket, ctx: Supplier<PacketContext>) {
         val context = ctx.get()
+        val player = context.player as ServerPlayer
         if (Platform.isDevelopmentEnvironment()) println("Server Received Packet: $packet")
 
-        if (!packet.permissionCheck(context.player as ServerPlayer)) {
-            context.player.sendMessage(
-                TextComponent("You have insufficient permissions to perform this action.")
-                    .withStyle(ChatFormatting.DARK_RED),
-                null
+        if (!packet.permissionCheck(player)) {
+            player.sendSystemMessage(
+                Component.literal("You have insufficient permissions to perform this action.")
+                    .withStyle(ChatFormatting.DARK_RED)
             )
             return
         }

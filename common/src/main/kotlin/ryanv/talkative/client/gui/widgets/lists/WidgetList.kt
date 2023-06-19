@@ -4,14 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
 import net.minecraft.util.Mth
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.util.ScissorUtil
 import java.awt.Color
 
 //Original Code provided by DenimRed - https://github.com/DenimRed/
-open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height: Int, title: Component? = TextComponent.EMPTY) : NestedWidget(x, y, width, height, title) {
+open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, height: Int, title: Component? = Component.empty()) : NestedWidget(x, y, width, height, title) {
     protected var totalHeight = 0
     protected var scrollPos = 0
         set(pos) {

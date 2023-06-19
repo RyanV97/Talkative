@@ -2,7 +2,6 @@ package ryanv.talkative.server.conversations
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.api.ActorEntity
 import ryanv.talkative.common.data.tree.DialogBranch
@@ -48,15 +47,17 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
 
     private fun sendDialog(node: DialogNode) {
         currentNodeID = node.nodeId
-        val branch = getBranch()
+        val branch = getBranch() ?: return
         val responses = Int2ReferenceOpenHashMap<Component>()
 
         node.getResponseIDs()?.forEach {
-            //ToDo Change Node content to Component - This TextComponent is temporary until then
-            responses.put(it, TextComponent(branch?.getNode(it)?.content))
+            //ToDo Change Node content to Component - This Component.literal is temporary until then
+            branch.getNode(it).let { responseNode ->
+                responses.put(it, Component.literal(responseNode!!.content))
+            }
         }
 
-        DialogPacket(TextComponent(node.content), responses, node.getChildren().isEmpty()).sendToPlayer(player)
+        DialogPacket(Component.literal(node.content), responses, node.getChildren().isEmpty()).sendToPlayer(player)
     }
 
     fun changeBranch(newBranchPath: String) {

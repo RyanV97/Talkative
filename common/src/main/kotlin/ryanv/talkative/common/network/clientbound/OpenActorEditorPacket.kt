@@ -8,6 +8,7 @@ class OpenActorEditorPacket(val entityId: Int, val actorData: ActorData) : Talka
     constructor(buf: FriendlyByteBuf) : this(buf.readInt(), ActorData.deserialize(buf.readNbt()!!))
 
     override fun encode(buf: FriendlyByteBuf) {
+        actorData.validate()
         buf.writeInt(entityId)
         buf.writeNbt(actorData.serialize())
     }

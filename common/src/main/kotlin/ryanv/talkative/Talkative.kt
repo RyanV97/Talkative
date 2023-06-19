@@ -1,6 +1,6 @@
 package ryanv.talkative
 
-import me.shedaniel.architectury.registry.DeferredRegister
+import dev.architectury.registry.registries.DeferredRegister
 import net.minecraft.core.Registry
 import net.minecraft.world.item.Item
 import ryanv.talkative.common.item.ActorWandItem

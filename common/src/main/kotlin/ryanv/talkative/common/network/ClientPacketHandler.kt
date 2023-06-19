@@ -1,16 +1,16 @@
 package ryanv.talkative.common.network
 
-import me.shedaniel.architectury.networking.NetworkManager
-import me.shedaniel.architectury.platform.Platform
-import me.shedaniel.architectury.utils.NbtType
+import dev.architectury.networking.NetworkManager
+import dev.architectury.platform.Platform
 import net.minecraft.client.Minecraft
+import net.minecraft.nbt.Tag
 import net.minecraft.world.entity.LivingEntity
 import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.dialog.DialogScreen
-import ryanv.talkative.client.gui.editor.ActorEditorScreen
-import ryanv.talkative.client.gui.editor.BranchDirectoryScreen
-import ryanv.talkative.client.gui.editor.BranchNodeEditorScreen
+import ryanv.talkative.client.gui.editor.MainEditorScreen
+import ryanv.talkative.client.gui.editor.branch.BranchDirectoryScreen
+import ryanv.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import ryanv.talkative.common.network.NetworkHandler.TalkativePacket
 import ryanv.talkative.common.network.clientbound.*
 import java.util.function.Supplier
@@ -44,22 +44,23 @@ object ClientPacketHandler {
     private fun processOpenActorEditor(packet: OpenActorEditorPacket, ctx: NetworkManager.PacketContext) {
         ctx.player.level.getEntity(packet.entityId)?.let {
             if (it is LivingEntity) {
+                val screen = Minecraft.getInstance().screen
                 TalkativeClient.editingActorData = packet.actorData
-                Minecraft.getInstance().setScreen(ActorEditorScreen(it))
+
+                if (screen !is MainEditorScreen)
+                    Minecraft.getInstance().setScreen(MainEditorScreen(it))
             }
         }
     }
 
     private fun processOpenBranchEditor(packet: OpenBranchEditorPacket) {
-        val screen = Minecraft.getInstance().screen
-        val parent: TalkativeScreen? = if (screen is ActorEditorScreen) screen else null
         TalkativeClient.editingBranch = packet.branch
         TalkativeClient.editingBranchPath = packet.path
-        Minecraft.getInstance().setScreen(BranchNodeEditorScreen(parent))
+        Minecraft.getInstance().setScreen(BranchNodeEditorScreen(Minecraft.getInstance().screen))
     }
 
     private fun processSyncBranchList(packet: SyncBranchListPacket) {
-        val list = packet.tag?.getList("branchList", NbtType.STRING)
+        val list = packet.tag?.getList("branchList", Tag.TAG_STRING.toInt())
         val screen = Minecraft.getInstance().screen
         if (screen is BranchDirectoryScreen)
             screen.loadBranchList(list)

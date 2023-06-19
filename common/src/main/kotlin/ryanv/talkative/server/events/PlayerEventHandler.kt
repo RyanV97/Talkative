@@ -1,6 +1,6 @@
 package ryanv.talkative.server.events
 
-import me.shedaniel.architectury.event.events.PlayerEvent
+import dev.architectury.event.events.common.PlayerEvent
 import net.minecraft.server.level.ServerPlayer
 import ryanv.talkative.server.conversations.ConversationManager
 

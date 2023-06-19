@@ -2,46 +2,47 @@ package ryanv.talkative.client.gui.dialog
 
 import com.mojang.blaze3d.vertex.PoseStack
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
+import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextComponent
 import ryanv.talkative.client.gui.dialog.widgets.DialogList
 import ryanv.talkative.client.gui.dialog.widgets.ResponsesWidget
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.common.network.serverbound.DialogResponsePacket
 import ryanv.talkative.common.network.serverbound.FinishConversationPacket
 
-class DialogScreen : Screen(TextComponent("NPC Dialog")) {
-    private val pendingTasks = ArrayList<Runnable>()
+class DialogScreen : Screen(Component.literal("NPC Dialog")) {
     private var dialogEntryList: DialogList? = null
     private var currentDialogWidget: CurrentDialogWidget? = null
     private var responsesWidget: ResponsesWidget? = null
+
+    private val pendingTasks = ArrayList<Runnable>()
 
     override fun init() {
         super.init()
         val listWidth = width / 2
 
-        dialogEntryList = addButton(DialogList(this, listWidth - (listWidth / 2), 0, listWidth, height - 50, height - 50))
-        responsesWidget = addButton(ResponsesWidget(this, listWidth - (listWidth / 2), height - 50, listWidth, 50))
+        dialogEntryList = addRenderableWidget(DialogList(this, listWidth - (listWidth / 2), 0, listWidth, height - 50, height - 50))
+        responsesWidget = addRenderableWidget(ResponsesWidget(this, listWidth - (listWidth / 2), height - 50, listWidth, 50))
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(poseStack)
         currentDialogWidget?.render(poseStack, mouseX, mouseY, delta)
         super.render(poseStack, mouseX, mouseY, delta)
     }
 
-    override fun renderBackground(poseStack: PoseStack?) {
+    override fun renderBackground(poseStack: PoseStack) {
         fill(poseStack, 0, 0, width, height, 0x66000000)
     }
 
     fun loadDialog(dialogLine: Component, responses: Int2ReferenceOpenHashMap<Component>?, exitNode: Boolean) {
         //ToDo: Add Speaker to DialogNode
-        val speaker = TextComponent("Speaker")
+        val speaker = Component.literal("Speaker")
 
-        if (dialogLine != TextComponent.EMPTY) {
+        if (dialogLine != Component.empty()) {
             val listWidth = width / 2
-            val contentHeight = font.wordWrapHeight(dialogLine.contents, listWidth - 10) + 20
+            val contentHeight = font.wordWrapHeight(dialogLine, listWidth - 10) + 20
 
             dialogEntryList!!.setBottom(responsesWidget!!.y - contentHeight)
             currentDialogWidget = CurrentDialogWidget(
@@ -73,7 +74,7 @@ class DialogScreen : Screen(TextComponent("NPC Dialog")) {
                 dialogEntryList!!.setBottom(responsesWidget!!.y)
             }
             responsesWidget?.clear()
-            dialogEntryList?.addChild(DialogEntry(responseContents, TextComponent("Player"), this, false))
+            dialogEntryList?.addChild(DialogEntry(responseContents, Component.literal("Player"), this, false))
             DialogResponsePacket(index).sendToServer()
         }
     }
@@ -126,7 +127,10 @@ class DialogScreen : Screen(TextComponent("NPC Dialog")) {
 
         override fun setWidth(width: Int) {
             super.setWidth(width)
-            setHeight(parentScreen.font.wordWrapHeight(contents.contents, width - 5) + 25)
+            setHeight(parentScreen.font.wordWrapHeight(contents, width - 5) + 25)
+        }
+
+        override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
         }
     }
 

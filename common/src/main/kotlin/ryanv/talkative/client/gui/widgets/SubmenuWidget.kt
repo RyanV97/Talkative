@@ -5,9 +5,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.network.chat.Component
 
-class SubmenuWidget(x: Int, y: Int, private val label: String = "...", private val actions: Map<String, () -> Unit> = HashMap()) : AbstractWidget(x, y, 100, 150, TextComponent("Submenu")) {
+class SubmenuWidget(x: Int, y: Int, private val label: String = "...", private val actions: Map<String, () -> Unit> = HashMap()) : AbstractWidget(x, y, 100, 150, Component.literal("Submenu")) {
     private val font: Font = Minecraft.getInstance().font
 
     init {
@@ -47,5 +48,8 @@ class SubmenuWidget(x: Int, y: Int, private val label: String = "...", private v
     fun isMouseOver(index: Int, mouseX: Double, mouseY: Double): Boolean {
         val actionY = y + 13 + (index * 15)
         return active && visible && mouseX >= x.toDouble() && mouseY >= actionY.toDouble() && mouseX < (x + width).toDouble() && mouseY < (actionY + 15).toDouble()
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
     }
 }

@@ -5,16 +5,17 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.font.TextFieldHelper
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.network.chat.Component
 import ryanv.talkative.client.TalkativeClient
-import ryanv.talkative.client.gui.editor.BranchNodeEditorScreen
+import ryanv.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import ryanv.talkative.client.util.NodePositioner
 import ryanv.talkative.common.data.tree.DialogNode
 
-class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: NodeWidget?, private val parentScreen: BranchNodeEditorScreen): AbstractWidget(x, y, 121, 25, TextComponent("Dialog Node")) {
+class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: NodeWidget?, private val parentScreen: BranchNodeEditorScreen): AbstractWidget(x, y, 200, 0, Component.literal("Dialog Node")) {
     val minecraft: Minecraft = Minecraft.getInstance()
+    val minHeight = if (nodeType == DialogNode.NodeType.Dialog) 150 else 40
 
-    private val text = TextComponent(contents)
     var children: ArrayList<NodeWidget> = ArrayList()
     var lowestChildY: Int = 0
 
@@ -49,12 +50,12 @@ class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: Dialog
     }
 
     //Rendering
-    fun renderNodeAndChildren(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+    fun renderNodeAndChildren(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         renderNode(poseStack, mouseX, mouseY, delta)
         children.forEach { it.renderNodeAndChildren(poseStack, mouseX, mouseY, delta) }
     }
 
-    private fun renderNode(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+    private fun renderNode(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         if(visible) {
             val posX = this.x + parentScreen.offsetX
             val posY = this.y + parentScreen.offsetY
@@ -86,7 +87,7 @@ class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: Dialog
                 }
 
                 GuiComponent.drawString(poseStack, minecraft.font, label, posX + 2, posY + 1, 0xFFFFFF)
-                minecraft.font.drawWordWrap(TextComponent(contents), posX + 2, posY + 12, width - 4, 0xFFFFFF)
+                minecraft.font.drawWordWrap(Component.literal(contents), posX + 2, posY + 12, width - 4, 0xFFFFFF) //ToDo This doesn't scale with PoseStack
 
                 if(parentScreen.selectedNode == this) {
                     fill(poseStack, posX, posY + height + 1, posX + width, posY + height + 12, 0xFF333333.toInt())
@@ -98,16 +99,20 @@ class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: Dialog
     }
 
     private fun drawConnections(poseStack: PoseStack?, posX: Int, posY: Int, colour: Int) {
-        hLine(poseStack, posX + width, posX + width + 4, posY + (height / 2), colour)
+        hLine(poseStack, posX + width, posX + width + 5, posY + (height / 2), colour)
         children.forEach {
             val x = it.x + parentScreen.offsetX
             val y = it.y + parentScreen.offsetY + (it.height / 2)
-            hLine(poseStack, x - 4, x, y, colour)
+            hLine(poseStack, x - 5, x, y, colour)
         }
         val lastChild = children.last()
         val firstChild = children.first()
-        val yPos1 = (firstChild.y + parentScreen.offsetY) + (firstChild.height / 2) - 1
-        val yPos2 = lastChild.y + parentScreen.offsetY + (lastChild.height / 2) + 1
+
+        val yPos1 = (firstChild.y + parentScreen.offsetY) + (firstChild.height / 2)
+        val yPos2 =
+            if (children.size > 1) lastChild.y + parentScreen.offsetY + (lastChild.height / 2)
+            else (y + parentScreen.offsetY) + (height / 2) + 1
+
         vLine(poseStack, posX + width + 5, yPos1, yPos2, colour)
     }
 
@@ -148,7 +153,7 @@ class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: Dialog
 
     //Misc.
     private fun calculateHeight() {
-        val i = (12 + minecraft.font.wordWrapHeight(contents, width - 4)).coerceAtLeast(40)
+        val i = (12 + minecraft.font.wordWrapHeight(contents, width - 4)).coerceAtLeast(minHeight)
         if(i != height) {
             height = i
             parentScreen.rootNodeWidget?.let { NodePositioner.layoutTree(it) }
@@ -169,7 +174,10 @@ class NodeWidget(x: Int, y: Int, var contents: String = "", val nodeType: Dialog
         return scaledMouseX > posX - 1 && scaledMouseY > posY - 1 && scaledMouseX < posX + width + 1 && scaledMouseY < posY + height + 1
     }
 
-    override fun renderButton(poseStack: PoseStack?, i: Int, j: Int, f: Float) {
+    override fun renderButton(poseStack: PoseStack, i: Int, j: Int, f: Float) {
+    }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
     }
 
 }
