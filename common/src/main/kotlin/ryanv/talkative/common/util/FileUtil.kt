@@ -17,7 +17,7 @@ object FileUtil {
     fun createBranchAtPath(path: String) {
         val file = File(DIR_BRANCH.toFile(), "$path.branch")
         val branch = DialogBranch()
-        branch.addNode(DialogNode(nodeId = 0))
+        branch.addNode(DialogNode(0))
         val branchTag = branch.serialize(CompoundTag())
         //ToDo: Do a Exists check to handle overwriting
         file.parentFile.mkdirs()

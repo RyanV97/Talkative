@@ -1,6 +1,6 @@
-package ryanv.talkative.client.util
+package ryanv.talkative.client
 
-import ryanv.talkative.client.gui.editor.widgets.NodeWidget
+import ryanv.talkative.client.gui.editor.branch.widgets.nodes.NodeWidget
 
 object NodePositioner {
     fun layoutTree(rootWidget: NodeWidget) {

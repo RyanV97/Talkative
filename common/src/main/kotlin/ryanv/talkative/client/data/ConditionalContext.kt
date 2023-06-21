@@ -1,4 +1,4 @@
-package ryanv.talkative.client.util
+package ryanv.talkative.client.data
 
 import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.common.data.conditional.Conditional

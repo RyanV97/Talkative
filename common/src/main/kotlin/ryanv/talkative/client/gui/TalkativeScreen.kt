@@ -22,6 +22,8 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         super.init()
         centerX = width / 2
         centerY = height /2
+
+        popup?.recalculateChildren()
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {

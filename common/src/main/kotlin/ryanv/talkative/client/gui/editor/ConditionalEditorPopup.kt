@@ -9,7 +9,7 @@ import ryanv.talkative.client.gui.TalkativeScreen
 import ryanv.talkative.client.gui.editor.widgets.evaluable.ExpressionWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
 import ryanv.talkative.client.gui.widgets.popup.PopupWidget
-import ryanv.talkative.client.util.ConditionalContext
+import ryanv.talkative.client.data.ConditionalContext
 import ryanv.talkative.common.data.conditional.Conditional
 import ryanv.talkative.common.data.conditional.IntExpression
 

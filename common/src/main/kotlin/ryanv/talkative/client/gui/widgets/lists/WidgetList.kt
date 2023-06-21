@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import ryanv.talkative.client.gui.widgets.NestedWidget
-import ryanv.talkative.client.util.ScissorUtil
+import ryanv.talkative.client.ScissorUtil
 import java.awt.Color
 
 //Original Code provided by DenimRed - https://github.com/DenimRed/

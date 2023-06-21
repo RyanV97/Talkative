@@ -7,7 +7,7 @@ import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.util.NBTConstants
 
 class ActorData {
-    var markerData: MarkerData? = MarkerData()
+    var displayData: DisplayData? = DisplayData()
     var dialogBranches: ArrayList<BranchReference> = ArrayList()
 
     fun getBranchFromPath(path: String): BranchReference? {
@@ -32,8 +32,8 @@ class ActorData {
     }
 
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
-        if (markerData != null)
-            tag.put(NBTConstants.MARKER_DATA, markerData!!.serialize(CompoundTag()))
+        if (displayData != null)
+            tag.put(NBTConstants.DISPLAY_DATA, displayData!!.serialize(CompoundTag()))
 
         val branchList = ListTag()
         for (branch in dialogBranches)
@@ -51,7 +51,7 @@ class ActorData {
         fun deserialize(tag: CompoundTag): ActorData {
             val serverActorData = ActorData()
 
-            serverActorData.markerData = MarkerData.deserialize(tag)
+            serverActorData.displayData = DisplayData.deserialize(tag)
 
             val tagList = tag.getList(NBTConstants.BRANCH_REFERENCES, 10)
             for (branchTag in tagList)

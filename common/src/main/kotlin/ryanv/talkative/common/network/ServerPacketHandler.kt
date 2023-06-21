@@ -118,7 +118,8 @@ object ServerPacketHandler {
         FileUtil.getBranchFromPath(packet.branchPath)?.let { branch ->
             branch.getNode(packet.nodeId)?.setConditional(packet.conditional)
             FileUtil.saveBranchData(packet.branchPath, branch.serialize())
-            UpdateEditingBranchPacket(packet.branchPath, branch).sendToPlayer(ctx.player as ServerPlayer)
+            //Disabled to see if updating the conditional locally is enough
+            //UpdateEditingBranchPacket(packet.branchPath, branch).sendToPlayer(ctx.player as ServerPlayer)
         }
     }
 

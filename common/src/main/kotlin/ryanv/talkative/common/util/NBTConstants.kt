@@ -4,10 +4,12 @@ object NBTConstants {
     const val ACTOR_DATA = "TalkativeActorData"
     const val ACTOR_DATA_VERSION = "ActorDataVersion"
 
-    const val MARKER_DATA = "marker_data"
-    const val MARKER_LOCATION = "model_location"
-    const val MARKER_COLOUR = "colour_base"
-    const val MARKER_OUTLINE = "colour_outline"
+    const val DISPLAY_DATA = "marker_data"
+    const val DISPLAY_NAME_OVERRIDE = "name_override"
+    const val DISPLAY_NAME = "name"
+    const val DISPLAY_MARKER_LOCATION = "model_location"
+    const val DISPLAY_MARKER_COLOUR = "colour_base"
+    const val DISPLAY_MARKER_OUTLINE = "colour_outline"
 
     const val BRANCH_REFERENCES = "branch_references"
     const val BRANCH_NODES = "branch_nodes"
@@ -20,6 +22,7 @@ object NBTConstants {
     const val NODE_CONTENT = "node_contents"
     const val NODE_CHILDREN = "node_children"
     const val NODE_CHILD_TYPE = "node_child_type"
+    const val NODE_COMMANDS = "node_commands"
 
     const val CONDITIONAL = "conditional"
     const val CONDITIONAL_EXPRESSIONS = "expressions"

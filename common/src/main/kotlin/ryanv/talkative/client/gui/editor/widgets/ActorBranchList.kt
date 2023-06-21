@@ -13,11 +13,10 @@ import ryanv.talkative.client.gui.editor.MainEditorScreen
 import ryanv.talkative.client.gui.editor.tabs.ActorGeneralEditorTab
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.client.gui.widgets.lists.WidgetList
-import ryanv.talkative.client.util.ConditionalContext
+import ryanv.talkative.client.data.ConditionalContext
 import ryanv.talkative.common.data.tree.BranchReference
 import ryanv.talkative.common.network.serverbound.UnAttachBranchPacket
 import ryanv.talkative.common.network.serverbound.UpdateBranchConditionalPacket
-import java.awt.Color
 
 class ActorBranchList(private val parentTab: ActorGeneralEditorTab, x: Int, y: Int, width: Int, height: Int, title: Component) : WidgetList<MainEditorScreen>(parentTab.parentScreen, x, y, width, height, title) {
 

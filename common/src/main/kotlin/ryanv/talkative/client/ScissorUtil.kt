@@ -1,4 +1,4 @@
-package ryanv.talkative.client.util
+package ryanv.talkative.client
 
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft

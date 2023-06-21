@@ -1,20 +1,17 @@
-package ryanv.talkative.client.gui.editor.widgets
+package ryanv.talkative.client.gui.editor.branch.widgets.nodes
 
 import com.google.common.collect.Lists
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.components.MultiLineEditBox
-import net.minecraft.client.gui.font.TextFieldHelper
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
-import ryanv.talkative.client.TalkativeClient
 import ryanv.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import ryanv.talkative.client.gui.widgets.NestedWidget
 import ryanv.talkative.common.data.tree.DialogNode
 import ryanv.talkative.mixin.AbstractWidgetAccessor
 
-class NodeWidget(x: Int, y: Int, initialContents: String, val nodeType: DialogNode.NodeType, val nodeId: Int, val parentWidget: NodeWidget?, val parentScreen: BranchNodeEditorScreen): NestedWidget(x, y, 200, if (nodeType == DialogNode.NodeType.Dialog) 75 else 40, Component.literal("Dialog Node")) {
+class NodeWidget(x: Int, y: Int, val node: DialogNode, val parentWidget: NodeWidget?, val parentScreen: BranchNodeEditorScreen): NestedWidget(x, y, 200, if (node.nodeType == DialogNode.NodeType.Dialog) 75 else 40, Component.literal("Dialog Node")) {
     private val minecraft: Minecraft = Minecraft.getInstance()
 
     val editBox = addChild(NodeEditBox(this, x, y + 10, width, height - 10))
@@ -22,23 +19,13 @@ class NodeWidget(x: Int, y: Int, initialContents: String, val nodeType: DialogNo
     var lowestChildY: Int = 0
 
     init {
-        editBox.value = initialContents
-    }
-
-    fun serializeNodeAndChildren(): DialogNode {
-        val node = serializeNode()
-        for (child in childNodes) {
-            node.addChild(child.nodeId, child.nodeType)
-        }
-        return node
-    }
-
-    private fun serializeNode(): DialogNode {
-        return DialogNode(nodeType, editBox.value, TalkativeClient.editingBranch?.getNode(nodeId)?.getConditional(), nodeId)
+        editBox.value = node.content
+        editBox.setValueListener { node.content = it }
     }
 
     fun addChild(type: DialogNode.NodeType, id: Int) {
-        val child = parentScreen.createWidgetForNode(DialogNode(nodeType = type, nodeId = id), this)
+        val child = parentScreen.createWidgetForNode(DialogNode(id, type), this)
+        node.addChild(id, type)
         childNodes.add(child)
     }
 
@@ -63,7 +50,7 @@ class NodeWidget(x: Int, y: Int, initialContents: String, val nodeType: DialogNo
 
             if(shouldRender(posX, posY)) {
 
-                val bgColour: Int = when (nodeType) {
+                val bgColour: Int = when (node.nodeType) {
                     DialogNode.NodeType.Dialog -> 0xFF116611.toInt()
                     DialogNode.NodeType.Response -> 0xFF111166.toInt()
                 }
@@ -79,7 +66,7 @@ class NodeWidget(x: Int, y: Int, initialContents: String, val nodeType: DialogNo
                 fill(poseStack, posX, posY, posX + width, posY + 11, 0xFF333333.toInt())
                 fill(poseStack, posX, posY + 11, posX + width, posY + height, bgColour)
 
-                val label: String = when (nodeType) {
+                val label: String = when (node.nodeType) {
                     DialogNode.NodeType.Dialog -> "Dialog Node"
                     DialogNode.NodeType.Response -> "Response Node"
                 }
