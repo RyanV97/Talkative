@@ -1,7 +1,7 @@
 package dev.cryptcraft.talkative.client.gui.dialog
 
 import com.mojang.blaze3d.vertex.PoseStack
-import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
+import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
@@ -36,7 +36,7 @@ class DialogScreen : Screen(Component.literal("NPC Dialog")) {
         fill(poseStack, 0, 0, width, height, 0x66000000)
     }
 
-    fun loadDialog(dialogLine: Component, responses: Int2ReferenceOpenHashMap<Component>?, exitNode: Boolean) {
+    fun loadDialog(dialogLine: Component, responses: Int2ReferenceLinkedOpenHashMap<Component>?, exitNode: Boolean) {
         //ToDo: Add Speaker to DialogNode
         val speaker = Component.literal("Speaker")
 

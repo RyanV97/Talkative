@@ -1,11 +1,11 @@
 package dev.cryptcraft.talkative.common.data.tree
 
-import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
+import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.common.util.NBTConstants
 
-class DialogBranch(private val nodes: Int2ReferenceOpenHashMap<DialogNode> = Int2ReferenceOpenHashMap()) {
+class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<DialogNode> = Int2ReferenceLinkedOpenHashMap()) {
     var highestId: Int = 0
         get() {
             field += 1
@@ -52,7 +52,7 @@ class DialogBranch(private val nodes: Int2ReferenceOpenHashMap<DialogNode> = Int
 
     companion object {
         fun deserialize(tag: CompoundTag): DialogBranch? {
-            val nodes = Int2ReferenceOpenHashMap<DialogNode>()
+            val nodes = Int2ReferenceLinkedOpenHashMap<DialogNode>()
             val nodeList = tag.get(NBTConstants.BRANCH_NODES) as CompoundTag
             if (!nodeList.contains("0")) {
                 //uh oh, no root? :c

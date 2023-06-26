@@ -51,6 +51,10 @@ class CommandEditorScreen(parentScreen: BranchNodeEditorScreen, private val node
         this.removalList.clear()
     }
 
+    override fun shouldCloseOnEsc(): Boolean {
+        return false
+    }
+
     class CommandEntry(width: Int, height: Int, private val parentPopup: CommandEditorScreen) : NestedWidget(0,0, width, height, Component.empty()) {
         val commandBox = addChild(EditBox(Minecraft.getInstance().font, 0, 0, width - 25, height - 2, Component.empty()))
         val deleteButton = addChild(Button(0, 0, 20, 20, Component.literal("X")) {

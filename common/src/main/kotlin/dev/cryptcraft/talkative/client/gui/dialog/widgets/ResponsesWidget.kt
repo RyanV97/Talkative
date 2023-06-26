@@ -1,7 +1,7 @@
 package dev.cryptcraft.talkative.client.gui.dialog.widgets
 
 import com.mojang.blaze3d.vertex.PoseStack
-import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
+import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiComponent
@@ -28,7 +28,7 @@ class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: 
         renderEntryBackground = false
     }
 
-    fun repopulateResponses(responses: Int2ReferenceOpenHashMap<Component>) {
+    fun repopulateResponses(responses: Int2ReferenceLinkedOpenHashMap<Component>) {
         clear()
 
         //ToDo: These don't seem to be in order
@@ -88,7 +88,8 @@ class ResponsesWidget(parent: DialogScreen, x: Int, y: Int, width: Int, height: 
         currentState = State.FINISH
     }
 
-    class ResponseButton(
+    class ResponseButton
+        (
         val index: Int,
         x: Int,
         y: Int,

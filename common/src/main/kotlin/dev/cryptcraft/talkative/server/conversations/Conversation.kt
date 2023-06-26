@@ -1,6 +1,6 @@
 package dev.cryptcraft.talkative.server.conversations
 
-import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap
+import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
@@ -55,7 +55,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     private fun sendDialog(node: DialogNode) {
         currentNodeID = node.nodeId
         val branch = getBranch() ?: return
-        val responses = Int2ReferenceOpenHashMap<Component>()
+        val responses = Int2ReferenceLinkedOpenHashMap<Component>()
 
         node.getResponseIDs()?.forEach { id ->
             //ToDo Change Node content to Component - This Component.literal is temporary until then
