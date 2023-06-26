@@ -1,7 +1,7 @@
 modLoader = "kotlinforforge"
 loaderVersion = "[1.15.1,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "MIT"
 
 [[mods]]
 modId = "talkative"
@@ -9,8 +9,7 @@ version = "${version}"
 displayName = "Talkative"
 authors = "RyanV"
 description = '''
-A mod for adding Dialog Trees to Entities!
-Originally made for Crypts N Creepers.
+A mod for adding Dialog Trees to Entities! Made for Crypts & Creepers.
 '''
 #logoFile = ""
 

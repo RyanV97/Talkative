@@ -4,11 +4,11 @@
   "package": "dev.cryptcraft.talkative.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "dev.cryptcraft.talkative.mixin.entity.LivingEntityActorDataMixin"
+    "entity.LivingEntityActorDataMixin"
   ],
   "client": [
-    "dev.cryptcraft.talkative.mixin.AbstractScrollWidgetAccessor",
-    "dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor"
+    "AbstractScrollWidgetAccessor",
+    "AbstractWidgetAccessor"
   ],
   "server": []
 }

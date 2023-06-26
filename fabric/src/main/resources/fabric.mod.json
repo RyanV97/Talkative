@@ -3,11 +3,11 @@
   "id": "talkative",
   "version": "${version}",
   "name": "Talkative",
-  "description": "A mod for adding Dialog Trees to Entities!\nOriginally made for Crypts N Creepers.",
+  "description": "A mod for adding Dialog Trees to Entities! Made for Crypts & Creepers.",
   "authors": [
     "RyanV"
   ],
-  "license": "Insert License Here",
+  "license": "MIT",
   "icon": "assets/talkative/icon.png",
   "environment": "*",
   "entrypoints": {
