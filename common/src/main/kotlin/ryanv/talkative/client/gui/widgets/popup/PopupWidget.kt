@@ -68,7 +68,7 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
     }
 
     fun list(x: Int, y: Int, width: Int, height: Int): WidgetList<TalkativeScreen> {
-        return addChild(WidgetList(parent, x, y, width, height))
+        return addChild(WidgetList(parent, this.x + x, this.y + y, width, height))
     }
 
     class Builder(val x: Int, val y: Int, val width: Int, val height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) {

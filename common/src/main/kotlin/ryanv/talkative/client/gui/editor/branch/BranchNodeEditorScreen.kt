@@ -14,7 +14,6 @@ import ryanv.talkative.client.gui.editor.branch.widgets.nodes.NodeWidget
 import ryanv.talkative.client.gui.widgets.SubmenuWidget
 import ryanv.talkative.client.data.ConditionalContext
 import ryanv.talkative.client.NodePositioner
-import ryanv.talkative.client.gui.editor.branch.widgets.nodes.MissingNodeWidget
 import ryanv.talkative.common.data.tree.DialogNode
 import ryanv.talkative.common.network.serverbound.UpdateBranchPacket
 import ryanv.talkative.common.network.serverbound.UpdateNodeConditionalPacket
@@ -196,7 +195,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             }
 
             actionMap["Edit Commands"] = {
-                popup = CommandEditorPopup((width / 2) - 128, (height / 2) - 118, 256, 246, this, widget.node)
+                minecraft!!.setScreen(CommandEditorScreen(this, widget.node))
                 closeSubmenu()
             }
 

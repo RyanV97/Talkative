@@ -38,7 +38,6 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
         context.refresh()
         context.conditional?.forEach {
             if (it is IntExpression) entryList.addChild(ExpressionWidget(this, it, width, 25, Minecraft.getInstance().font))
-            //else  entryList?.addChild(ExpressionWidget(this, , width, 50, Minecraft.getInstance().font)) - Sub-Conditionals
         }
     }
 
