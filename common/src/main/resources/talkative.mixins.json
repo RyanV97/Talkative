@@ -1,14 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "ryanv.talkative.mixin",
+  "package": "dev.cryptcraft.talkative.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "entity.LivingEntityActorDataMixin"
+    "dev.cryptcraft.talkative.mixin.entity.LivingEntityActorDataMixin"
   ],
   "client": [
-    "AbstractScrollWidgetAccessor",
-    "AbstractWidgetAccessor"
+    "dev.cryptcraft.talkative.mixin.AbstractScrollWidgetAccessor",
+    "dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor"
   ],
   "server": []
 }

@@ -14,7 +14,7 @@
     "main": [
       {
         "adapter": "kotlin",
-        "value": "ryanv.talkative.fabric.TalkativeFabric"
+        "value": "dev.cryptcraft.talkative.fabric.TalkativeFabric"
       }
     ]
   },
