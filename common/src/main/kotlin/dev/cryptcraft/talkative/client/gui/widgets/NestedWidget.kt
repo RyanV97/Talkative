@@ -76,6 +76,7 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
     override fun playDownSound(manager: SoundManager) {}
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        //ToDo: Fix "confirm" button presses passing to all children
         if (visible && active) {
             var b = false
             for (child in children) {
@@ -112,6 +113,19 @@ open class NestedWidget(x: Int, y: Int, width: Int, height: Int, title: Componen
                 }
             }
             return b || super.mouseClicked(mouseX, mouseY, mouseButton)
+        }
+        return false
+    }
+
+    override fun mouseDragged(mouseX: Double, mouseY: Double, mouseButton: Int, dragX: Double, dragY: Double): Boolean {
+        if (isMouseOver(mouseX, mouseY)) {
+            var b = false
+            for (child in children) {
+                if (child.mouseDragged(mouseX, mouseY, mouseButton, dragX, dragY)) {
+                    b = true
+                }
+            }
+            return b || super.mouseDragged(mouseX, mouseY, mouseButton, dragX, dragY)
         }
         return false
     }

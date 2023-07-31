@@ -15,6 +15,7 @@ import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 abstract class BranchDirectoryScreen(parent: Screen?) : TalkativeScreen(parent, Component.empty()) {
     protected lateinit var list: StringSelectionList
 
+    //ToDo: Move Buttons to top, maybe style them as a toolbar?
     override fun init() {
         super.init()
 

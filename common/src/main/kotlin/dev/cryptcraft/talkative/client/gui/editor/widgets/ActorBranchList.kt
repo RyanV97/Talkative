@@ -10,31 +10,30 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import dev.cryptcraft.talkative.client.gui.editor.ConditionalEditorPopup
 import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
-import dev.cryptcraft.talkative.client.gui.editor.tabs.ActorGeneralEditorTab
+import dev.cryptcraft.talkative.client.gui.editor.tabs.ActorTab
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import dev.cryptcraft.talkative.client.data.ConditionalContext
+import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.common.data.tree.BranchReference
 import dev.cryptcraft.talkative.common.network.serverbound.UnAttachBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchConditionalPacket
 
-class ActorBranchList(private val parentTab: ActorGeneralEditorTab, x: Int, y: Int, width: Int, height: Int, title: Component) : WidgetList<MainEditorScreen>(parentTab.parentScreen, x, y, width, height, title) {
+class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: Int, height: Int, title: Component) : WidgetList<MainEditorScreen>(parentTab.parentScreen, x, y, width, height, title) {
 
     fun addEntry(actorIndex: Int, branch: BranchReference) {
         addChild(BranchListEntry(parentTab, actorIndex, branch))
     }
 
-    class BranchListEntry(private val parentTab: ActorGeneralEditorTab, val index: Int, val branch: BranchReference) : NestedWidget(0, 0, 0, 20, Component.literal(branch.fileString)) {
-        private val conditionalButton: Button = addChild(Button(0, 0, 20, 20, Component.literal("C"), ::openConditionalEditor, ::handleTooltip))
-        private val detachButton: Button = addChild(Button(0, 0, 20, 20, Component.literal("X"), ::detachBranch, ::handleTooltip))
+    class BranchListEntry(private val parentTab: ActorTab, val index: Int, val branch: BranchReference) : NestedWidget(0, 0, 0, 20, Component.literal(branch.fileString)) {
+        private val conditionalButton = addChild(TalkativeButton(0, 0, 20, 20, Component.literal("C"), ::openConditionalEditor, ::handleTooltip))
+        private val detachButton = addChild(TalkativeButton(0, 0, 20, 20, Component.literal("X"), ::detachBranch, ::handleTooltip))
 
         init {
             conditionalButton.active = branch.valid
         }
 
         override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-            GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x55cccccc)
-
             val color: Int = if(!branch.valid) 0xFF0000 else if (isMouseOver(mouseX.toDouble(), mouseY.toDouble())) 0xFFFFFF else 0xCCCCCC
             val label = Component.literal(branch.fileString)
 
@@ -55,7 +54,7 @@ class ActorBranchList(private val parentTab: ActorGeneralEditorTab, x: Int, y: I
             this.detachButton.y = this.y
         }
 
-        private fun openConditionalEditor(button: Button) {
+        private fun openConditionalEditor(button: TalkativeButton) {
             val parentScreen = parentTab.parentScreen
             val context = ConditionalContext.BranchContext(parentScreen.actorEntity!!.id, index, branch.getConditional())
 
@@ -69,11 +68,11 @@ class ActorBranchList(private val parentTab: ActorGeneralEditorTab, x: Int, y: I
             }
         }
 
-        private fun detachBranch(button: Button) {
+        private fun detachBranch(button: TalkativeButton) {
             UnAttachBranchPacket(parentTab.parentScreen.actorEntity!!.id, index).sendToServer()
         }
 
-        private fun handleTooltip(button: Button, poseStack: PoseStack, mouseX: Int, mouseY: Int) {
+        private fun handleTooltip(button: TalkativeButton, poseStack: PoseStack, mouseX: Int, mouseY: Int) {
             if (button == this.conditionalButton && !branch.valid)
                 return
 

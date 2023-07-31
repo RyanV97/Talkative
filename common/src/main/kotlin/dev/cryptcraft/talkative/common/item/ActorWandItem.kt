@@ -13,6 +13,8 @@ import dev.cryptcraft.talkative.common.network.clientbound.OpenActorEditorPacket
 
 class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
 
+    //ToDo: Open Editor on regular Right Click
+
     override fun interactLivingEntity(itemStack: ItemStack, player: Player, livingEntity: LivingEntity, interactionHand: InteractionHand): InteractionResult {
         if (player.level.isClientSide || livingEntity is Player)
             return InteractionResult.FAIL

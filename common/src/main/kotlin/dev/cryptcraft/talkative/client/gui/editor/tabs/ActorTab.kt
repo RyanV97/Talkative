@@ -1,6 +1,7 @@
 package dev.cryptcraft.talkative.client.gui.editor.tabs
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.cryptcraft.talkative.api.ActorEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.Button
@@ -9,18 +10,19 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.TalkativeClient
-import dev.cryptcraft.talkative.client.gui.editor.branch.BranchDirectoryScreen
 import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.AttachBranchScreen
 import dev.cryptcraft.talkative.client.gui.editor.widgets.ActorBranchList
+import dev.cryptcraft.talkative.client.gui.editor.widgets.CallbackCheckbox
+import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.common.network.serverbound.AttachBranchPacket
 
-class ActorGeneralEditorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorScreen) :
+class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorScreen) :
     EditorTab(x, y, width, height, parent, Component.literal("General Actor Settings")) {
-    private val overrideDisplayName: Checkbox = addChild(Checkbox(0,0, 20, 20, Component.literal("Override Entity Name"), TalkativeClient.editingActorData?.shouldOverrideDisplayName() ?: false))
+    private val overrideDisplayName: Checkbox = addChild(CallbackCheckbox(0,0, 20, 20, Component.literal("Override Entity Name"), TalkativeClient.editingActorData?.displayData?.overrideDisplayName ?: false, ::changeDisplayOverride))
     private val actorDisplayName: EditBox = addChild(EditBox(Minecraft.getInstance().font, 0,0, 150, 20, Component.literal("Actor Display Name")))
     private val branchList: ActorBranchList = addChild(ActorBranchList(this, 0, 0, width / 2, height - 40, Component.literal("Attached Branches List")))
-    private val attachButton: Button = addChild(Button(0, 0, 15, 15, Component.literal("+"), ::attachBranchPrompt))
+    private val attachButton: TalkativeButton = addChild(TalkativeButton(0, 0, 15, 15, Component.literal("+"), { openAttachBranchScreen() }))
 
     private var horizontalMid: Int = 0
 
@@ -28,12 +30,14 @@ class ActorGeneralEditorTab(x: Int, y: Int, width: Int, height: Int, val parent:
         recalculateChildren()
         refresh()
 
-        //ToDo Figure out how to sync data on tab change to this
+        actorDisplayName.setResponder {
+            (parent.actorEntity as ActorEntity).getActorData()?.displayData?.displayName = it
+        }
+        actorDisplayName.setSuggestion(parent.actorEntity!!.displayName.string)
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        fillGradient(poseStack, horizontalMid, y + 15, horizontalMid + (width / 2), y + height, 0x55000000.toInt(), 0x55000000.toInt())
-        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, "Attached Branches", x + (width / 2) + 2, y + 20, 0xFFFFFF)
+        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, Component.literal("Attached Branches").withStyle { it.withBold(true).withUnderlined(true) }, x + (width / 2) + 2, y + 20, 0xFFFFFF)
         this.actorDisplayName.setEditable(this.overrideDisplayName.selected())
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
@@ -72,7 +76,12 @@ class ActorGeneralEditorTab(x: Int, y: Int, width: Int, height: Int, val parent:
         super.recalculateChildren()
     }
 
-    private fun attachBranchPrompt(button: Button) {
+    //ToDo: Finish implementing Name Override
+    private fun changeDisplayOverride() {
+        (parent.actorEntity as ActorEntity).getActorData()?.displayData?.overrideDisplayName = overrideDisplayName.selected()
+    }
+
+    private fun openAttachBranchScreen() {
         Minecraft.getInstance().setScreen(AttachBranchScreen(parent) {
             if (it!!.value.isNotBlank())
                 addBranchToActor(it.value)

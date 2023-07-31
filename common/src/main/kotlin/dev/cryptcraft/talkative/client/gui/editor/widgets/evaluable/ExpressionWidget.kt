@@ -56,6 +56,7 @@ class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpres
     }
 
     private fun cycleOperation(btn: Button) {
+        //ToDo: Cycle Backwards with Right Click?
         var index = operation.ordinal + 1
         val values = IntExpression.Operation.values()
         if (index >= values.size)

@@ -17,7 +17,7 @@ import dev.cryptcraft.talkative.client.NodePositioner
 import dev.cryptcraft.talkative.common.data.tree.DialogNode
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateNodeConditionalPacket
-import dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor
+import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -30,6 +30,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     var offsetY: Int = -50
     var zoomScale: Float = 1.0F
 
+    //ToDo: Move Buttons to top, maybe style them as a toolbar?
     override fun init() {
         super.init()
         TalkativeClient.editingBranch?.let {
@@ -43,7 +44,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             onClose()
         })
 
-        addRenderableWidget(Button(width - 100, height - 20, 50, 20, Component.literal("Discard")) {
+        addRenderableWidget(Button(width - 100, height - 20, 50, 20, Component.literal("Cancel")) {
             onClose()
         })
 
@@ -104,7 +105,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
     override fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
         if (selectedNode != null && keyCode == 256) {
-            (selectedNode!!.editBox as dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor).pleaseSetFocused(false)
+            (selectedNode!!.editBox as AbstractWidgetAccessor).pleaseSetFocused(false)
             selectedNode = null
             return true
         }

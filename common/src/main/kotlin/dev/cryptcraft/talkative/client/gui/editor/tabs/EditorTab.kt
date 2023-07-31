@@ -9,7 +9,6 @@ import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 
 abstract class EditorTab(x: Int, y: Int, width: Int, height: Int, val parentScreen: MainEditorScreen, title: Component) : NestedWidget(x, y, width, height, title) {
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        GuiComponent.drawCenteredString(poseStack, Minecraft.getInstance().font, message, x + (width / 2), y, 0xFFFFFF)
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
 

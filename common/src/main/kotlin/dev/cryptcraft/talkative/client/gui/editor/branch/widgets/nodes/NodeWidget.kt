@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.common.data.tree.DialogNode
-import dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor
+import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
 
 class NodeWidget(x: Int, y: Int, val node: DialogNode, val parentWidget: NodeWidget?, val parentScreen: BranchNodeEditorScreen): NestedWidget(x, y, 200, if (node.nodeType == DialogNode.NodeType.Dialog) 75 else 40, Component.literal("Dialog Node")) {
     private val minecraft: Minecraft = Minecraft.getInstance()
@@ -113,7 +113,7 @@ class NodeWidget(x: Int, y: Int, val node: DialogNode, val parentWidget: NodeWid
             when(button) {
                 0 -> {
                     parentScreen.selectedNode = this
-                    (editBox as dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor).pleaseSetFocused(true)
+                    (editBox as AbstractWidgetAccessor).pleaseSetFocused(true)
                 }
                 1 -> {
                     parentScreen.createSubMenu(mouseX.toInt(), mouseY.toInt(), this)
@@ -121,7 +121,7 @@ class NodeWidget(x: Int, y: Int, val node: DialogNode, val parentWidget: NodeWid
             }
             return true
         }
-        (editBox as dev.cryptcraft.talkative.mixin.AbstractWidgetAccessor).pleaseSetFocused(false)
+        (editBox as AbstractWidgetAccessor).pleaseSetFocused(false)
         return false
     }
 

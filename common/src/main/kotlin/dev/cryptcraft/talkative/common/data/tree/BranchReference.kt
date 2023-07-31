@@ -6,6 +6,12 @@ import dev.cryptcraft.talkative.common.data.conditional.Conditional
 import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.NBTConstants
 
+/**
+ * A Reference to a [DialogBranch] File
+ *
+ * @property[fileString] The path to the referenced Branch, relative to the current World's 'talkative/branches' folder.
+ * @property[conditional] The Conditional used to evaluate if a Player should be allowed to progress down this Branch.
+ */
 class BranchReference(var fileString: String, private var conditional: Conditional? = null) : ConditionalHolder {
     var valid: Boolean = FileUtil.branchExists(fileString)
 

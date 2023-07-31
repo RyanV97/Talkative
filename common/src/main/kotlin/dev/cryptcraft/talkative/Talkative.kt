@@ -12,12 +12,12 @@ import dev.cryptcraft.talkative.server.events.WorldEventHandler
 object Talkative {
     const val MOD_ID = "talkative"
 
-    private val ITEMS: DeferredRegister<Item> = DeferredRegister.create(dev.cryptcraft.talkative.Talkative.MOD_ID, Registry.ITEM_REGISTRY)
-    val ACTOR_WAND = dev.cryptcraft.talkative.Talkative.ITEMS.register("actor_wand") { ActorWandItem() }
+    private val ITEMS: DeferredRegister<Item> = DeferredRegister.create(MOD_ID, Registry.ITEM_REGISTRY)
+    val ACTOR_WAND = ITEMS.register("actor_wand") { ActorWandItem() }
 
     @JvmStatic
     fun init() {
-        dev.cryptcraft.talkative.Talkative.ITEMS.register()
+        ITEMS.register()
         EntityEventHandler.init()
         WorldEventHandler.init()
         PlayerEventHandler.init()

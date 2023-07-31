@@ -5,14 +5,14 @@ import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
 import dev.cryptcraft.talkative.client.gui.widgets.lists.StringSelectionList
 
-class AttachBranchScreen(parentScreen: MainEditorScreen, private var onConfirm: (selection: StringSelectionList.StringEntry?) -> Unit) : BranchDirectoryScreen(parentScreen) {
+class AttachBranchScreen(parentScreen: MainEditorScreen, private var callback: (selection: StringSelectionList.StringEntry?) -> Unit) : BranchDirectoryScreen(parentScreen) {
     private lateinit var confirmButton: Button
 
     override fun init() {
         super.init()
 
-        confirmButton = addRenderableWidget(Button(width - 50, height - 20, 50, 20, Component.literal("Confirm")) {
-            onConfirm(list.selectedEntry)
+        confirmButton = addRenderableWidget(Button(width - 50, height - 20, 50, 20, Component.literal("Attach")) {
+            callback(list.selectedEntry)
             onClose()
         })
         confirmButton.active = false

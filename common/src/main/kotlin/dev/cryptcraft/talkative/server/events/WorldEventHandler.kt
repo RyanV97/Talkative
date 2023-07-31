@@ -14,9 +14,14 @@ object WorldEventHandler {
     private fun serverWorldLoadEvent(level: ServerLevel) {
         val worldDir = level.server.getWorldPath(LevelResource.ROOT)
         FileUtil.DIR_WORLD = worldDir
-        FileUtil.DIR_BRANCH = worldDir.resolve("talkative/branches")
-        if (!FileUtil.DIR_BRANCH.toFile().exists())
-            FileUtil.DIR_BRANCH.toFile().mkdirs()
+
+        FileUtil.DIR_BRANCHES = worldDir.resolve("talkative/branches")
+        if (!FileUtil.DIR_BRANCHES!!.toFile().exists())
+            FileUtil.DIR_BRANCHES!!.toFile().mkdirs()
+
+        FileUtil.DIR_MARKERS = worldDir.resolve("talkative/markers")
+        if (!FileUtil.DIR_MARKERS!!.toFile().exists())
+            FileUtil.DIR_MARKERS!!.toFile().mkdirs()
     }
 
 }

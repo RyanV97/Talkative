@@ -54,7 +54,7 @@ class DialogNode(val nodeId: Int, var nodeType: NodeType = NodeType.Dialog, var 
         return clone
     }
 
-    fun serialize(tag: CompoundTag): CompoundTag {
+    fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
         tag.putInt(NBTConstants.NODE_ID, nodeId)
         tag.putString(NBTConstants.NODE_TYPE, nodeType.name)
         tag.putString(NBTConstants.NODE_CONTENT, content)

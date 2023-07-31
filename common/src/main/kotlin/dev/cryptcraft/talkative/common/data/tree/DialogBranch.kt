@@ -4,6 +4,8 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.common.util.NBTConstants
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.Tag
 
 class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<DialogNode> = Int2ReferenceLinkedOpenHashMap()) {
     var highestId: Int = 0
@@ -40,34 +42,35 @@ class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<DialogNode>
     }
 
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
-        val nodeList = CompoundTag()
-        nodes.forEach { (id, node) ->
-            nodeList.put(id.toString(), node.serialize(CompoundTag()))
+        val nodeList = ListTag()
+
+        nodes.values.forEach { node ->
+            nodeList.add(node.serialize())
         }
         tag.put(NBTConstants.BRANCH_NODES, nodeList)
+
         if (nodes.isNotEmpty())
             tag.putInt(NBTConstants.BRANCH_HIGH_ID, nodes.maxByOrNull { it.key }!!.key)
+
         return tag
     }
 
     companion object {
         fun deserialize(tag: CompoundTag): DialogBranch? {
             val nodes = Int2ReferenceLinkedOpenHashMap<DialogNode>()
-            val nodeList = tag.get(NBTConstants.BRANCH_NODES) as CompoundTag
-            if (!nodeList.contains("0")) {
-                //uh oh, no root? :c
-                //Throw exception
-                return null
+            val nodeList = tag.getList(NBTConstants.BRANCH_NODES, Tag.TAG_COMPOUND.toInt())
+
+            nodeList.forEach {
+                val nodeData = it as CompoundTag
+                val node = DialogNode.deserialize(nodeData)
+                nodes.put(nodeData.getInt(NBTConstants.NODE_ID), node!!)
             }
-            nodeList.allKeys.forEach {
-                val id: Int = it.toInt()
-                val node = DialogNode.deserialize(nodeList.get(it) as CompoundTag)
-                nodes.put(id, node!!)
-            }
+
             var highestId = 0
             if (tag.contains(NBTConstants.BRANCH_HIGH_ID)) {
                 highestId = tag.getInt(NBTConstants.BRANCH_HIGH_ID)
             }
+
             val branch = DialogBranch(nodes)
             branch.highestId = highestId
             return branch

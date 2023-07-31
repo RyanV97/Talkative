@@ -15,7 +15,7 @@ import dev.cryptcraft.talkative.common.data.conditional.IntExpression
 
 class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int, height: Int, private val context: ConditionalContext, val onSave: (context: ConditionalContext) -> Unit) : PopupWidget(x, y, width, height, parent) {
     private var entryList: WidgetList<*> = WidgetList(parent, x, y + 20, width, height - 20)
-    private val pendingTasks = ArrayList<Runnable>()
+    private val removalList = ArrayList<ExpressionWidget>()
 
     init {
         entryList.renderBackground = false
@@ -69,11 +69,13 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
     }
 
     override fun tick() {
-        pendingTasks.forEach { it.run() }
+        removalList.forEach {
+            entryList.remove(it)
+        }
     }
 
     fun deleteEntry(entry: ExpressionWidget) {
-        pendingTasks.add { entryList.remove(entry) }
+        removalList.add(entry)
     }
 
     private fun createConditional(): Conditional? {
