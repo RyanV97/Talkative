@@ -1,4 +1,4 @@
-package dev.cryptcraft.talkative.mixin;
+package dev.cryptcraft.talkative.mixin.client;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import org.spongepowered.asm.mixin.Mixin;

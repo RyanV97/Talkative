@@ -1,7 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "proto_dialog:npc_marker",
-        "layer1": "proto_dialog:marker_outline"
-    }
-}

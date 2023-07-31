@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "talkative:marker/basic_marker",
+        "layer1": "talkative:marker/basic_marker_outline"
+    }
+}

@@ -7,8 +7,9 @@
     "entity.LivingEntityActorDataMixin"
   ],
   "client": [
-    "AbstractScrollWidgetAccessor",
-    "AbstractWidgetAccessor"
+    "client.AbstractScrollWidgetAccessor",
+    "client.AbstractWidgetAccessor",
+    "client.ModelBakeryMixin"
   ],
   "server": []
 }
