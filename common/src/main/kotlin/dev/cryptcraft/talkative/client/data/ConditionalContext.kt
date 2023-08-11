@@ -1,7 +1,7 @@
 package dev.cryptcraft.talkative.client.data
 
 import dev.cryptcraft.talkative.client.TalkativeClient
-import dev.cryptcraft.talkative.common.data.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.Conditional
 
 abstract class ConditionalContext(var conditional: Conditional?) {
     class BranchContext(val actorId: Int, val branchIndex: Int, conditional: Conditional?) : ConditionalContext(conditional) {

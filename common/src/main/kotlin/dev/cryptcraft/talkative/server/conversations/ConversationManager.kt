@@ -1,9 +1,8 @@
 package dev.cryptcraft.talkative.server.conversations
 
 import net.minecraft.server.level.ServerPlayer
-import dev.cryptcraft.talkative.api.ActorEntity
-import dev.cryptcraft.talkative.common.data.ActorData
-import dev.cryptcraft.talkative.common.data.tree.DialogBranch
+import dev.cryptcraft.talkative.api.actor.ActorEntity
+import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.RefCountMap
 import java.util.*

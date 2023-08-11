@@ -1,14 +1,25 @@
-package dev.cryptcraft.talkative.common.data.tree
+package dev.cryptcraft.talkative.api.tree
 
 import com.google.common.collect.Lists
 import net.minecraft.nbt.*
-import dev.cryptcraft.talkative.api.ConditionalHolder
-import dev.cryptcraft.talkative.common.data.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.ConditionalHolder
+import dev.cryptcraft.talkative.api.conditional.Conditional
 import dev.cryptcraft.talkative.common.util.NBTConstants
 
+/**
+ * A Node used within a [DialogBranch].
+ * Can be either a Dialog node or Response node. All children are expected to be of the same [NodeType].
+ */
 class DialogNode(val nodeId: Int, var nodeType: NodeType = NodeType.Dialog, var content: String = "Hello World", private var conditional: Conditional? = null) : ConditionalHolder {
+    /**
+     * The [NodeType] of this node's children. Used to ensure all Child [NodeType]s are the same.
+     */
     private var childType: NodeType? = null
     private var children: ArrayList<Int> = ArrayList()
+
+    /**
+     * The Commands attached to this Node to be executed when this Node is reached during a [Conversation][dev.cryptcraft.talkative.server.conversations.Conversation].
+     */
     var commands: ArrayList<String>? = null
 
     fun addChild(child: Int, type: NodeType) {
@@ -26,6 +37,9 @@ class DialogNode(val nodeId: Int, var nodeType: NodeType = NodeType.Dialog, var 
         return childType
     }
 
+    /**
+     * @return List of Child Node IDs if children [NodeType] is [NodeType.Response], otherwise Null.
+     */
     fun getResponseIDs(): List<Int>? {
         if (childType != NodeType.Response)
             return null

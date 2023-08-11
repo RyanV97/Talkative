@@ -7,11 +7,14 @@ import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.LivingEntity
-import dev.cryptcraft.talkative.api.ActorEntity
-import dev.cryptcraft.talkative.common.data.tree.DialogBranch
-import dev.cryptcraft.talkative.common.data.tree.DialogNode
+import dev.cryptcraft.talkative.api.actor.ActorEntity
+import dev.cryptcraft.talkative.api.tree.DialogBranch
+import dev.cryptcraft.talkative.api.tree.DialogNode
 import dev.cryptcraft.talkative.common.network.clientbound.DialogPacket
 
+/**
+ * A Conversation represents an ongoing Dialog between a Player and an Actor.
+ */
 class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var branchPath: String) : CommandSource {
     val listeners: ArrayList<ServerPlayer>? = null
     private var currentNodeID: Int = 0

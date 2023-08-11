@@ -1,7 +1,6 @@
-package dev.cryptcraft.talkative.common.data
+package dev.cryptcraft.talkative.api.actor
 
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
 import dev.cryptcraft.talkative.common.util.NBTConstants
 
 class DisplayData {

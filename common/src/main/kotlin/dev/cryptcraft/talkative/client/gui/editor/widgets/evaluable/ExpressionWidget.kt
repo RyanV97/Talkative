@@ -5,28 +5,28 @@ import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
-import dev.cryptcraft.talkative.api.Evaluable
+import dev.cryptcraft.talkative.api.conditional.Evaluable
 import dev.cryptcraft.talkative.client.gui.editor.ConditionalEditorPopup
 import dev.cryptcraft.talkative.client.gui.editor.widgets.ScoreboardObjectiveTextBox
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
-import dev.cryptcraft.talkative.common.data.conditional.IntExpression
+import dev.cryptcraft.talkative.api.conditional.ScoreboardExpression
 
-class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpression, width: Int, height: Int, font: Font) : NestedWidget(0,0, width,height, Component.empty()), EvaluableWidget {
+class ExpressionWidget(parent: ConditionalEditorPopup, val expression: ScoreboardExpression, width: Int, height: Int, font: Font) : NestedWidget(0,0, width,height, Component.empty()), EvaluableWidget {
     val propertyBox: ScoreboardObjectiveTextBox
     val operationButton: Button
     val valueBox: EditBox
     val deleteButton: Button
 
-    var operation: IntExpression.Operation = IntExpression.Operation.EQUALS
+    var operation: ScoreboardExpression.Operation = ScoreboardExpression.Operation.EQUALS
         set(value) {
             field = value
             val label =
                 when (value) {
-                    IntExpression.Operation.EQUALS -> "=="
-                    IntExpression.Operation.LESS_THAN -> "<"
-                    IntExpression.Operation.LESS_EQUAL -> "<="
-                    IntExpression.Operation.GREATER_THAN -> ">"
-                    IntExpression.Operation.GREATER_EQUAL -> ">="
+                    ScoreboardExpression.Operation.EQUALS -> "=="
+                    ScoreboardExpression.Operation.LESS_THAN -> "<"
+                    ScoreboardExpression.Operation.LESS_EQUAL -> "<="
+                    ScoreboardExpression.Operation.GREATER_THAN -> ">"
+                    ScoreboardExpression.Operation.GREATER_EQUAL -> ">="
                 }
             operationButton.message = Component.literal(label)
         }
@@ -37,9 +37,9 @@ class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpres
         valueBox = addChild(EditBox(font, 0, 0, 40, 20, Component.empty()))
         valueBox.setFilter { return@setFilter it.toIntOrNull() != null || it.isBlank() }
         deleteButton = addChild(Button(0, 0, 20, 20, Component.literal("X")) { parent.deleteEntry(this) })
-        propertyBox.value = expression.propertyName
+        propertyBox.value = expression.objectiveName
         operation = expression.operation
-        valueBox.value = expression.valueB.toString()
+        valueBox.value = expression.compareValue.toString()
     }
 
     override fun recalculateChildren() {
@@ -58,7 +58,7 @@ class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpres
     private fun cycleOperation(btn: Button) {
         //ToDo: Cycle Backwards with Right Click?
         var index = operation.ordinal + 1
-        val values = IntExpression.Operation.values()
+        val values = ScoreboardExpression.Operation.values()
         if (index >= values.size)
             index = 0
         operation = values[index]
@@ -69,7 +69,7 @@ class ExpressionWidget(parent: ConditionalEditorPopup, val expression: IntExpres
     }
 
     override fun getModifiedEvaluable(): Evaluable? {
-        return IntExpression(propertyBox.value, valueBox.value.toIntOrNull() ?: 0, operation)
+        return ScoreboardExpression(propertyBox.value, valueBox.value.toIntOrNull() ?: 0, operation)
     }
 
     override fun updateNarration(narrationElementOutput: NarrationElementOutput) {

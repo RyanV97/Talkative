@@ -1,13 +1,14 @@
-package dev.cryptcraft.talkative.common.data.tree
+package dev.cryptcraft.talkative.api.tree
 
 import net.minecraft.nbt.CompoundTag
-import dev.cryptcraft.talkative.api.ConditionalHolder
-import dev.cryptcraft.talkative.common.data.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.ConditionalHolder
+import dev.cryptcraft.talkative.api.conditional.Conditional
 import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.NBTConstants
 
 /**
  * A Reference to a [DialogBranch] File
+ * This is used to avoid keeping entire branches loaded in memory when unused, and to allow multiple Actors to reference the same Branch.
  *
  * @property[fileString] The path to the referenced Branch, relative to the current World's 'talkative/branches' folder.
  * @property[conditional] The Conditional used to evaluate if a Player should be allowed to progress down this Branch.

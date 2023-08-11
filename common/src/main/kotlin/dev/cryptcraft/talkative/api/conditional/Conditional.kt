@@ -1,9 +1,8 @@
-package dev.cryptcraft.talkative.common.data.conditional
+package dev.cryptcraft.talkative.api.conditional
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.server.level.ServerPlayer
-import dev.cryptcraft.talkative.api.Evaluable
 import dev.cryptcraft.talkative.common.util.NBTConstants
 
 class Conditional : ArrayList<Evaluable>(), Evaluable {
@@ -36,7 +35,7 @@ class Conditional : ArrayList<Evaluable>(), Evaluable {
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
         val list = ListTag()
         for (e in this) {
-            val expression = e as IntExpression
+            val expression = e as ScoreboardExpression
             list.add(expression.serialize(CompoundTag()))
         }
         tag.put(NBTConstants.CONDITIONAL_EXPRESSIONS, list)
@@ -55,7 +54,7 @@ class Conditional : ArrayList<Evaluable>(), Evaluable {
                 return null
 
             for (expressionTag in list) {
-                IntExpression.deserialize(expressionTag as CompoundTag)?.let { conditional.add(it) }
+                ScoreboardExpression.deserialize(expressionTag as CompoundTag)?.let { conditional.add(it) }
             }
             return conditional
         }

@@ -14,7 +14,7 @@ import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.NodeWidge
 import dev.cryptcraft.talkative.client.gui.widgets.SubmenuWidget
 import dev.cryptcraft.talkative.client.data.ConditionalContext
 import dev.cryptcraft.talkative.client.NodePositioner
-import dev.cryptcraft.talkative.common.data.tree.DialogNode
+import dev.cryptcraft.talkative.api.tree.DialogNode
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor

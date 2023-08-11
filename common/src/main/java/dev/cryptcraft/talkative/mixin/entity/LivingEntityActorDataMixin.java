@@ -1,7 +1,7 @@
 package dev.cryptcraft.talkative.mixin.entity;
 
-import dev.cryptcraft.talkative.api.ActorEntity;
-import dev.cryptcraft.talkative.common.data.ActorData;
+import dev.cryptcraft.talkative.api.actor.ActorEntity;
+import dev.cryptcraft.talkative.api.actor.ActorData;
 import dev.cryptcraft.talkative.common.util.ActorUtil;
 import dev.cryptcraft.talkative.common.util.NBTConstants;
 import net.minecraft.nbt.CompoundTag;
@@ -14,10 +14,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import dev.cryptcraft.talkative.api.ActorEntity;
-import dev.cryptcraft.talkative.common.data.ActorData;
-import dev.cryptcraft.talkative.common.util.ActorUtil;
-import dev.cryptcraft.talkative.common.util.NBTConstants;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityActorDataMixin extends Entity implements ActorEntity {

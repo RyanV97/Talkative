@@ -10,8 +10,8 @@ import dev.cryptcraft.talkative.client.gui.editor.widgets.evaluable.ExpressionWi
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
 import dev.cryptcraft.talkative.client.data.ConditionalContext
-import dev.cryptcraft.talkative.common.data.conditional.Conditional
-import dev.cryptcraft.talkative.common.data.conditional.IntExpression
+import dev.cryptcraft.talkative.api.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.ScoreboardExpression
 
 class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int, height: Int, private val context: ConditionalContext, val onSave: (context: ConditionalContext) -> Unit) : PopupWidget(x, y, width, height, parent) {
     private var entryList: WidgetList<*> = WidgetList(parent, x, y + 20, width, height - 20)
@@ -24,7 +24,7 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
         addChild(entryList)
 
         button(width - 20,2, "+", 15,15)  {
-            val expression = IntExpression("", 0, IntExpression.Operation.EQUALS)
+            val expression = ScoreboardExpression("", 0, ScoreboardExpression.Operation.EQUALS)
             entryList.addChild(ExpressionWidget(this, expression, width, 25, Minecraft.getInstance().font))
         }
 
@@ -37,7 +37,7 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
     private fun refresh() {
         context.refresh()
         context.conditional?.forEach {
-            if (it is IntExpression) entryList.addChild(ExpressionWidget(this, it, width, 25, Minecraft.getInstance().font))
+            if (it is ScoreboardExpression) entryList.addChild(ExpressionWidget(this, it, width, 25, Minecraft.getInstance().font))
         }
     }
 

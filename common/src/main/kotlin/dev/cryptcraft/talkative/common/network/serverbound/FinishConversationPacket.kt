@@ -1,8 +1,11 @@
 package dev.cryptcraft.talkative.common.network.serverbound
 
+import dev.architectury.networking.NetworkManager
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.common.network.NetworkHandler.TalkativePacket
+import dev.cryptcraft.talkative.server.conversations.ConversationManager
+import java.util.function.Supplier
 
 class FinishConversationPacket(): TalkativePacket.ServerboundTalkativePacket {
     constructor(buf: FriendlyByteBuf): this()
@@ -12,4 +15,8 @@ class FinishConversationPacket(): TalkativePacket.ServerboundTalkativePacket {
     }
 
     override fun encode(buf: FriendlyByteBuf) {}
+
+    override fun onReceived(ctx: NetworkManager.PacketContext) {
+        ConversationManager.endConversation(ctx.player as ServerPlayer)
+    }
 }

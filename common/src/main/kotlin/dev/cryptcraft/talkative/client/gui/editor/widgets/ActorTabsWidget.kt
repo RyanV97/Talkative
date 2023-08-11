@@ -71,6 +71,7 @@ class ActorTabsWidget(x: Int, y: Int, width: Int, height: Int, val onTabChange: 
             child.x = totalWidth
             child.y = y + 5
             totalWidth += child.width + 5
+            (child as TabWidget).getTab()?.recalculateChildren()
         }
     }
 

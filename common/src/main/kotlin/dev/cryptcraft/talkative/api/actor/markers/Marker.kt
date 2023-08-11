@@ -1,6 +1,6 @@
-package dev.cryptcraft.talkative.common.data.markers
+package dev.cryptcraft.talkative.api.actor.markers
 
-import dev.cryptcraft.talkative.common.data.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.Conditional
 import dev.cryptcraft.talkative.common.util.NBTConstants
 import net.minecraft.client.resources.model.ModelResourceLocation
 import net.minecraft.nbt.CompoundTag

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
@@ -15,7 +14,7 @@ import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import dev.cryptcraft.talkative.client.data.ConditionalContext
 import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
-import dev.cryptcraft.talkative.common.data.tree.BranchReference
+import dev.cryptcraft.talkative.api.tree.BranchReference
 import dev.cryptcraft.talkative.common.network.serverbound.UnAttachBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchConditionalPacket
 

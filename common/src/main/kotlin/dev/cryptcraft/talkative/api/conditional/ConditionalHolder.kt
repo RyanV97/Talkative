@@ -1,7 +1,8 @@
-package dev.cryptcraft.talkative.api
+package dev.cryptcraft.talkative.api.conditional
 
-import dev.cryptcraft.talkative.common.data.conditional.Conditional
-
+/**
+ * Interface for classes that contain Conditional data.
+ */
 interface ConditionalHolder {
     fun getConditional(): Conditional?
     fun setConditional(newConditional: Conditional?)

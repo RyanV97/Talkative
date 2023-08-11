@@ -8,7 +8,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
-import dev.cryptcraft.talkative.common.data.tree.DialogNode
+import dev.cryptcraft.talkative.api.tree.DialogNode
 import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
 
 class NodeWidget(x: Int, y: Int, val node: DialogNode, val parentWidget: NodeWidget?, val parentScreen: BranchNodeEditorScreen): NestedWidget(x, y, 200, if (node.nodeType == DialogNode.NodeType.Dialog) 75 else 40, Component.literal("Dialog Node")) {

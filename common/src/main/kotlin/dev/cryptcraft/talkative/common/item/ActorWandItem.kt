@@ -1,28 +1,18 @@
 package dev.cryptcraft.talkative.common.item
 
-import net.minecraft.server.level.ServerPlayer
+import dev.cryptcraft.talkative.client.TalkativeClient
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import dev.cryptcraft.talkative.api.ActorEntity
-import dev.cryptcraft.talkative.common.network.clientbound.OpenActorEditorPacket
+import net.minecraft.world.level.Level
 
 class ActorWandItem: Item(Properties().tab(CreativeModeTab.TAB_TOOLS)) {
-
-    //ToDo: Open Editor on regular Right Click
-
-    override fun interactLivingEntity(itemStack: ItemStack, player: Player, livingEntity: LivingEntity, interactionHand: InteractionHand): InteractionResult {
-        if (player.level.isClientSide || livingEntity is Player)
-            return InteractionResult.FAIL
-
-        val actorEntity = livingEntity as ActorEntity
-        OpenActorEditorPacket(livingEntity.id, actorEntity.getOrCreateActorData()).sendToPlayer(player as ServerPlayer)
-
-        return InteractionResult.PASS
+    override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
+        val itemStack = player.getItemInHand(usedHand)
+        if (level.isClientSide) TalkativeClient.openEditor()
+        return InteractionResultHolder.success(itemStack)
     }
-
 }

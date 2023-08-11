@@ -10,12 +10,11 @@ import dev.cryptcraft.talkative.client.gui.editor.widgets.ColourPickerWidget
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
-import dev.cryptcraft.talkative.common.data.markers.Marker
+import dev.cryptcraft.talkative.api.actor.markers.Marker
 import net.minecraft.ResourceLocationException
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.EditBox
-import net.minecraft.client.gui.screens.inventory.GrindstoneScreen
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.resources.model.ModelResourceLocation
 import net.minecraft.network.chat.Component

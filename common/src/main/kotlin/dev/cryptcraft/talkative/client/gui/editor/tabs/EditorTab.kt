@@ -8,9 +8,9 @@ import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 
 abstract class EditorTab(x: Int, y: Int, width: Int, height: Int, val parentScreen: MainEditorScreen, title: Component) : NestedWidget(x, y, width, height, title) {
+    abstract fun refresh()
+
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
-
-    abstract fun refresh()
 }

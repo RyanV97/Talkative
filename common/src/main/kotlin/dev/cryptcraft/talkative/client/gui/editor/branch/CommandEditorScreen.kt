@@ -8,7 +8,7 @@ import org.apache.commons.compress.utils.Lists
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
-import dev.cryptcraft.talkative.common.data.tree.DialogNode
+import dev.cryptcraft.talkative.api.tree.DialogNode
 
 class CommandEditorScreen(parentScreen: BranchNodeEditorScreen, private val node: DialogNode) : TalkativeScreen(parentScreen, Component.literal("Commands")) {
     lateinit var list: WidgetList<CommandEditorScreen>

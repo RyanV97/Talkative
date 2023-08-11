@@ -1,10 +1,9 @@
 package dev.cryptcraft.talkative.client.gui.editor.tabs
 
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.cryptcraft.talkative.api.ActorEntity
+import dev.cryptcraft.talkative.api.actor.ActorEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.Checkbox
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput

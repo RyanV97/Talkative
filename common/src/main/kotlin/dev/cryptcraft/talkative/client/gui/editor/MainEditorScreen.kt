@@ -17,7 +17,6 @@ import net.minecraft.world.entity.LivingEntity
 
 class MainEditorScreen(val actorEntity: LivingEntity?) : TalkativeScreen(null, Component.literal("Actor Editor")), DataScreen {
     constructor() : this(null)
-    //ToDo: Open Actor Tab by default when editing an Actor
 
     private val tabsHeight = 30
     private val tabsWidget: ActorTabsWidget = ActorTabsWidget(0, 10, 0, tabsHeight, ::onTabChange)
@@ -25,16 +24,15 @@ class MainEditorScreen(val actorEntity: LivingEntity?) : TalkativeScreen(null, C
     override fun init() {
         super.init()
 
-        tabsWidget.width = width - 20
-        if (tabsWidget.getActiveTab() != null) {
-            val tab = addRenderableWidget(tabsWidget.getActiveTab())
-            tab!!.width = width
-        }
-
         if (tabsWidget.empty())
             generateTabs()
-
         addRenderableWidget(tabsWidget)
+        tabsWidget.width = width - 20
+
+        if (tabsWidget.getActiveTab() != null) {
+            val tab = addRenderableWidget(tabsWidget.getActiveTab()!!)
+            tab.width = width
+        }
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
@@ -82,7 +80,11 @@ class MainEditorScreen(val actorEntity: LivingEntity?) : TalkativeScreen(null, C
                 }
             }
         }
-        tabsWidget.setActiveTab(0)
+
+        if (actorEntity != null)
+            tabsWidget.setActiveTab(1)
+        else
+            tabsWidget.setActiveTab(0)
     }
 
     private fun onTabChange(oldTab: EditorTab?, newTab: EditorTab) {

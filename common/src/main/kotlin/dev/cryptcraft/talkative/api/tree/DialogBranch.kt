@@ -1,4 +1,4 @@
-package dev.cryptcraft.talkative.common.data.tree
+package dev.cryptcraft.talkative.api.tree
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.nbt.CompoundTag
@@ -7,6 +7,10 @@ import dev.cryptcraft.talkative.common.util.NBTConstants
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 
+/**
+ * Data class for a Dialog Tree Branch. Made up of a root [DialogNode] and it's children.
+ * For attaching a branch to an Actor, use a [BranchReference]
+ */
 class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<DialogNode> = Int2ReferenceLinkedOpenHashMap()) {
     var highestId: Int = 0
         get() {

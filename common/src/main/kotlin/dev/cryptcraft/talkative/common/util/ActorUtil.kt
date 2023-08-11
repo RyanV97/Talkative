@@ -1,8 +1,8 @@
 package dev.cryptcraft.talkative.common.util
 
 import net.minecraft.nbt.CompoundTag
-import dev.cryptcraft.talkative.api.ActorEntity
-import dev.cryptcraft.talkative.common.data.ActorData
+import dev.cryptcraft.talkative.api.actor.ActorEntity
+import dev.cryptcraft.talkative.api.actor.ActorData
 
 object ActorUtil {
 

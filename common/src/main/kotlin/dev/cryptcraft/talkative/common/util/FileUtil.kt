@@ -1,12 +1,12 @@
 package dev.cryptcraft.talkative.common.util
 
-import dev.cryptcraft.talkative.common.data.markers.Marker
+import dev.cryptcraft.talkative.api.actor.markers.Marker
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.StringTag
-import dev.cryptcraft.talkative.common.data.tree.DialogBranch
-import dev.cryptcraft.talkative.common.data.tree.DialogNode
+import dev.cryptcraft.talkative.api.tree.DialogBranch
+import dev.cryptcraft.talkative.api.tree.DialogNode
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path

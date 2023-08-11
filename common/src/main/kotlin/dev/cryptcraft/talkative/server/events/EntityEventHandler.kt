@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
-import dev.cryptcraft.talkative.api.ActorEntity
+import dev.cryptcraft.talkative.api.actor.ActorEntity
 import dev.cryptcraft.talkative.common.item.ActorWandItem
 import dev.cryptcraft.talkative.server.conversations.ConversationManager
 

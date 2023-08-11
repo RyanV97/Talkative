@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.nbt.ListTag
 import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
+import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.client.gui.widgets.lists.StringSelectionList
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
 import dev.cryptcraft.talkative.common.network.serverbound.RequestBranchListPacket
@@ -15,7 +16,6 @@ import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 abstract class BranchDirectoryScreen(parent: Screen?) : TalkativeScreen(parent, Component.empty()) {
     protected lateinit var list: StringSelectionList
 
-    //ToDo: Move Buttons to top, maybe style them as a toolbar?
     override fun init() {
         super.init()
 
@@ -23,19 +23,16 @@ abstract class BranchDirectoryScreen(parent: Screen?) : TalkativeScreen(parent, 
 
         list = addWidget(StringSelectionList(this, 0, 20, listRight, height - 20, ::onSelectionChange))
 
-        addRenderableWidget(Button(listRight, height - 20, 70, 20, Component.literal("New Branch")) {
-            popup = PopupWidget.Builder((width / 2) - 155, (height / 2) - 15, 310, 30, this)
-                .textField(5, 5, width = 195)
-                .button(205, 5, "Save") {
-                    createBranch(popup!!.getAllTextFields()[0].value)
-                }
-                .button(259, 5, "Cancel") {
-                    closePopup()
-                }
-                .build()
-        })
+        addRenderableWidget(TalkativeButton(0, 0, 70, 20, Component.literal("New Branch"), ::openCreatePopup))
 
         RequestBranchListPacket().sendToServer()
+    }
+
+    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(poseStack!!)
+        GuiComponent.drawCenteredString(poseStack, font, "Available Branches", width / 2, 6, 0xFFFFFF)
+        list.render(poseStack, mouseX, mouseY, delta)
+        super.render(poseStack, mouseX, mouseY, delta)
     }
 
     fun loadBranchList(listTag: ListTag?) {
@@ -45,11 +42,16 @@ abstract class BranchDirectoryScreen(parent: Screen?) : TalkativeScreen(parent, 
         }
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(poseStack!!)
-        GuiComponent.drawCenteredString(poseStack, font, "Available Branches", width / 2, 6, 0xFFFFFF)
-        list.render(poseStack, mouseX, mouseY, delta)
-        super.render(poseStack, mouseX, mouseY, delta)
+    private fun openCreatePopup(talkativeButton: TalkativeButton) {
+        popup = PopupWidget.Builder((width / 2) - 155, (height / 2) - 15, 310, 30, this)
+            .textField(5, 5, width = 195)
+            .button(205, 5, "Save") {
+                createBranch(popup!!.getAllTextFields()[0].value)
+            }
+            .button(259, 5, "Cancel") {
+                closePopup()
+            }
+            .build()
     }
 
     private fun createBranch(path: String) {
