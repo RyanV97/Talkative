@@ -16,9 +16,9 @@ object ConversationManager {
             return
 
         actor.getActorData()?.getBranchForPlayer(player)?.let { branchRef ->
-            val branch = loadedBranches[branchRef.fileString] ?: loadBranch(branchRef.fileString)
+            val branch = loadedBranches[branchRef.filePath] ?: loadBranch(branchRef.filePath)
             if (branch != null) {
-                val conversation = Conversation(player, actor, branchRef.fileString)
+                val conversation = Conversation(player, actor, branchRef.filePath)
                 conversations[player.uuid] = conversation
                 conversation.startConversation()
             }
@@ -38,7 +38,7 @@ object ConversationManager {
 
     fun endConversation(player: ServerPlayer) {
         conversations.remove(player.uuid)?.let {
-            endConversation(player)
+//            endConversation(player)
             unregisterBranchReference(it.getBranchPath(), it)
         }
     }

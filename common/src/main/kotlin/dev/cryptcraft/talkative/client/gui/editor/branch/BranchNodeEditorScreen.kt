@@ -2,26 +2,31 @@ package dev.cryptcraft.talkative.client.gui.editor.branch
 
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.gui.components.AbstractWidget
-import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.screens.Screen
-import net.minecraft.network.chat.Component
+import dev.cryptcraft.talkative.api.tree.node.BridgeNode
+import dev.cryptcraft.talkative.api.tree.node.NodeBase
+import dev.cryptcraft.talkative.api.tree.node.TextNode
+import dev.cryptcraft.talkative.client.NodePositioner
 import dev.cryptcraft.talkative.client.TalkativeClient
-import dev.cryptcraft.talkative.client.gui.DataScreen
+import dev.cryptcraft.talkative.client.data.ConditionalContext
+import dev.cryptcraft.talkative.client.gui.EditorScreen
+import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.editor.ConditionalEditorPopup
+import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.BridgeNodeWidget
 import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.NodeWidget
+import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.TextNodeWidget
 import dev.cryptcraft.talkative.client.gui.widgets.SubmenuWidget
-import dev.cryptcraft.talkative.client.data.ConditionalContext
-import dev.cryptcraft.talkative.client.NodePositioner
-import dev.cryptcraft.talkative.api.tree.DialogNode
+import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
+import net.minecraft.client.gui.components.AbstractWidget
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.network.chat.Component
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.literal("Dialog Tree Editor")), DataScreen {
+class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.literal("Dialog Tree Editor")), EditorScreen {
     private var rootNodeWidget: NodeWidget? = null
     private var nodeWidgets: ArrayList<NodeWidget> = ArrayList()
     var selectedNode: NodeWidget? = null
@@ -30,7 +35,6 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     var offsetY: Int = -50
     var zoomScale: Float = 1.0F
 
-    //ToDo: Move Buttons to top, maybe style them as a toolbar?
     override fun init() {
         super.init()
         TalkativeClient.editingBranch?.let {
@@ -39,23 +43,18 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             offsetY = -(rootNodeWidget!!.height / 2)
         }
 
-        addRenderableWidget(Button(width - 50, height - 20, 50, 20, Component.literal("Save")) {
+        addRenderableWidget(TalkativeButton(5, 5, 35, 20, Component.literal("Save"), {
             saveChanges()
             onClose()
-        })
+        }))
 
-        addRenderableWidget(Button(width - 100, height - 20, 50, 20, Component.literal("Cancel")) {
+        addRenderableWidget(TalkativeButton(45, 5, 50, 20, Component.literal("Cancel"), {
             onClose()
-        })
-
-        addRenderableWidget(Button(width - 150, height - 20, 50, 20, Component.literal("Options")) {
-            NodePositioner.layoutTree(rootNodeWidget!!)
-        })
+        }))
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(poseStack!!)
-
+        fill(poseStack!!, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
         poseStack.pushPose()
         poseStack.scale(zoomScale, zoomScale, 1.0F)
 
@@ -95,8 +94,8 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     }
 
     override fun onMouseScroll(mouseX: Double, mouseY: Double, scrollAmount: Double): Boolean {
-        if (selectedNode != null)
-            return selectedNode!!.editBox.mouseScrolled(mouseX, mouseY, scrollAmount)
+        if (selectedNode is TextNodeWidget)
+            return (selectedNode!! as TextNodeWidget).editBox.mouseScrolled(mouseX, mouseY, scrollAmount)
 
         val i = (scrollAmount.toFloat() * 0.1F)
         zoomScale = (zoomScale + i).coerceIn(0.2F, 2.0F)
@@ -105,31 +104,36 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
     override fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
         if (selectedNode != null && keyCode == 256) {
-            (selectedNode!!.editBox as AbstractWidgetAccessor).pleaseSetFocused(false)
+            if (selectedNode is TextNodeWidget)
+                ((selectedNode as TextNodeWidget).editBox as AbstractWidgetAccessor).pleaseSetFocused(false)
             selectedNode = null
             return true
         }
         return selectedNode?.keyPressed(keyCode, j, k) ?: false
     }
 
-    override fun onCharTyped(char: Char, i: Int): Boolean {
-        return selectedNode?.editBox?.charTyped(char, i) ?: false
-    }
-
-    private fun loadNodeAndChildren(node: DialogNode, parent: NodeWidget? = null): NodeWidget {
-        val widget = createWidgetForNode(node, parent)
+    private fun loadNodeAndChildren(node: NodeBase, parent: NodeWidget? = null): NodeWidget? {
+        val widget = createWidgetForNode(node, parent) ?: return null
         node.getChildren().forEach {
-            val child = TalkativeClient.editingBranch?.getNode(it)
+            val child = TalkativeClient.editingBranch?.getNode(it.nodeId)
             if (child != null)
-                widget.childNodes.add(loadNodeAndChildren(child, widget))
+                widget.childNodes.add(loadNodeAndChildren(child, widget) ?: return@forEach)
 //            else //ToDo Add a node type/widget to show child connections to non-existing IDs
 //                widget.childNodes.add(MissingNodeWidget(0, 0, node, this))
         }
         return widget
     }
 
-    fun createWidgetForNode(node: DialogNode, parent: NodeWidget?): NodeWidget {
-        val widget = NodeWidget(width / 2, height / 2, node, parent, this)
+    fun createWidgetForNode(node: NodeBase, parent: NodeWidget?): NodeWidget? {
+        val widget = if (node is TextNode)
+            TextNodeWidget(width / 2, height / 2, node, parent, this)
+        else if (node is BridgeNode)
+            BridgeNodeWidget(width / 2, height / 2, node, parent, this)
+        else
+            return null
+//        else
+//            MissingNodeWidget(width / 2, height / 2, parent, this)
+
         addChild(widget)
         return widget
     }
@@ -167,15 +171,15 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
         if (widget is NodeWidget) {
             val actionMap = HashMap<String, () -> Unit>()
 
-            if (widget.childNodes.isEmpty() || (widget.childNodes[0].node.nodeType == DialogNode.NodeType.Dialog))
+            if (widget.childNodes.isEmpty() || widget.node.getChildrenType() == NodeBase.NodeType.Dialog)
                 actionMap["New Child (Dialog)"] = {
-                    widget.addChild(DialogNode.NodeType.Dialog, TalkativeClient.editingBranch!!.highestId)
+                    widget.addChildNode(NodeBase.NodeType.Dialog, TalkativeClient.editingBranch!!.highestId)
                     NodePositioner.layoutTree(rootNodeWidget!!)
                     closeSubmenu()
                 }
-            if (widget.childNodes.isEmpty() || (widget.childNodes[0].node.nodeType == DialogNode.NodeType.Response))
+            if (widget.childNodes.isEmpty() || widget.node.getChildrenType() == NodeBase.NodeType.Response)
                 actionMap["New Child (Response)"] = {
-                    widget.addChild(DialogNode.NodeType.Response, TalkativeClient.editingBranch!!.highestId)
+                    widget.addChildNode(NodeBase.NodeType.Response, TalkativeClient.editingBranch!!.highestId)
                     NodePositioner.layoutTree(rootNodeWidget!!)
                     closeSubmenu()
                 }
@@ -207,22 +211,20 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
             if (rootNodeWidget!! != widget) {
                 if (widget.childNodes.isEmpty())
-                    actionMap["Remove Node"] = {
-                        println("Delete Node")
-                        widget.parentWidget?.removeChild(widget)
+                    actionMap["Delete Node"] = {
+                        widget.parentWidget?.removeChildNode(widget)
                         NodePositioner.layoutTree(rootNodeWidget!!)
                         closeSubmenu()
                     }
                 else
-                    actionMap["Remove Node (And Children)"] = {
-                        println("Delete Node and Children")
-                        widget.parentWidget?.removeChild(widget)
+                    actionMap["Delete Node (And Children)"] = {
+                        widget.parentWidget?.removeChildNode(widget)
                         NodePositioner.layoutTree(rootNodeWidget!!)
                         closeSubmenu()
                     }
             }
 
-            submenu = SubmenuWidget(mouseX, mouseY, "${widget.node.nodeType.name} Node", actionMap)
+            submenu = SubmenuWidget(mouseX, mouseY, "${widget.node.getNodeType().name} Node", actionMap)
         }
     }
 }

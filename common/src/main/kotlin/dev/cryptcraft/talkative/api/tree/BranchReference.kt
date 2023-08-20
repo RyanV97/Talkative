@@ -1,20 +1,20 @@
 package dev.cryptcraft.talkative.api.tree
 
-import net.minecraft.nbt.CompoundTag
-import dev.cryptcraft.talkative.api.conditional.ConditionalHolder
 import dev.cryptcraft.talkative.api.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.ConditionalHolder
 import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.NBTConstants
+import net.minecraft.nbt.CompoundTag
 
 /**
  * A Reference to a [DialogBranch] File
  * This is used to avoid keeping entire branches loaded in memory when unused, and to allow multiple Actors to reference the same Branch.
  *
- * @property[fileString] The path to the referenced Branch, relative to the current World's 'talkative/branches' folder.
+ * @property[filePath] The path to the referenced Branch, relative to the current World's 'talkative/branches' folder.
  * @property[conditional] The Conditional used to evaluate if a Player should be allowed to progress down this Branch.
  */
-class BranchReference(var fileString: String, private var conditional: Conditional? = null) : ConditionalHolder {
-    var valid: Boolean = FileUtil.branchExists(fileString)
+class BranchReference(var filePath: String, private var conditional: Conditional? = null) : ConditionalHolder {
+    var valid: Boolean = FileUtil.branchExists(filePath)
 
     override fun getConditional(): Conditional? {
         return conditional
@@ -25,11 +25,11 @@ class BranchReference(var fileString: String, private var conditional: Condition
     }
 
     fun validate() {
-        valid = FileUtil.branchExists(fileString)
+        valid = FileUtil.branchExists(filePath)
     }
 
     fun serialize(tag: CompoundTag): CompoundTag {
-        tag.putString(NBTConstants.BRANCH_FILE, fileString)
+        tag.putString(NBTConstants.BRANCH_FILE, filePath)
         if (conditional != null) tag.put(NBTConstants.CONDITIONAL, conditional!!.serialize(CompoundTag()))
         return tag
     }

@@ -1,37 +1,41 @@
 package dev.cryptcraft.talkative.client.gui.editor.widgets
 
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.components.Button
-import net.minecraft.client.gui.narration.NarrationElementOutput
-import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.gui.editor.tabs.EditorTab
 import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.network.chat.Component
 
-class ActorTabsWidget(x: Int, y: Int, width: Int, height: Int, val onTabChange: (EditorTab?, EditorTab) -> Unit) : NestedWidget(x, y, width, height, Component.empty()) {
+class EditorTabsWidget(x: Int, y: Int, width: Int, height: Int, val onTabChange: (EditorTab?, EditorTab) -> Unit) : NestedWidget(x, y, width, height, Component.empty()) {
     private var activeTab: EditorTab? = null
     private var activeTabIndex: Int = -1
 
-    fun addTab(text: Component, editorTab: EditorTab) {
+    fun addTab(text: Component, editorTab: EditorTab): Int {
         val btnWidth = Minecraft.getInstance().font.width(text) + 10
-        addChild(TabButton(children.size, btnWidth, 20, text, editorTab, this))
+        addChild(TabButton(children.size, btnWidth, 20, text, editorTab) {
+            setActiveTab((it as TabButton).index, editorTab)
+        })
         recalculateChildren()
+        return children.size - 1
     }
 
-    fun addTab(icon: IconButton.Icon, editorTab: EditorTab) {
-        addChild(ImageTabButton(children.size, icon, editorTab, this))
+    fun addTab(icon: IconButton.Icon, editorTab: EditorTab): Int {
+        addChild(ImageTabButton(children.size, 20, 20, icon, editorTab, this))
         recalculateChildren()
+        return children.size - 1
     }
 
-    fun addShortcut(text: Component, onPress: (TalkativeButton) -> Unit) {
+    fun addShortcut(text: Component, onPress: (Button) -> Unit) {
         val btnWidth = Minecraft.getInstance().font.width(text) + 10
-        addChild(TabButton(children.size, btnWidth, 20, text, null, this, onPress))
+        addChild(TabButton(children.size, btnWidth, 20, text, null, onPress))
         recalculateChildren()
     }
 
     fun addShortcut(icon: IconButton.Icon, onPress: (Button) -> Unit) {
-        addChild(ImageTabButton(children.size, icon, null, this, onPress))
+        addChild(ImageTabButton(children.size, 20, 20, icon, null, this, onPress))
         recalculateChildren()
     }
 
@@ -89,13 +93,13 @@ class ActorTabsWidget(x: Int, y: Int, width: Int, height: Int, val onTabChange: 
         fun getTab(): EditorTab?
     }
 
-    class TabButton(index: Int, width: Int, height: Int, text: Component, private val tab: EditorTab?, parentWidget: ActorTabsWidget, onPress: (TalkativeButton) -> Unit = { parentWidget.setActiveTab(index, tab) }) : TalkativeButton(0, 0, width, height, text, onPress), TabWidget {
+    class TabButton(val index: Int, width: Int, height: Int, text: Component, private val tab: EditorTab?, onPress: OnPress) : TalkativeButton(0, 0, width, height, text, onPress), TabWidget {
         override fun getTab(): EditorTab? {
             return tab
         }
     }
 
-    class ImageTabButton(index: Int, icon: Icon, private val tab: EditorTab?, parentWidget: ActorTabsWidget, onPress: (Button) -> Unit = { parentWidget.setActiveTab(index, tab) }) : IconButton(0, 0, icon.width, icon.height, icon, onPress), TabWidget {
+    class ImageTabButton(index: Int, width: Int, height: Int, icon: Icon, private val tab: EditorTab?, parentWidget: EditorTabsWidget, onPress: (Button) -> Unit = { parentWidget.setActiveTab(index, tab) }) : IconButton(0, 0, width, height, icon, onPress), TabWidget {
         override fun getTab(): EditorTab? {
             return tab
         }

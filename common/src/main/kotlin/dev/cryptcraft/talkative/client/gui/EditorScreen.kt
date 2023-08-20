@@ -1,5 +1,5 @@
 package dev.cryptcraft.talkative.client.gui
 
-interface DataScreen {
+interface EditorScreen {
     fun refresh()
 }

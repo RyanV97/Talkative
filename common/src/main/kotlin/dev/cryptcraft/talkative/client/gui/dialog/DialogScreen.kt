@@ -1,146 +1,109 @@
 package dev.cryptcraft.talkative.client.gui.dialog
 
-import com.mojang.blaze3d.vertex.PoseStack
-import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
-import net.minecraft.client.gui.narration.NarrationElementOutput
-import net.minecraft.client.gui.screens.Screen
-import net.minecraft.network.chat.Component
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.*
+import com.mojang.math.Matrix4f
+import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.dialog.widgets.DialogList
-import dev.cryptcraft.talkative.client.gui.dialog.widgets.ResponsesWidget
-import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
-import dev.cryptcraft.talkative.common.network.serverbound.DialogResponsePacket
-import dev.cryptcraft.talkative.common.network.serverbound.FinishConversationPacket
+import dev.cryptcraft.talkative.client.gui.dialog.widgets.ResponseList
+import dev.cryptcraft.talkative.common.network.clientbound.DialogPacket
+import dev.cryptcraft.talkative.common.network.serverbound.ExitConversationPacket
+import net.minecraft.client.renderer.GameRenderer
+import net.minecraft.network.chat.Component
+import org.lwjgl.glfw.GLFW
 
-class DialogScreen : Screen(Component.literal("NPC Dialog")) {
-    private var dialogEntryList: DialogList? = null
-    private var currentDialogWidget: CurrentDialogWidget? = null
-    private var responsesWidget: ResponsesWidget? = null
-
-    private val pendingTasks = ArrayList<Runnable>()
+class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Screen")) {
+    private val dialogList = DialogList(this, 0, 0, 0, 0)
+    private val responseList = ResponseList(this, 0, 0, 0, 0)
 
     override fun init() {
         super.init()
-        val listWidth = width / 2
+        val responseBoxHeight = (height * .3).toInt()
+        val dialogListHeight = height - responseBoxHeight - 10
 
-        dialogEntryList = addRenderableWidget(DialogList(this, listWidth - (listWidth / 2), 0, listWidth, height - 50, height - 50))
-        responsesWidget = addRenderableWidget(ResponsesWidget(this, listWidth - (listWidth / 2), height - 50, listWidth, 50))
+        dialogList.x = (width * .25).toInt()
+        dialogList.width = width / 2
+        dialogList.maxHeight = dialogListHeight
+        dialogList.setBottom(dialogListHeight)
+        addRenderableWidget(dialogList)
+
+        responseList.x = (width * .25).toInt()
+        responseList.y = height - responseBoxHeight
+        responseList.width = width / 2
+        responseList.height = responseBoxHeight
+        addRenderableWidget(responseList)
     }
 
-    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(poseStack)
-        currentDialogWidget?.render(poseStack, mouseX, mouseY, delta)
+    fun receiveDialog(dialogLine: Component, responses: ArrayList<DialogPacket.ResponseData>?, exitNode: Boolean) {
+        dialogList.addEntry(dialogLine)
+        responseList.clear()
+        if (!responses.isNullOrEmpty())
+            responses.forEach(responseList::addEntry)
+//        else
+//            if (exitNode)
+//                ToDo Add Exit Button
+//            else
+//                ToDo Add Continue Arrow
+    }
+
+    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+        fill(poseStack!!, 0, 0, width, height, 0xD91c1c1c.toInt()) //Background
+
+        //Responses Section - Rendered above Entities
+        val responseHeight = height - (height * .3).toInt()
+        val fadeHeight = height - (height * .35).toInt()
+
+        fillGradient(poseStack, 0, fadeHeight, width, responseHeight, 0x001c1c1c, 0xD9141414.toInt())
+        fill(poseStack, 0, responseHeight, width, height, 0xD9141414.toInt())
+
+        val separatorY = responseHeight - 1
+        horizontalGradient(poseStack, (width * .1).toInt(), separatorY, (width * .5).toInt(), separatorY + 1, 0x00FFFFFF, 0xFFFFFFFF.toInt())
+        horizontalGradient(poseStack, (width * .5).toInt(), separatorY, width - (width * .1).toInt(), separatorY + 1, 0xFFFFFFFF.toInt(), 0x00FFFFFF)
+
         super.render(poseStack, mouseX, mouseY, delta)
     }
 
-    override fun renderBackground(poseStack: PoseStack) {
-        fill(poseStack, 0, 0, width, height, 0x66000000)
-    }
-
-    fun loadDialog(dialogLine: Component, responses: Int2ReferenceLinkedOpenHashMap<Component>?, exitNode: Boolean) {
-        //ToDo: Add Speaker to DialogNode
-        val speaker = Component.literal("Speaker")
-
-        if (dialogLine != Component.empty()) {
-            val listWidth = width / 2
-            val contentHeight = font.wordWrapHeight(dialogLine, listWidth - 10) + 20
-
-            dialogEntryList!!.setBottom(responsesWidget!!.y - contentHeight)
-            currentDialogWidget = CurrentDialogWidget(
-                listWidth - (listWidth / 2),
-                height - 50 - contentHeight,
-                listWidth,
-                contentHeight,
-                dialogLine,
-                speaker,
-                this
-            )
+    override fun onKeyPressed(keyCode: Int, j: Int, k: Int): Boolean {
+        if (keyCode in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9) {
+            val num = keyCode - GLFW.GLFW_KEY_1
+            if (num < responseList.children.size)
+                (responseList.children[num] as ResponseList.ResponseListEntry).onResponse()
+            return true
         }
-        else
-            dialogEntryList!!.setBottom(responsesWidget!!.y)
-
-        if (!responses!!.isEmpty())
-            responsesWidget?.repopulateResponses(responses)
-        else if (!exitNode)
-            responsesWidget?.clearResponsesAndContinue()
-        else
-            responsesWidget?.clearResponsesAndFinish()
+        return false
     }
 
-    fun onResponse(index: Int, responseContents: Component) {
-        addTask {
-            currentDialogWidget?.let {
-                dialogEntryList?.addChild(DialogEntry(it.contents, it.speaker, this))
-                currentDialogWidget = null
-                dialogEntryList!!.setBottom(responsesWidget!!.y)
-            }
-            responsesWidget?.clear()
-            dialogEntryList?.addChild(DialogEntry(responseContents, Component.literal("Player"), this, false))
-            DialogResponsePacket(index).sendToServer()
-        }
+    fun horizontalGradient(poseStack: PoseStack, x1: Int, y1: Int, x2: Int, y2: Int, colorFrom: Int, colorTo: Int) {
+        RenderSystem.disableTexture()
+        RenderSystem.enableBlend()
+        RenderSystem.defaultBlendFunc()
+        RenderSystem.setShader { GameRenderer.getPositionColorShader() }
+        val tesselator = Tesselator.getInstance()
+        val bufferBuilder = tesselator.builder
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR)
+        horizontalGradient(poseStack.last().pose(), bufferBuilder, x1, y1, x2, y2, 0, colorFrom, colorTo)
+        tesselator.end()
+        RenderSystem.disableBlend()
+        RenderSystem.enableTexture()
     }
 
-    fun onContinue() {
-        currentDialogWidget?.let { dialogEntryList?.addChild(DialogEntry(it.contents, it.speaker, this)) }
-        DialogResponsePacket(-1).sendToServer()
+    fun horizontalGradient(matrix: Matrix4f, builder: BufferBuilder, x1: Int, y1: Int, x2: Int, y2: Int, blitOffset: Int, colorA: Int, colorB: Int) {
+        val f = (colorA shr 24 and 0xFF).toFloat() / 255.0f
+        val g = (colorA shr 16 and 0xFF).toFloat() / 255.0f
+        val h = (colorA shr 8 and 0xFF).toFloat() / 255.0f
+        val i = (colorA and 0xFF).toFloat() / 255.0f
+        val j = (colorB shr 24 and 0xFF).toFloat() / 255.0f
+        val k = (colorB shr 16 and 0xFF).toFloat() / 255.0f
+        val l = (colorB shr 8 and 0xFF).toFloat() / 255.0f
+        val m = (colorB and 0xFF).toFloat() / 255.0f
+        builder.vertex(matrix, x1.toFloat(), y1.toFloat(), blitOffset.toFloat()).color(g, h, i, f).endVertex()
+        builder.vertex(matrix, x1.toFloat(), y2.toFloat(), blitOffset.toFloat()).color(g, h, i, f).endVertex()
+        builder.vertex(matrix, x2.toFloat(), y2.toFloat(), blitOffset.toFloat()).color(k, l, m, j).endVertex()
+        builder.vertex(matrix, x2.toFloat(), y1.toFloat(), blitOffset.toFloat()).color(k, l, m, j).endVertex()
     }
 
     override fun onClose() {
-        FinishConversationPacket().sendToServer()
+        ExitConversationPacket().sendToServer()
         super.onClose()
-    }
-
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        if(responsesWidget?.currentState == ResponsesWidget.State.CONTINUE) {
-            responsesWidget!!.children.get(0).onClick(mouseX, mouseY)
-            return true
-        }
-
-        return super.mouseClicked(mouseX, mouseY, button)
-    }
-
-    override fun tick() {
-        if (pendingTasks.isNotEmpty()) {
-            for (task in pendingTasks) {
-                task.run()
-            }
-            pendingTasks.clear()
-        }
-    }
-
-    fun addTask(task: Runnable) {
-        pendingTasks.add(task)
-    }
-
-    open class DialogEntry(val contents: Component, val speaker: Component, private val parentScreen: DialogScreen, private val speakerOnRight: Boolean = true): NestedWidget(0, 0, 0, 0, null) {
-        override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-            fill(poseStack, x, y, x + width, y + height - 9, -267386864)
-
-            hLine(poseStack, x, x + width - 1, y, 0x505000FF)
-            hLine(poseStack, x, x + width - 1, y + height - 10, 0x505000FF)
-
-            vLine(poseStack, x, y, y + height - 10, 0x505000FF)
-            vLine(poseStack, x + width - 1, y, y + height - 10, 0x505000FF)
-
-            parentScreen.font.drawWordWrap(contents, x + 5, y + 6, width - 5, 0xFFFFFF)
-            parentScreen.renderTooltip(poseStack, speaker, if (speakerOnRight) x + width - parentScreen.font.width(speaker) - 16 else x - 8, y + height - 3)
-        }
-
-        override fun setWidth(width: Int) {
-            super.setWidth(width)
-            setHeight(parentScreen.font.wordWrapHeight(contents, width - 5) + 25)
-        }
-
-        override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
-        }
-    }
-
-    class CurrentDialogWidget(x: Int, y: Int, width: Int, height: Int, contents: Component, speaker: Component, parentScreen: DialogScreen): DialogEntry(contents, speaker, parentScreen) {
-        val animationFinished: Boolean = false
-
-        init {
-            this.setX(x)
-            this.setY(y)
-            this.setWidth(width)
-        }
     }
 }

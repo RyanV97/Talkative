@@ -1,12 +1,13 @@
 package dev.cryptcraft.talkative.common.util
 
 import dev.cryptcraft.talkative.api.actor.markers.Marker
+import dev.cryptcraft.talkative.api.tree.DialogBranch
+import dev.cryptcraft.talkative.api.tree.node.DialogNode
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.StringTag
-import dev.cryptcraft.talkative.api.tree.DialogBranch
-import dev.cryptcraft.talkative.api.tree.DialogNode
+import net.minecraft.network.chat.Component
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -21,7 +22,7 @@ object FileUtil {
         DIR_BRANCHES?.let { dir ->
             val file = File(dir.toFile(), "$path.branch")
             val branch = DialogBranch()
-            branch.addNode(DialogNode(0))
+            branch.addNode(DialogNode(0, Component.literal("Hello World")))
             val branchTag = branch.serialize()
             //ToDo: Do a Exists check to handle overwriting
             file.parentFile.mkdirs()

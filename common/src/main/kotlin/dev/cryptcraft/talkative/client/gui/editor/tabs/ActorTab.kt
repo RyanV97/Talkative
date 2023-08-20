@@ -1,20 +1,18 @@
 package dev.cryptcraft.talkative.client.gui.editor.tabs
 
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.cryptcraft.talkative.api.actor.ActorEntity
+import dev.cryptcraft.talkative.client.TalkativeClient
+import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
+import dev.cryptcraft.talkative.client.gui.editor.branch.BranchSelectionScreen
+import dev.cryptcraft.talkative.client.gui.editor.widgets.ActorBranchList
+import dev.cryptcraft.talkative.client.gui.editor.widgets.CallbackCheckbox
+import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.Checkbox
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
-import dev.cryptcraft.talkative.client.TalkativeClient
-import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
-import dev.cryptcraft.talkative.client.gui.editor.branch.AttachBranchScreen
-import dev.cryptcraft.talkative.client.gui.editor.widgets.ActorBranchList
-import dev.cryptcraft.talkative.client.gui.editor.widgets.CallbackCheckbox
-import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
-import dev.cryptcraft.talkative.common.network.serverbound.AttachBranchPacket
 
 class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorScreen) :
     EditorTab(x, y, width, height, parent, Component.literal("General Actor Settings")) {
@@ -23,20 +21,18 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
     private val branchList: ActorBranchList = addChild(ActorBranchList(this, 0, 0, width / 2, height - 40, Component.literal("Attached Branches List")))
     private val attachButton: TalkativeButton = addChild(TalkativeButton(0, 0, 15, 15, Component.literal("+"), { openAttachBranchScreen() }))
 
-    private var horizontalMid: Int = 0
-
     init {
         recalculateChildren()
         refresh()
 
         actorDisplayName.setResponder {
-            (parent.actorEntity as ActorEntity).getActorData()?.displayData?.displayName = it
+            TalkativeClient.editingActorData?.displayData?.displayName = it
         }
-        actorDisplayName.setSuggestion(parent.actorEntity!!.displayName.string)
+        actorDisplayName.setSuggestion(TalkativeClient.editingActorEntity!!.displayName.string)
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, Component.literal("Attached Branches").withStyle { it.withBold(true).withUnderlined(true) }, x + (width / 2) + 2, y + 20, 0xFFFFFF)
+        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, Component.literal("Attached Branches").withStyle { it.withBold(true).withUnderlined(true) }, x + (width / 2) - 5, y + 20, 0xFFFFFF)
         this.actorDisplayName.setEditable(this.overrideDisplayName.selected())
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
@@ -44,14 +40,13 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
     override fun refresh() {
         this.branchList.clear()
         var index = 0
+        println(TalkativeClient.editingActorEntity)
         TalkativeClient.editingActorData?.dialogBranches?.forEach {
             this.branchList.addEntry(index++, it)
         }
     }
 
     override fun recalculateChildren() {
-        this.horizontalMid = x + (width / 2)
-
         //Checkbox - Override Display Name
         this.overrideDisplayName.x = x + 9
         this.overrideDisplayName.y = y + 15
@@ -61,15 +56,15 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
         this.actorDisplayName.y = y + 40
 
         //List - Attached Branch List
-        this.branchList.x = this.horizontalMid
+        this.branchList.x = width / 2
         this.branchList.y = y + 35
-        this.branchList.width = width / 2
+        this.branchList.width = (width / 2) - 5
         this.branchList.height = height - 35
         this.branchList.recalculateChildren()
         this.branchList.renderBackground = false
 
         //Button - Attach Branch Button
-        this.attachButton.x = x + width - 18
+        this.attachButton.x = x + width - 26
         this.attachButton.y = y + 17
 
         super.recalculateChildren()
@@ -77,18 +72,11 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
 
     //ToDo: Finish implementing Name Override
     private fun changeDisplayOverride() {
-        (parent.actorEntity as ActorEntity).getActorData()?.displayData?.overrideDisplayName = overrideDisplayName.selected()
+        TalkativeClient.editingActorData?.displayData?.overrideDisplayName = overrideDisplayName.selected()
     }
 
     private fun openAttachBranchScreen() {
-        Minecraft.getInstance().setScreen(AttachBranchScreen(parent) {
-            if (it!!.value.isNotBlank())
-                addBranchToActor(it.value)
-        })
-    }
-
-    private fun addBranchToActor(path: String) {
-        AttachBranchPacket(parentScreen.actorEntity!!.id, path).sendToServer()
+        Minecraft.getInstance().setScreen(BranchSelectionScreen(parent, BranchSelectionScreen.ListMode.ATTACH))
     }
 
     override fun updateNarration(narrationElementOutput: NarrationElementOutput) {

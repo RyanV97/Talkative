@@ -1,22 +1,21 @@
 package dev.cryptcraft.talkative.api.actor
 
 import dev.cryptcraft.talkative.api.actor.markers.Marker
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
-import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.api.tree.BranchReference
 import dev.cryptcraft.talkative.common.util.NBTConstants
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
+import net.minecraft.server.level.ServerPlayer
 
 class ActorData {
     var dialogBranches: ArrayList<BranchReference> = ArrayList()
     var displayData: DisplayData = DisplayData()
     var markers: ArrayList<Marker> = ArrayList()
 
-
     fun getBranchWithPath(path: String): BranchReference? {
         this.dialogBranches.forEach {
-            if(it.fileString == path)
+            if(it.filePath == path)
                 return it
         }
         return null
@@ -24,7 +23,7 @@ class ActorData {
 
     fun getBranchForPlayer(player: ServerPlayer): BranchReference? {
         this.dialogBranches.forEach {
-            if(it.getConditional() == null || it.getConditional()!!.eval(player))
+            if(it.valid && (it.getConditional() == null || it.getConditional()!!.eval(player)))
                 return it
         }
         return null

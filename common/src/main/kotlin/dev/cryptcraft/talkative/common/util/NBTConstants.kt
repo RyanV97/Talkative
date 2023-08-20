@@ -19,10 +19,12 @@ object NBTConstants {
 
     const val NODE_ID = "node_id"
     const val NODE_TYPE = "node_type"
-    const val NODE_CONTENT = "node_contents"
     const val NODE_CHILDREN = "node_children"
     const val NODE_CHILD_TYPE = "node_child_type"
     const val NODE_COMMANDS = "node_commands"
+    const val NODE_TEXT_CONTENTS = "node_text_contents"
+    const val NODE_BRIDGE_DESTINATION_ID = "node_bridge_destination_id"
+    const val NODE_BRIDGE_DESTINATION_BRANCH = "node_bridge_destination_branch"
 
     const val CONDITIONAL = "conditional"
     const val CONDITIONAL_EXPRESSIONS = "expressions"

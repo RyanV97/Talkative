@@ -1,22 +1,26 @@
 package dev.cryptcraft.talkative.client.gui.editor.widgets
 
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.narration.NarrationElementOutput
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
+import dev.cryptcraft.talkative.api.tree.BranchReference
+import dev.cryptcraft.talkative.client.TalkativeClient
+import dev.cryptcraft.talkative.client.data.ConditionalContext
+import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.editor.ConditionalEditorPopup
 import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.tabs.ActorTab
+import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
-import dev.cryptcraft.talkative.client.data.ConditionalContext
-import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
-import dev.cryptcraft.talkative.api.tree.BranchReference
+import dev.cryptcraft.talkative.common.network.serverbound.RequestBranchForEditPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UnAttachBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchConditionalPacket
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiComponent
+import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 
 class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: Int, height: Int, title: Component) : WidgetList<MainEditorScreen>(parentTab.parentScreen, x, y, width, height, title) {
 
@@ -24,9 +28,12 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
         addChild(BranchListEntry(parentTab, actorIndex, branch))
     }
 
-    class BranchListEntry(private val parentTab: ActorTab, val index: Int, val branch: BranchReference) : NestedWidget(0, 0, 0, 20, Component.literal(branch.fileString)) {
-        private val conditionalButton = addChild(TalkativeButton(0, 0, 20, 20, Component.literal("C"), ::openConditionalEditor, ::handleTooltip))
-        private val detachButton = addChild(TalkativeButton(0, 0, 20, 20, Component.literal("X"), ::detachBranch, ::handleTooltip))
+    class BranchListEntry(private val parentTab: ActorTab, val index: Int, val branch: BranchReference) : NestedWidget(0, 0, 0, 20, Component.literal(branch.filePath)) {
+        private val editButton = addChild(IconButton(0, 0, 20, 20, GuiConstants.EDIT_ICON, {
+            RequestBranchForEditPacket(branch.filePath).sendToServer()
+        }, ::handleTooltip))
+        private val conditionalButton = addChild(IconButton(0, 0, 20, 20, GuiConstants.CONDITIONAL_ICON, ::openConditionalEditor, ::handleTooltip))
+        private val detachButton = addChild(IconButton(0, 0, 20, 20, GuiConstants.DETACH_ICON, ::detachBranch, ::handleTooltip))
 
         init {
             conditionalButton.active = branch.valid
@@ -34,7 +41,7 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
 
         override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
             val color: Int = if(!branch.valid) 0xFF0000 else if (isMouseOver(mouseX.toDouble(), mouseY.toDouble())) 0xFFFFFF else 0xCCCCCC
-            val label = Component.literal(branch.fileString)
+            val label = Component.literal(branch.filePath)
 
             if (!branch.valid) label.style = Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)
 
@@ -44,6 +51,10 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
         }
 
         override fun recalculateChildren() {
+            //Button - Edit Branch Button
+            this.editButton.x = this.x + this.width - 60
+            this.editButton.y = this.y
+
             //Button - Edit Conditional Button
             this.conditionalButton.x = this.x + this.width - 40
             this.conditionalButton.y = this.y
@@ -53,9 +64,9 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
             this.detachButton.y = this.y
         }
 
-        private fun openConditionalEditor(button: TalkativeButton) {
+        private fun openConditionalEditor(button: Button) {
             val parentScreen = parentTab.parentScreen
-            val context = ConditionalContext.BranchContext(parentScreen.actorEntity!!.id, index, branch.getConditional())
+            val context = ConditionalContext.BranchContext(TalkativeClient.editingActorEntity!!.id, index, branch.getConditional())
 
             val popupSize = parentScreen.height - 10
             val popupX = (parentTab.width / 2) - (popupSize / 2)
@@ -67,16 +78,19 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
             }
         }
 
-        private fun detachBranch(button: TalkativeButton) {
-            UnAttachBranchPacket(parentTab.parentScreen.actorEntity!!.id, index).sendToServer()
+        private fun detachBranch(button: Button) {
+            UnAttachBranchPacket(TalkativeClient.editingActorEntity!!.id, index).sendToServer()
         }
 
-        private fun handleTooltip(button: TalkativeButton, poseStack: PoseStack, mouseX: Int, mouseY: Int) {
+        private fun handleTooltip(button: Button, poseStack: PoseStack, mouseX: Int, mouseY: Int) {
             if (button == this.conditionalButton && !branch.valid)
                 return
 
             val tooltip =
-                if (button == this.conditionalButton) {
+                if (button == this.editButton) {
+                    Component.literal("Edit Branch")
+                }
+                else if (button == this.conditionalButton) {
                     Component.literal("Edit Conditional")
                 }
                 else

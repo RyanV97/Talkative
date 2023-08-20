@@ -1,16 +1,17 @@
 package dev.cryptcraft.talkative.server.conversations
 
-import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
+import dev.cryptcraft.talkative.api.actor.ActorEntity
+import dev.cryptcraft.talkative.api.tree.DialogBranch
+import dev.cryptcraft.talkative.api.tree.node.DialogNode
+import dev.cryptcraft.talkative.api.tree.node.NodeBase
+import dev.cryptcraft.talkative.api.tree.node.ResponseNode
+import dev.cryptcraft.talkative.common.network.clientbound.DialogPacket
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.LivingEntity
-import dev.cryptcraft.talkative.api.actor.ActorEntity
-import dev.cryptcraft.talkative.api.tree.DialogBranch
-import dev.cryptcraft.talkative.api.tree.DialogNode
-import dev.cryptcraft.talkative.common.network.clientbound.DialogPacket
 
 /**
  * A Conversation represents an ongoing Dialog between a Player and an Actor.
@@ -23,7 +24,8 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     fun startConversation() {
         //ToDo Fire an event or somethin
         this.branchGetter = ConversationManager.registerBranchReference(branchPath, this)
-        getBranch()?.getNode(0)?.let { sendDialog(it) }
+        val node = getBranch()?.getNode(0) ?: return
+        sendDialog(node as DialogNode)
     }
 
     fun progressConversation() {
@@ -33,6 +35,10 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
                 executeNodeCommands(node)
             }
         }
+
+        val node = getNextNode() ?: return
+        sendDialog(node as DialogNode)
+        executeNodeCommands(node)
     }
 
     fun onResponse(responseID: Int) {
@@ -44,8 +50,8 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
                 val nextNode = getNextNode()
                 if (nextNode != null)
                     sendDialog(nextNode)
-                else
-                    DialogPacket(null, null, true).sendToPlayer(player)
+                //else
+                    //ToDo Throw Exception?
             }
         }
     }
@@ -58,23 +64,39 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     private fun sendDialog(node: DialogNode) {
         currentNodeID = node.nodeId
         val branch = getBranch() ?: return
-        val responses = Int2ReferenceLinkedOpenHashMap<Component>()
+        val responses = ArrayList<DialogPacket.ResponseData>()
 
-        node.getResponseIDs()?.forEach { id ->
-            //ToDo Change Node content to Component - This Component.literal is temporary until then
-            branch.getNode(id).let { responseNode ->
-                if (responseNode != null)
-                    responses.put(id, Component.literal(responseNode.content))
-                else
-                    println("No Response Node found with ID: $id")
-                    //ToDo: Make and Throw Talkative exceptions?
+        if (node.getChildren().isNotEmpty()) {
+            if (node.getChildrenType() == NodeBase.NodeType.Response) {
+                node.getChildren().forEach { ref ->
+                    branch.getNode(ref.nodeId)?.let { responseNode ->
+                        if (responseNode is ResponseNode) {
+                            if (responseNode.getConditional()?.eval(player) == false)
+                                return@forEach
+
+                            val type = if (responseNode.getChildren().isEmpty())
+                                DialogPacket.ResponseData.Type.Exit
+                            else
+                                DialogPacket.ResponseData.Type.Response
+
+                            responses.add(DialogPacket.ResponseData(ref.nodeId, responseNode.getContents(), type))
+                        }
+                        else
+                            println("No Response Node found with ID: $ref.nodeId")
+                        //ToDo: Make and Throw Talkative exceptions?
+                    }
+                }
             }
+            else
+                responses.add(DialogPacket.ResponseData(0, Component.literal("Continue").withStyle { it.withItalic(true) }, DialogPacket.ResponseData.Type.Continue))
         }
+        else
+            responses.add(DialogPacket.ResponseData(0, Component.literal("Leave").withStyle { it.withItalic(true) }, DialogPacket.ResponseData.Type.Exit))
 
-        DialogPacket(Component.literal(node.content), responses, node.getChildren().isEmpty()).sendToPlayer(player)
+        DialogPacket(node.getContents(), responses, node.getChildren().isEmpty()).sendToPlayer(player)
     }
 
-    private fun executeNodeCommands(node: DialogNode) {
+    private fun executeNodeCommands(node: NodeBase) {
         val entity = actor as LivingEntity
         val commandSourceStack = CommandSourceStack(this, entity.position(), entity.rotationVector, entity.level as ServerLevel, 3, entity.name.string, entity.displayName, entity.level.server, entity)
         node.commands?.forEach {
@@ -99,7 +121,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     }
 
     private fun getNextNode(): DialogNode? {
-        return getBranch()?.getChildNodeForPlayer(currentNodeID, player)
+        return getBranch()?.getNextDialogForPlayer(currentNodeID, player)
     }
 
     override fun sendSystemMessage(component: Component) {

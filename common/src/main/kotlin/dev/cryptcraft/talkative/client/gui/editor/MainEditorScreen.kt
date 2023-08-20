@@ -2,34 +2,32 @@ package dev.cryptcraft.talkative.client.gui.editor
 
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.architectury.platform.Platform
-import dev.cryptcraft.talkative.client.gui.DataScreen
-import dev.cryptcraft.talkative.client.gui.TalkativeScreen
+import dev.cryptcraft.talkative.client.TalkativeClient
+import dev.cryptcraft.talkative.client.gui.EditorScreen
 import dev.cryptcraft.talkative.client.gui.GuiConstants
+import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.editor.tabs.ActorTab
 import dev.cryptcraft.talkative.client.gui.editor.tabs.EditorTab
-import dev.cryptcraft.talkative.client.gui.editor.tabs.GlobalTab
 import dev.cryptcraft.talkative.client.gui.editor.tabs.MarkerTab
-import dev.cryptcraft.talkative.client.gui.editor.widgets.ActorTabsWidget
-import dev.cryptcraft.talkative.client.gui.widgets.IconButton
+import dev.cryptcraft.talkative.client.gui.editor.widgets.EditorTabsWidget
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.network.chat.Component
-import net.minecraft.world.entity.LivingEntity
 
-class MainEditorScreen(val actorEntity: LivingEntity?) : TalkativeScreen(null, Component.literal("Actor Editor")), DataScreen {
-    constructor() : this(null)
+class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")), EditorScreen {
+    private var actorEntity = TalkativeClient.editingActorEntity
 
     private val tabsHeight = 30
-    private val tabsWidget: ActorTabsWidget = ActorTabsWidget(0, 10, 0, tabsHeight, ::onTabChange)
+    private val tabsWidget: EditorTabsWidget = EditorTabsWidget(0, 10, 0, tabsHeight, ::onTabChange)
 
     override fun init() {
         super.init()
 
+        tabsWidget.width = width - 20
+        addRenderableWidget(tabsWidget)
+
         if (tabsWidget.empty())
             generateTabs()
-        addRenderableWidget(tabsWidget)
-        tabsWidget.width = width - 20
-
-        if (tabsWidget.getActiveTab() != null) {
+        else {
             val tab = addRenderableWidget(tabsWidget.getActiveTab()!!)
             tab.width = width
         }
@@ -44,47 +42,48 @@ class MainEditorScreen(val actorEntity: LivingEntity?) : TalkativeScreen(null, C
     }
 
     override fun renderBackground(poseStack: PoseStack) {
-        //ToDo: Make all backgrounds consistent - Near Opaque
-        fill(poseStack, 0, 0, width, height, GuiConstants.COLOR_BG)
-        GuiComponent.fill(poseStack, 0, tabsHeight + 10, width, height, 0x55000000)
+        fill(poseStack, 0, 0, width, tabsHeight + 10, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        fill(poseStack, 0, tabsHeight + 10, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        fill(poseStack, 5, tabsHeight + 15, width - 5, height - 5, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
     }
 
     private fun generateTabs() {
         val tabY = 10 + tabsHeight
 
+        var globalTabIndex = 0
+        var actorTabIndex = 0
+
         //Global Settings
-        tabsWidget.addTab(
-            Component.literal("Global"),
-            GlobalTab(0, tabY, width, height - tabsHeight, this)
-        )
+//        globalTabIndex = tabsWidget.addTab(
+//            Component.literal("Global"),
+//            GlobalTab(5, tabY, width - 10, height - tabsHeight, this)
+//        )
 
         //Actor Specific Settings
         if (actorEntity != null) {
             //General Settings
-            tabsWidget.addTab(
+            actorTabIndex = tabsWidget.addTab(
                 Component.literal("Actor"),
-                ActorTab(0, tabY, width, height - tabsHeight + 5, this)
+                ActorTab(5, tabY, width - 10, height - tabsHeight + 5, this)
             )
 
             //Marker Settings
             tabsWidget.addTab(
                 Component.literal("Markers"),
-                MarkerTab(0, tabY, width, height - tabsHeight, this)
+                MarkerTab(5, tabY, width - 10, height - tabsHeight, this)
             )
 
             if (Platform.isModLoaded("simplemuseum") || Platform.isDevelopmentEnvironment()) {
-                tabsWidget.addShortcut(
-                    IconButton.Icon(GuiConstants.SM_ICON, 20, 20, textureWidth = 64, textureHeight = 64)
-                ) {
+                tabsWidget.addShortcut(GuiConstants.SM_ICON) {
                     //ToDo: Tell SM to open Screen
                 }
             }
         }
 
         if (actorEntity != null)
-            tabsWidget.setActiveTab(1)
+            tabsWidget.setActiveTab(actorTabIndex)
         else
-            tabsWidget.setActiveTab(0)
+            tabsWidget.setActiveTab(globalTabIndex)
     }
 
     private fun onTabChange(oldTab: EditorTab?, newTab: EditorTab) {
@@ -94,6 +93,7 @@ class MainEditorScreen(val actorEntity: LivingEntity?) : TalkativeScreen(null, C
     }
 
     override fun refresh() {
+        actorEntity = TalkativeClient.editingActorEntity
         tabsWidget.children.forEachIndexed { index, _ ->
             tabsWidget.getTab(index)?.refresh()
         }
