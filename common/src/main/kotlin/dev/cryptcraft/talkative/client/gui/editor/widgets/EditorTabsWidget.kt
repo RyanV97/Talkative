@@ -79,6 +79,14 @@ class EditorTabsWidget(x: Int, y: Int, width: Int, height: Int, val onTabChange:
         }
     }
 
+    fun getAllTabs(): ArrayList<EditorTab> {
+        val list = ArrayList<EditorTab>()
+        children.forEach {
+            list.add((it as TabWidget).getTab() ?: return@forEach)
+        }
+        return list
+    }
+
     fun clear() {
         clearChildren()
     }

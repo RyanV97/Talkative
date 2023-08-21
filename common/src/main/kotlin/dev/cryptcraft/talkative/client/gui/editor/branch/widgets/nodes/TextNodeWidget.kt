@@ -1,5 +1,6 @@
 package dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes
 
+import com.google.gson.JsonParseException
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import dev.cryptcraft.talkative.api.tree.node.TextNode
@@ -11,9 +12,15 @@ class TextNodeWidget(x: Int, y: Int, node: NodeBase, parentWidget: NodeWidget?, 
     val editBox = addChild(NodeEditBox(this, x, y + 10, width, height - 10))
 
     init {
-        editBox.value = (node as TextNode).getContents().string
+        editBox.value = if (parentScreen.jsonMode) Component.Serializer.toJson((node as TextNode).getContents()) else (node as TextNode).getContents().string
         editBox.setValueListener {
-            node.setContents(Component.literal(it))
+            try {
+                node.setContents(Component.Serializer.fromJsonLenient(it) ?: Component.literal(it))
+            }
+            catch (e: JsonParseException) {
+                node.setContents(Component.literal(it))
+            }
+//            node.setContents(Component.literal(it))
         }
     }
 

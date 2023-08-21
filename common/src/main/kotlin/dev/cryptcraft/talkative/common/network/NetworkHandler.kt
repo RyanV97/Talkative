@@ -26,6 +26,7 @@ object NetworkHandler {
         register(::UpdateNodeConditionalPacket)
         register(::AttachBranchPacket)
         register(::UnAttachBranchPacket)
+        register(::UpdateMarkersPacket)
 
         //Clientbound
         register(::DialogPacket)

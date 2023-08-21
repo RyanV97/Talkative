@@ -37,6 +37,9 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
 
+    override fun onClose() {
+    }
+
     override fun refresh() {
         this.branchList.clear()
         var index = 0

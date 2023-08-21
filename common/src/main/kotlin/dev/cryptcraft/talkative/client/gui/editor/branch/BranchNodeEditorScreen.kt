@@ -34,6 +34,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     var offsetX: Int = 100
     var offsetY: Int = -50
     var zoomScale: Float = 1.0F
+    var jsonMode: Boolean = false
 
     override fun init() {
         super.init()
@@ -43,14 +44,20 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             offsetY = -(rootNodeWidget!!.height / 2)
         }
 
-        addRenderableWidget(TalkativeButton(5, 5, 35, 20, Component.literal("Save"), {
+        addRenderableWidget(TalkativeButton(5, 5, 35, 20, Component.literal("Save")) {
             saveChanges()
             onClose()
-        }))
+        })
 
-        addRenderableWidget(TalkativeButton(45, 5, 50, 20, Component.literal("Cancel"), {
+        addRenderableWidget(TalkativeButton(45, 5, 50, 20, Component.literal("Cancel")) {
             onClose()
-        }))
+        })
+
+        addRenderableWidget(TalkativeButton(100, 5, 100, 20, Component.literal("Json Mode: $jsonMode")) {
+            jsonMode = !jsonMode
+            refresh()
+            it.message = Component.literal("Json Mode: $jsonMode")
+        })
     }
 
     override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {

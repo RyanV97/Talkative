@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component
 class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")), EditorScreen {
     private var actorEntity = TalkativeClient.editingActorEntity
 
-    private val tabsHeight = 30
+    private val tabsHeight = 40
     private val tabsWidget: EditorTabsWidget = EditorTabsWidget(0, 10, 0, tabsHeight, ::onTabChange)
 
     override fun init() {
@@ -29,7 +29,8 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
             generateTabs()
         else {
             val tab = addRenderableWidget(tabsWidget.getActiveTab()!!)
-            tab.width = width
+            tab.width = width - 10
+            tab.height = height - tabsHeight - 10
         }
     }
 
@@ -42,13 +43,12 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
     }
 
     override fun renderBackground(poseStack: PoseStack) {
-        fill(poseStack, 0, 0, width, tabsHeight + 10, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
-        fill(poseStack, 0, tabsHeight + 10, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
-        fill(poseStack, 5, tabsHeight + 15, width - 5, height - 5, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
+        fill(poseStack, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        fill(poseStack, 5, tabsHeight, width - 5, height - 5, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
     }
 
     private fun generateTabs() {
-        val tabY = 10 + tabsHeight
+        val tabY = tabsHeight
 
         var globalTabIndex = 0
         var actorTabIndex = 0
@@ -89,6 +89,8 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
     private fun onTabChange(oldTab: EditorTab?, newTab: EditorTab) {
         if (oldTab != null) removeWidget(oldTab)
         newTab.refresh()
+        newTab.width = width - 10
+        newTab.height = height - tabsHeight - 10
         addRenderableWidget(newTab)
     }
 
@@ -97,6 +99,13 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
         tabsWidget.children.forEachIndexed { index, _ ->
             tabsWidget.getTab(index)?.refresh()
         }
+    }
+
+    override fun onClose() {
+        tabsWidget.getAllTabs().forEach {
+            it.onClose()
+        }
+        super.onClose()
     }
 
     override fun tick() {
