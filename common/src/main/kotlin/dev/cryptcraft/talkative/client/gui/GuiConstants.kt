@@ -25,5 +25,6 @@ object GuiConstants {
     val DELETE_ICON = IconButton.Icon(ResourceLocation(Talkative.MOD_ID, "textures/gui/icons/delete.png"), 20, 20, 0, 0, 20, 40, textureWidth = 20, textureHeight = 60)
     val DETACH_ICON = IconButton.Icon(ResourceLocation(Talkative.MOD_ID, "textures/gui/icons/detach.png"), 20, 20, 0, 0, 20, 40, textureWidth = 20, textureHeight = 60)
     val EDIT_ICON = IconButton.Icon(ResourceLocation(Talkative.MOD_ID, "textures/gui/icons/edit.png"), 20, 20, 0, 0, 20, 40, textureWidth = 20, textureHeight = 60)
+    val SAVE_ICON = IconButton.Icon(ResourceLocation(Talkative.MOD_ID, "textures/gui/icons/save.png"), 20, 20, 0, 0, 20, 40, textureWidth = 20, textureHeight = 60)
     val SM_ICON = IconButton.Icon(ResourceLocation(Talkative.MOD_ID, "textures/gui/icons/simple_museum_icon.png"), 64, 64, textureWidth = 64, textureHeight = 64)
 }

@@ -4,12 +4,16 @@
   "package": "dev.cryptcraft.talkative.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "entity.LivingEntityActorDataMixin"
+    "entity.ChunkMapAccessor",
+    "entity.LivingEntityActorDataMixin",
+    "entity.TrackedEntityAccessor"
   ],
   "client": [
     "client.AbstractScrollWidgetAccessor",
     "client.AbstractWidgetAccessor",
-    "client.ModelBakeryMixin"
+    "client.MarkerRenderingMixin",
+    "client.ModelBakeryMixin",
+    "client.MarkerEntityMixin"
   ],
   "server": []
 }

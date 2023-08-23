@@ -2,10 +2,10 @@ package dev.cryptcraft.talkative.client.gui
 
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.gui.screens.Screen
-import net.minecraft.network.chat.Component
 import dev.cryptcraft.talkative.client.gui.widgets.SubmenuWidget
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.network.chat.Component
 
 abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(title) {
     var popup: PopupWidget? = null
@@ -26,16 +26,16 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         popup?.recalculateChildren()
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(poseStack, mouseX, mouseY, delta)
         submenu?.render(poseStack, mouseX, mouseY, delta)
         if (popup != null) {
-            poseStack?.pushPose()
+            fill(poseStack, 0, 0, width, height, 0xCF000000.toInt())
+            poseStack.pushPose()
             GlStateManager._enableDepthTest()
-            poseStack?.translate(0.0, 0.0, 100.0)
-            renderBackground(poseStack)
+            poseStack.translate(0.0, 0.0, 100.0)
             popup!!.render(poseStack, mouseX, mouseY, delta)
-            poseStack?.popPose()
+            poseStack.popPose()
         }
     }
 

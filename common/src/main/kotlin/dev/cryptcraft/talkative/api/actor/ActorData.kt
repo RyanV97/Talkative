@@ -60,8 +60,9 @@ class ActorData {
             actorData.displayData = DisplayData.deserialize(tag)
 
             val markerList = tag.getList(NBTConstants.MARKER_DATA, Tag.TAG_COMPOUND.toInt())
-            for (markerTag in markerList)
-                actorData.markers.add(Marker.deserialize(markerTag as CompoundTag))
+            for (markerTag in markerList) {
+                actorData.markers.add(Marker.deserialize(markerTag as CompoundTag) ?: continue)
+            }
 
             return actorData
         }

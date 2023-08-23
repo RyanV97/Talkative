@@ -43,7 +43,6 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
     override fun refresh() {
         this.branchList.clear()
         var index = 0
-        println(TalkativeClient.editingActorEntity)
         TalkativeClient.editingActorData?.dialogBranches?.forEach {
             this.branchList.addEntry(index++, it)
         }

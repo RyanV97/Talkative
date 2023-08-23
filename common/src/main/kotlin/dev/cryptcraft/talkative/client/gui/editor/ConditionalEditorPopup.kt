@@ -1,19 +1,20 @@
 package dev.cryptcraft.talkative.client.gui.editor
 
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.narration.NarrationElementOutput
-import org.lwjgl.glfw.GLFW
+import dev.cryptcraft.talkative.api.conditional.Conditional
+import dev.cryptcraft.talkative.api.conditional.ScoreboardExpression
+import dev.cryptcraft.talkative.client.data.ConditionalContext
+import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.editor.widgets.evaluable.ExpressionWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
-import dev.cryptcraft.talkative.client.data.ConditionalContext
-import dev.cryptcraft.talkative.api.conditional.Conditional
-import dev.cryptcraft.talkative.api.conditional.ScoreboardExpression
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiComponent
+import net.minecraft.client.gui.narration.NarrationElementOutput
+import org.lwjgl.glfw.GLFW
 
-class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int, height: Int, private val context: ConditionalContext, val onSave: (context: ConditionalContext) -> Unit) : PopupWidget(x, y, width, height, parent) {
+class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int, height: Int, private val context: ConditionalContext, private val onSave: (context: ConditionalContext) -> Unit) : PopupWidget(x, y, width, height, parent) {
     private var entryList: WidgetList<*> = WidgetList(parent, x, y + 20, width, height - 20)
     private val removalList = ArrayList<ExpressionWidget>()
 
@@ -23,12 +24,12 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
         entryList.setSize(width - 5, height - 20)
         addChild(entryList)
 
-        button(width - 20,2, "+", 15,15)  {
+        button(width - 22,2, "+", 20,20)  {
             val expression = ScoreboardExpression("", 0, ScoreboardExpression.Operation.EQUALS)
             entryList.addChild(ExpressionWidget(this, expression, width, 25, Minecraft.getInstance().font))
         }
 
-        button(width - 60, 0, "Save", 40, 20) {
+        iconButton(width - 44, 2, 20, 20, GuiConstants.SAVE_ICON) {
             context.conditional = createConditional()
             onSave.invoke(context)
         }
@@ -42,9 +43,8 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack, 0, 0, width, 20, -1072689136)
         super.renderButton(poseStack, mouseX, mouseY, delta)
-        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, "Objective", x + 4, y + 5, 0xFFFFFF)
+        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, "Objective", x + 8, y + 8, 0xFFFFFF)
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {

@@ -16,6 +16,12 @@
         "adapter": "kotlin",
         "value": "dev.cryptcraft.talkative.fabric.TalkativeFabric"
       }
+    ],
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "dev.cryptcraft.talkative.fabric.TalkativeClientFabric"
+      }
     ]
   },
   "depends": {

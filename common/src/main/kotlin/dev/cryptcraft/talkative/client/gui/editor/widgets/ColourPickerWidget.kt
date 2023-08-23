@@ -7,13 +7,11 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 import java.awt.Color
-import java.text.DecimalFormat
 
 class ColourPickerWidget(x: Int, y: Int, private val callback: ((Int) -> Unit)?) : NestedWidget(x, y, 75, 100, Component.empty()) {
     constructor(x: Int, y: Int) : this(x, y, null)
 
-    private val decimalFormat = DecimalFormat("#.##")
-    private val hexEntry = addChild(EditBox(Minecraft.getInstance().font, 0, 0, width, 20, Component.empty()))
+    private val hexEntry = addChild(EditBox(Minecraft.getInstance().font, 0, 0, width, 16, Component.empty()))
 
     var hue: Float = 0f
         set(value) {
@@ -32,6 +30,8 @@ class ColourPickerWidget(x: Int, y: Int, private val callback: ((Int) -> Unit)?)
         }
 
     init {
+        hexEntry.setMaxLength(7)
+        hexEntry.setFilter { return@setFilter it.startsWith('#') }
         hexEntry.setResponder {
             if (!hexEntry.canConsumeInput())
                 return@setResponder

@@ -1,20 +1,23 @@
 package dev.cryptcraft.talkative.client.gui.widgets.popup
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.cryptcraft.talkative.client.gui.GuiConstants
+import dev.cryptcraft.talkative.client.gui.TalkativeScreen
+import dev.cryptcraft.talkative.client.gui.widgets.IconButton
+import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
+import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
+import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.components.*
+import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
-import dev.cryptcraft.talkative.client.gui.TalkativeScreen
-import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
-import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 
 open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) : NestedWidget(x, y, width, height, Component.literal("Popup Window")) {
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack, x, y - 10, x + width, y, 0xFF666666.toInt())
-        fill(poseStack, x, y, x + width, y + height, 0xFF222222.toInt())
+        fill(poseStack, x, y, x + width, y + height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        fill(poseStack, x + 2, y + 2, x + width - 2, y + height - 2, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
 
         if (!label.isNullOrEmpty()) GuiComponent.drawCenteredString(poseStack, Minecraft.getInstance().font, label, x + (width / 2), y - 9, 0xFFFFFF)
 
@@ -49,12 +52,16 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
         return addChild(PopupLabel(this.x + x, this.y + y, label))
     }
 
-    fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: (btn: Button) -> Unit): Button {
-        return addChild(Button(this.x + x, this.y + y, width, height, Component.literal(label), action))
+    fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: (btn: Button) -> Unit): TalkativeButton {
+        return addChild(TalkativeButton(this.x + x, this.y + y, width, height, Component.literal(label), action))
     }
 
-    fun imageButton(x: Int, y: Int, iconTexture: ResourceLocation, textureX: Int = 0, textureY: Int = 0, width: Int = 50, height: Int = 50, texWidth: Int = 256, texHeight: Int = 256, diffTexY: Int = 0, action: Button.OnPress, tooltip: Button.OnTooltip = Button.NO_TOOLTIP): ImageButton {
-        return addChild(ImageButton(x, y, width, height, textureX, textureY, diffTexY, iconTexture, texWidth, texHeight, action, tooltip, Component.empty()))
+    fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: Button.OnPress): IconButton {
+        return iconButton(x, y, width, height, icon, action, Button.NO_TOOLTIP)
+    }
+
+    fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: Button.OnPress, tooltip: Button.OnTooltip): IconButton {
+        return addChild(IconButton(this.x + x, this.y + y, width, height, icon, action, tooltip))
     }
 
     fun editBox(x: Int, y: Int, width: Int = 120, height: Int = 20, defaultString: String = ""): EditBox {
@@ -89,8 +96,8 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
             return this
         }
 
-        fun imageButton(x: Int, y: Int, iconTexture: ResourceLocation, textureX: Int = 0, textureY: Int = 0, width: Int = 50, height: Int = 50, texWidth: Int = 256, texHeight: Int = 256, diffTexY: Int = 0, action: Button.OnPress, tooltip: Button.OnTooltip = Button.NO_TOOLTIP): Builder {
-            widget.imageButton(x, y, iconTexture, textureX, textureY, width, height, texWidth, texHeight, diffTexY, action, tooltip)
+        fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: Button.OnPress, tooltip: Button.OnTooltip = Button.NO_TOOLTIP): Builder {
+            widget.iconButton(x, y, width, height, icon, action, tooltip)
             return this
         }
 

@@ -46,8 +46,8 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
 //                ToDo Add Continue Arrow
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack!!, 0, 0, width, height, 0xD91c1c1c.toInt()) //Background
+    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
+        fill(poseStack, 0, 0, width, height, 0xD91c1c1c.toInt()) //Background
 
         //Responses Section - Rendered above Entities
         val responseHeight = height - (height * .3).toInt()

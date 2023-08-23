@@ -34,8 +34,8 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
         }
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(poseStack!!)
+    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(poseStack)
         super.render(poseStack, mouseX, mouseY, delta)
 
         if (tabsWidget.getActiveTab() != null)
@@ -112,5 +112,6 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
         if (tabsWidget.getActiveTab() is MarkerTab) {
             (tabsWidget.getActiveTab() as MarkerTab).tick()
         }
+        super.tick()
     }
 }

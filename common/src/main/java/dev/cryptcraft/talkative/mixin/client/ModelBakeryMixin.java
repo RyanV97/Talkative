@@ -40,7 +40,6 @@ public abstract class ModelBakeryMixin {
                             ),
                             "marker"
                     );
-                    System.out.println(modelLocation);
                     BlockModel blockModel = loadBlockModel(modelLocation);
                     this.unbakedCache.put(modelLocation, blockModel);
                     this.topLevelModels.put(modelLocation, blockModel);

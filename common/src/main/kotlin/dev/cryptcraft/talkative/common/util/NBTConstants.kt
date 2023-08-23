@@ -10,6 +10,7 @@ object NBTConstants {
     const val MARKER_DATA = "marker_data"
     const val MARKER_LOCATION = "marker_location"
     const val MARKER_COLOUR = "marker_overlay_colour"
+    const val MARKER_OFFSET = "marker_offset"
 
     const val BRANCH_REFERENCES = "branch_references"
     const val BRANCH_NODES = "branch_nodes"

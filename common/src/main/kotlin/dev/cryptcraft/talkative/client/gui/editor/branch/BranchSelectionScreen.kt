@@ -25,8 +25,8 @@ class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: Lis
         RequestBranchListPacket().sendToServer()
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack!!, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
+        fill(poseStack, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
         super.render(poseStack, mouseX, mouseY, delta)
     }
 

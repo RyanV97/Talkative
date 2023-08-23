@@ -37,7 +37,7 @@ class UpdateMarkersPacket(private val entityId: Int, private val markers: ArrayL
         private fun readMarkerList(buf: FriendlyByteBuf): ArrayList<Marker> {
             val list = ArrayList<Marker>()
             for (i in 0 until buf.readInt()) {
-                list.add(Marker.deserialize(buf.readNbt()!!))
+                list.add(Marker.deserialize(buf.readNbt()) ?: continue)
             }
             return list
         }

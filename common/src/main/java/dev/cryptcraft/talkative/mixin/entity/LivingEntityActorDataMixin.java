@@ -1,10 +1,14 @@
 package dev.cryptcraft.talkative.mixin.entity;
 
-import dev.cryptcraft.talkative.api.actor.ActorEntity;
 import dev.cryptcraft.talkative.api.actor.ActorData;
+import dev.cryptcraft.talkative.api.actor.ActorEntity;
+import dev.cryptcraft.talkative.api.actor.markers.Marker;
+import dev.cryptcraft.talkative.common.network.clientbound.SyncMarkerPacket;
 import dev.cryptcraft.talkative.common.util.ActorUtil;
 import dev.cryptcraft.talkative.common.util.NBTConstants;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,6 +18,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Set;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityActorDataMixin extends Entity implements ActorEntity {
@@ -35,6 +41,24 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
 
     public void setActorData(ActorData serverActorDataData) {
         this.actorData = serverActorDataData;
+    }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void onTick(CallbackInfo ci) {
+        if (level.isClientSide || getActorData() == null || tickCount % 100 != 0)
+            return;
+
+        Set<ServerPlayerConnection> tracking = ((TrackedEntityAccessor) ((ChunkMapAccessor) ((ServerLevel) level).getChunkSource().chunkMap).getEntityMap().get(getId())).getSeenBy();
+        for (ServerPlayerConnection connection : tracking) {
+            Marker syncMarker = null;
+            for(Marker marker : getActorData ().getMarkers()) {
+                if (marker.getConditional() == null || marker.getConditional().eval(connection.getPlayer())) {
+                    syncMarker = marker;
+                    break;
+                }
+            }
+            new SyncMarkerPacket(getId(), syncMarker).sendToPlayer(connection.getPlayer());
+        }
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("HEAD"))

@@ -1,9 +1,9 @@
 package dev.cryptcraft.talkative.api.conditional
 
+import dev.cryptcraft.talkative.common.util.NBTConstants
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.server.level.ServerPlayer
-import dev.cryptcraft.talkative.common.util.NBTConstants
 
 class Conditional : ArrayList<Evaluable>(), Evaluable {
     private var not: Boolean = false
@@ -16,10 +16,8 @@ class Conditional : ArrayList<Evaluable>(), Evaluable {
 
         for (evaluable in this) {
             val result = evaluable.not() != evaluable.eval(player)
-            println("Result: $result - Output: $output")
             output = if (output == null) result else if (evaluable.or()) output or result else output and result
         }
-        println("Output: $output")
 
         return output ?: false
     }

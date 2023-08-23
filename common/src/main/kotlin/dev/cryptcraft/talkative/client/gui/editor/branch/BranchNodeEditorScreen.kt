@@ -60,8 +60,8 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
         })
     }
 
-    override fun render(poseStack: PoseStack?, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack!!, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+    override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
+        fill(poseStack, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
         poseStack.pushPose()
         poseStack.scale(zoomScale, zoomScale, 1.0F)
 

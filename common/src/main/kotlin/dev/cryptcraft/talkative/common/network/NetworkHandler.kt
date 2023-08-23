@@ -35,6 +35,7 @@ object NetworkHandler {
         register(::UpdateEditingActorDataPacket)
         register(::UpdateEditingBranchPacket)
         register(::SyncBranchListPacket)
+        register(::SyncMarkerPacket)
     }
 
     private inline fun <reified T : TalkativePacket> register(decoder: Function<FriendlyByteBuf, T>) {
