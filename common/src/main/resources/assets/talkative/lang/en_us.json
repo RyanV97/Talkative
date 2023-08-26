@@ -1,3 +1,8 @@
 {
-  "item.talkative.actor_wand": "Actor Wand"
+  "item.talkative.actor_wand": "Actor Wand",
+
+  "talkative.gui.editor.close_confirm": "Are you sure you want to Save this Actor Data?",
+  "talkative.gui.editor.save": "Save these settings to this Actor, and close the Editor",
+  "talkative.gui.editor.discard": "Leave Actor settings as they were, and close the Editor",
+  "talkative.gui.editor.cancel": "Return to the Editor"
 }

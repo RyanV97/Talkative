@@ -12,7 +12,6 @@ import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import dev.cryptcraft.talkative.common.network.serverbound.RequestBranchForEditPacket
-import dev.cryptcraft.talkative.common.network.serverbound.UnAttachBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchConditionalPacket
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
@@ -23,12 +22,24 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 
 class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: Int, height: Int, title: Component) : WidgetList<MainEditorScreen>(parentTab.parentScreen, x, y, width, height, title) {
+    private val removeQueue = ArrayList<BranchListEntry>()
 
     fun addEntry(actorIndex: Int, branch: BranchReference) {
-        addChild(BranchListEntry(parentTab, actorIndex, branch))
+        addChild(BranchListEntry(parentTab, this, actorIndex, branch))
     }
 
-    class BranchListEntry(private val parentTab: ActorTab, val index: Int, val branch: BranchReference) : NestedWidget(0, 0, 0, 20, Component.literal(branch.filePath)) {
+    fun tick() {
+        if (removeQueue.isEmpty()) return
+
+        removeQueue.forEach {
+            TalkativeClient.editingActorData?.dialogBranches?.removeAt(it.index)
+            remove(it)
+        }
+
+        removeQueue.clear()
+    }
+
+    class BranchListEntry(private val parentTab: ActorTab, private val parentList: ActorBranchList, val index: Int, val branch: BranchReference) : NestedWidget(0, 0, 0, 20, Component.literal(branch.filePath)) {
         private val editButton = addChild(IconButton(0, 0, 20, 20, GuiConstants.EDIT_ICON, {
             RequestBranchForEditPacket(branch.filePath).sendToServer()
         }, ::handleTooltip))
@@ -79,7 +90,7 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
         }
 
         private fun detachBranch(button: Button) {
-            UnAttachBranchPacket(TalkativeClient.editingActorEntity!!.id, index).sendToServer()
+            parentList.removeQueue.add(this)
         }
 
         private fun handleTooltip(button: Button, poseStack: PoseStack, mouseX: Int, mouseY: Int) {

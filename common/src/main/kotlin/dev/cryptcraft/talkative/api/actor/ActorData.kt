@@ -35,7 +35,7 @@ class ActorData {
             branchList.add(branch.serialize(CompoundTag()))
         tag.put(NBTConstants.BRANCH_REFERENCES, branchList)
 
-        tag.put(NBTConstants.DISPLAY_DATA, this.displayData.serialize(CompoundTag()))
+        tag.put(NBTConstants.DISPLAY_DATA, this.displayData.serialize())
 
         val markerList = ListTag()
         for (marker in this.markers)
@@ -50,14 +50,16 @@ class ActorData {
     }
 
     companion object {
-        fun deserialize(tag: CompoundTag): ActorData {
+        fun deserialize(tag: CompoundTag?): ActorData? {
+            if (tag == null) return null
+
             val actorData = ActorData()
 
             val tagList = tag.getList(NBTConstants.BRANCH_REFERENCES, Tag.TAG_COMPOUND.toInt())
             for (branchTag in tagList)
                 actorData.dialogBranches.add(BranchReference.deserialize(branchTag as CompoundTag))
 
-            actorData.displayData = DisplayData.deserialize(tag)
+            actorData.displayData = DisplayData.deserialize(tag.getCompound(NBTConstants.DISPLAY_DATA))
 
             val markerList = tag.getList(NBTConstants.MARKER_DATA, Tag.TAG_COMPOUND.toInt())
             for (markerTag in markerList) {

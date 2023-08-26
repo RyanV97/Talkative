@@ -4,10 +4,14 @@ import dev.architectury.networking.NetworkChannel
 import dev.architectury.networking.NetworkManager
 import dev.cryptcraft.talkative.common.network.clientbound.*
 import dev.cryptcraft.talkative.common.network.serverbound.*
+import dev.cryptcraft.talkative.mixin.entity.ChunkMapAccessor
+import dev.cryptcraft.talkative.mixin.entity.TrackedEntityAccessor
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
 import java.util.function.Function
 import java.util.function.Supplier
 
@@ -24,9 +28,7 @@ object NetworkHandler {
         register(::UpdateBranchPacket)
         register(::UpdateBranchConditionalPacket)
         register(::UpdateNodeConditionalPacket)
-        register(::AttachBranchPacket)
-        register(::UnAttachBranchPacket)
-        register(::UpdateMarkersPacket)
+        register(::UpdateActorData)
 
         //Clientbound
         register(::DialogPacket)
@@ -42,10 +44,11 @@ object NetworkHandler {
         CHANNEL.register(T::class.java, TalkativePacket::encode, decoder, ::handlePacket)
     }
 
-    fun <T : TalkativePacket> handlePacket(packet: T, contextSupplier: Supplier<NetworkManager.PacketContext>) {
+    private fun <T : TalkativePacket> handlePacket(packet: T, contextSupplier: Supplier<NetworkManager.PacketContext>) {
         val ctx = contextSupplier.get()
         ctx.queue {
             if (packet is TalkativePacket.ServerboundTalkativePacket && !packet.permissionCheck(ctx.player as ServerPlayer)) {
+                //ToDo Configurable Permissions
                 //ToDo More formal system for warnings like this
                 ctx.player.sendSystemMessage(Component.literal("You don't have permission for this action."))
                 return@queue
@@ -53,6 +56,20 @@ object NetworkHandler {
             println("Handling Packet: ${packet.javaClass.name} on Side: ${if (ctx.player.level.isClientSide) "Client" else "Server"}")
             packet.onReceived(ctx)
         }
+    }
+
+    @JvmStatic
+    fun getTrackingPlayers(entity: Entity): ArrayList<ServerPlayer> {
+        val list = ArrayList<ServerPlayer>()
+        val trackedEntity = ((entity.level as ServerLevel).chunkSource.chunkMap as ChunkMapAccessor).entityMap[entity.id]
+
+        if (trackedEntity != null) {
+            val tracking = (trackedEntity as TrackedEntityAccessor).seenBy
+            for (connection in tracking) {
+                list.add(connection.player)
+            }
+        }
+        return list
     }
 
     interface TalkativePacket {
@@ -75,6 +92,12 @@ object NetworkHandler {
             fun sendToPlayers(players: Collection<ServerPlayer>) {
                 players.forEach {
                     CHANNEL.sendToPlayer(it, this)
+                }
+            }
+
+            fun sendToTrackingPlayers(entity: Entity) {
+                getTrackingPlayers(entity).forEach {
+                    sendToPlayer(it)
                 }
             }
         }

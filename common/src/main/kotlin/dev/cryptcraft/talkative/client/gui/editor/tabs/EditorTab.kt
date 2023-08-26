@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component
 abstract class EditorTab(x: Int, y: Int, width: Int, height: Int, val parentScreen: MainEditorScreen, title: Component) : NestedWidget(x, y, width, height, title) {
     abstract fun onClose()
     abstract fun refresh()
+    open fun tick() {}
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)

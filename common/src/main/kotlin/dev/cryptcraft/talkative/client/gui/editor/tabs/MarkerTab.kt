@@ -16,7 +16,6 @@ import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
-import dev.cryptcraft.talkative.common.network.serverbound.UpdateMarkersPacket
 import net.minecraft.ResourceLocationException
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
@@ -190,12 +189,12 @@ class MarkerTab(x: Int, y: Int, width: Int, height: Int, parentScreen: MainEdito
     }
 
     override fun onClose() {
-        val list = ArrayList<Marker>()
+        val list = TalkativeClient.editingActorData?.markers
+        list?.clear()
         markerList.children.forEach {
             if (it !is MarkerEntry) return@forEach
-            list.add(it.marker)
+            list?.add(it.marker)
         }
-        UpdateMarkersPacket(TalkativeClient.editingActorEntity!!.id, list).sendToServer()
     }
 
     override fun refresh() {
@@ -214,7 +213,7 @@ class MarkerTab(x: Int, y: Int, width: Int, height: Int, parentScreen: MainEdito
         })
     }
 
-    fun tick() {
+    override fun tick() {
         if (removeQueue.isNotEmpty()) {
             removeQueue.forEach {
                 markerList.remove(it)

@@ -1,13 +1,13 @@
 package dev.cryptcraft.talkative.client.gui.widgets.lists
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.cryptcraft.talkative.api.tree.BranchReference
 import dev.cryptcraft.talkative.client.TalkativeClient
 import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchSelectionScreen
 import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
-import dev.cryptcraft.talkative.common.network.serverbound.AttachBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.RequestBranchForEditPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 import net.minecraft.client.Minecraft
@@ -15,7 +15,7 @@ import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 
-open class BranchDirectoryList(parentScreen: BranchSelectionScreen, x: Int, y: Int, width: Int, height: Int) : WidgetList<TalkativeScreen>(parentScreen, x, y, width, height) {
+open class BranchDirectoryList(val parentScreen: BranchSelectionScreen, x: Int, y: Int, width: Int, height: Int) : WidgetList<TalkativeScreen>(parentScreen, x, y, width, height) {
     init {
         renderBackground = false
     }
@@ -25,7 +25,7 @@ open class BranchDirectoryList(parentScreen: BranchSelectionScreen, x: Int, y: I
     }
 
     fun addAttachEntry(value: String) {
-        addChild(AttachEntry(value, width))
+        addChild(AttachEntry(parentScreen, value, width))
     }
 
     fun addEditableEntry(value: String) {
@@ -60,9 +60,10 @@ open class BranchDirectoryList(parentScreen: BranchSelectionScreen, x: Int, y: I
         override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}
     }
 
-    class AttachEntry(branchPath: String, width: Int) : BranchEntry(branchPath, width) {
+    class AttachEntry(parentScreen: TalkativeScreen, branchPath: String, width: Int) : BranchEntry(branchPath, width) {
         private val attachButton = addChild(IconButton(0, 0, 0, 0, GuiConstants.ATTACH_ICON) {
-            AttachBranchPacket(TalkativeClient.editingActorEntity!!.id, branchPath).sendToServer()
+            TalkativeClient.editingActorData?.dialogBranches?.add(BranchReference(branchPath))
+            parentScreen.onClose()
         })
         private val editButton = addChild(IconButton(0, 0, 0, 0, GuiConstants.EDIT_ICON) {
             RequestBranchForEditPacket(branchPath).sendToServer()

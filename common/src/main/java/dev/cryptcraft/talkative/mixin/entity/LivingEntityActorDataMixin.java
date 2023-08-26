@@ -3,23 +3,22 @@ package dev.cryptcraft.talkative.mixin.entity;
 import dev.cryptcraft.talkative.api.actor.ActorData;
 import dev.cryptcraft.talkative.api.actor.ActorEntity;
 import dev.cryptcraft.talkative.api.actor.markers.Marker;
+import dev.cryptcraft.talkative.common.network.NetworkHandler;
 import dev.cryptcraft.talkative.common.network.clientbound.SyncMarkerPacket;
 import dev.cryptcraft.talkative.common.util.ActorUtil;
 import dev.cryptcraft.talkative.common.util.NBTConstants;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.network.ServerPlayerConnection;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Set;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityActorDataMixin extends Entity implements ActorEntity {
@@ -27,6 +26,7 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
         super(entityType, level);
     }
 
+    @Unique
     private ActorData actorData;
 
     public ActorData getActorData() {
@@ -41,24 +41,27 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
 
     public void setActorData(ActorData serverActorDataData) {
         this.actorData = serverActorDataData;
+        syncMarker();
     }
 
-    @Inject(method = "tick", at = @At("RETURN"))
-    private void onTick(CallbackInfo ci) {
-        if (level.isClientSide || getActorData() == null || tickCount % 100 != 0)
-            return;
-
-        Set<ServerPlayerConnection> tracking = ((TrackedEntityAccessor) ((ChunkMapAccessor) ((ServerLevel) level).getChunkSource().chunkMap).getEntityMap().get(getId())).getSeenBy();
-        for (ServerPlayerConnection connection : tracking) {
+    @Unique
+    private void syncMarker() {
+        for (ServerPlayer player : NetworkHandler.getTrackingPlayers(this)) {
             Marker syncMarker = null;
             for(Marker marker : getActorData ().getMarkers()) {
-                if (marker.getConditional() == null || marker.getConditional().eval(connection.getPlayer())) {
+                if (marker.getConditional() == null || marker.getConditional().eval(player)) {
                     syncMarker = marker;
                     break;
                 }
             }
-            new SyncMarkerPacket(getId(), syncMarker).sendToPlayer(connection.getPlayer());
+            new SyncMarkerPacket(getId(), syncMarker).sendToPlayer(player);
         }
+    }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void onTick(CallbackInfo ci) {
+        if (level.isClientSide || getActorData() == null || tickCount % 100 != 0) return;
+        syncMarker();
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("HEAD"))

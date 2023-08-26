@@ -11,9 +11,10 @@
   "client": [
     "client.AbstractScrollWidgetAccessor",
     "client.AbstractWidgetAccessor",
+    "client.MarkerEntityMixin",
     "client.MarkerRenderingMixin",
     "client.ModelBakeryMixin",
-    "client.MarkerEntityMixin"
+    "client.MouseHandlerAccessor"
   ],
   "server": []
 }

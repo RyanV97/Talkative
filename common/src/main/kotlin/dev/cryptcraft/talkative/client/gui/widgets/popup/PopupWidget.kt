@@ -9,11 +9,11 @@ import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
-import net.minecraft.client.gui.components.Button
+import net.minecraft.client.gui.components.Button.*
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
 
-open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) : NestedWidget(x, y, width, height, Component.literal("Popup Window")) {
+open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, private val label: String? = null, private val clickThrough: Boolean = false) : NestedWidget(x, y, width, height, Component.literal("Popup Window")) {
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         fill(poseStack, x, y, x + width, y + height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
@@ -49,18 +49,26 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
     }
 
     fun label(x: Int, y: Int, label: String): PopupLabel {
+        return label(x, y, Component.literal(label))
+    }
+
+    fun label(x: Int, y: Int, label: Component): PopupLabel {
         return addChild(PopupLabel(this.x + x, this.y + y, label))
     }
 
-    fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: (btn: Button) -> Unit): TalkativeButton {
-        return addChild(TalkativeButton(this.x + x, this.y + y, width, height, Component.literal(label), action))
+    fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: OnPress): TalkativeButton {
+        return button(x, y, label, width, height, action, NO_TOOLTIP)
     }
 
-    fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: Button.OnPress): IconButton {
-        return iconButton(x, y, width, height, icon, action, Button.NO_TOOLTIP)
+    fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: OnPress, tooltip: OnTooltip): TalkativeButton {
+        return addChild(TalkativeButton(this.x + x, this.y + y, width, height, Component.literal(label), action, tooltip))
     }
 
-    fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: Button.OnPress, tooltip: Button.OnTooltip): IconButton {
+    fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: OnPress): IconButton {
+        return iconButton(x, y, width, height, icon, action, NO_TOOLTIP)
+    }
+
+    fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: OnPress, tooltip: OnTooltip): IconButton {
         return addChild(IconButton(this.x + x, this.y + y, width, height, icon, action, tooltip))
     }
 
@@ -78,7 +86,7 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
         return addChild(WidgetList(parent, this.x + x, this.y + y, width, height))
     }
 
-    class Builder(val x: Int, val y: Int, val width: Int, val height: Int, val parent: TalkativeScreen, val label: String? = null, private val clickThrough: Boolean = false) {
+    class Builder(val x: Int, val y: Int, val width: Int, val height: Int, val parent: TalkativeScreen, private val label: String? = null, private val clickThrough: Boolean = false) {
         private var widget: PopupWidget = PopupWidget(x, y, width, height, parent, label, clickThrough)
 
         fun title(title: Component): Builder {
@@ -87,16 +95,28 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
         }
 
         fun label(x: Int, y: Int, label: String): Builder {
+            return label(x, y, Component.literal(label))
+        }
+
+        fun label(x: Int, y: Int, label: Component): Builder {
             widget.label(x, y, label)
             return this
         }
 
-        fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: (btn: Button) -> Unit): Builder {
-            widget.button(x, y, label, width, height, action)
+        fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: OnPress): Builder {
+            return button(x, y, label, width, height, action, NO_TOOLTIP)
+        }
+
+        fun button(x: Int, y: Int, label: String, width: Int = 50, height: Int = 20, action: OnPress, tooltip: OnTooltip): Builder {
+            widget.button(x, y, label, width, height, action, tooltip)
             return this
         }
 
-        fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: Button.OnPress, tooltip: Button.OnTooltip = Button.NO_TOOLTIP): Builder {
+        fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: OnPress): Builder {
+            return iconButton(x, y, width, height, icon, action, NO_TOOLTIP)
+        }
+
+        fun iconButton(x: Int, y: Int, width: Int, height: Int, icon: IconButton.Icon, action: OnPress, tooltip: OnTooltip): Builder {
             widget.iconButton(x, y, width, height, icon, action, tooltip)
             return this
         }

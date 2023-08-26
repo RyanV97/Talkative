@@ -22,7 +22,9 @@ open class TalkativeButton(x: Int, y: Int, width: Int, height: Int, message: Com
             renderToolTip(poseStack, mouseX, mouseY)
     }
 
-    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
+    override fun isValidClickButton(button: Int): Boolean {
+        return button == 0 || button == 1
     }
 
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}
 }

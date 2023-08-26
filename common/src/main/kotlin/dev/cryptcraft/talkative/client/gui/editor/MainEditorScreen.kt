@@ -10,6 +10,9 @@ import dev.cryptcraft.talkative.client.gui.editor.tabs.ActorTab
 import dev.cryptcraft.talkative.client.gui.editor.tabs.EditorTab
 import dev.cryptcraft.talkative.client.gui.editor.tabs.MarkerTab
 import dev.cryptcraft.talkative.client.gui.editor.widgets.EditorTabsWidget
+import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
+import dev.cryptcraft.talkative.common.network.serverbound.UpdateActorData
+import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.network.chat.Component
 
@@ -31,6 +34,7 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
             val tab = addRenderableWidget(tabsWidget.getActiveTab()!!)
             tab.width = width - 10
             tab.height = height - tabsHeight - 10
+            refresh()
         }
     }
 
@@ -102,16 +106,49 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
     }
 
     override fun onClose() {
-        tabsWidget.getAllTabs().forEach {
-            it.onClose()
-        }
-        super.onClose()
+        val popupX = width / 2 - 127
+        val popupY = height / 2 - 25
+        popup = PopupWidget.Builder(popupX, popupY, 255, 50, this)
+            .label(6, 7, Component.translatable("talkative.gui.editor.close_confirm"))
+            .button(5, 25, "Save", 50, 20,
+                {
+                    tabsWidget.getAllTabs().forEach {
+                         it.onClose()
+                    }
+                    UpdateActorData(TalkativeClient.editingActorEntity?.id ?: -1, TalkativeClient.editingActorData).sendToServer()
+                    super.onClose()
+                },
+                { _, poseStack, _, _ ->
+                    val label = Component.translatable("talkative.gui.editor.save").withStyle(ChatFormatting.GREEN)
+                    val labelWidth = font.width(label)
+                    renderTooltip(poseStack, label, (popupX + 127) - (labelWidth / 2) - 15, popupY + 65)
+                }
+            )
+            .button(103, 25, "Discard", 50, 20,
+                {
+                    super.onClose()
+                },
+                { _, poseStack, _, _ ->
+                    val label = Component.translatable("talkative.gui.editor.discard").withStyle(ChatFormatting.RED)
+                    val labelWidth = font.width(label)
+                    renderTooltip(poseStack, label, (popupX + 127) - (labelWidth / 2) - 15, popupY + 65)
+                }
+            )
+            .button(200, 25, "Cancel", 50, 20,
+                {
+                    closePopup()
+                },
+                { _, poseStack, _, _ ->
+                    val label = Component.translatable("talkative.gui.editor.cancel")
+                    val labelWidth = font.width(label)
+                    renderTooltip(poseStack, label, (popupX + 127) - (labelWidth / 2) - 8, popupY + 65)
+                }
+            )
+            .build()
     }
 
     override fun tick() {
-        if (tabsWidget.getActiveTab() is MarkerTab) {
-            (tabsWidget.getActiveTab() as MarkerTab).tick()
-        }
+        tabsWidget.getActiveTab()?.tick()
         super.tick()
     }
 }

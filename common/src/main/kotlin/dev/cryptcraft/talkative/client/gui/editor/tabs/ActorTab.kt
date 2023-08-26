@@ -14,8 +14,7 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 
-class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorScreen) :
-    EditorTab(x, y, width, height, parent, Component.literal("General Actor Settings")) {
+class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorScreen) : EditorTab(x, y, width, height, parent, Component.literal("General Actor Settings")) {
     private val overrideDisplayName: Checkbox = addChild(CallbackCheckbox(0,0, 20, 20, Component.literal("Override Entity Name"), TalkativeClient.editingActorData?.displayData?.overrideDisplayName ?: false, ::changeDisplayOverride))
     private val actorDisplayName: EditBox = addChild(EditBox(Minecraft.getInstance().font, 0,0, 150, 20, Component.literal("Actor Display Name")))
     private val branchList: ActorBranchList = addChild(ActorBranchList(this, 0, 0, width / 2, height - 40, Component.literal("Attached Branches List")))
@@ -37,10 +36,10 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
 
-    override fun onClose() {
-    }
+    override fun onClose() {}
 
     override fun refresh() {
+        this.actorDisplayName.value = TalkativeClient.editingActorData?.displayData?.displayName.toString()
         this.branchList.clear()
         var index = 0
         TalkativeClient.editingActorData?.dialogBranches?.forEach {
@@ -72,7 +71,10 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
         super.recalculateChildren()
     }
 
-    //ToDo: Finish implementing Name Override
+    override fun tick() {
+        branchList.tick()
+    }
+
     private fun changeDisplayOverride() {
         TalkativeClient.editingActorData?.displayData?.overrideDisplayName = overrideDisplayName.selected()
     }
@@ -81,6 +83,5 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
         Minecraft.getInstance().setScreen(BranchSelectionScreen(parent, BranchSelectionScreen.ListMode.ATTACH))
     }
 
-    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
-    }
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}
 }

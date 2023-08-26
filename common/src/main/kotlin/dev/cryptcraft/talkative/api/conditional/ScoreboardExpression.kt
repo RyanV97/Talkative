@@ -1,8 +1,8 @@
 package dev.cryptcraft.talkative.api.conditional
 
+import dev.cryptcraft.talkative.common.util.NBTConstants
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
-import dev.cryptcraft.talkative.common.util.NBTConstants
 
 class ScoreboardExpression(val objectiveName: String, val compareValue: Int, val operation: Operation, private val not: Boolean = false, private val or: Boolean = false) : Evaluable {
     override fun eval(player: ServerPlayer): Boolean {
@@ -46,7 +46,7 @@ class ScoreboardExpression(val objectiveName: String, val compareValue: Int, val
         }
     }
 
-    enum class Operation {
-        EQUALS, LESS_THAN, LESS_EQUAL, GREATER_THAN, GREATER_EQUAL
+    enum class Operation(val label: String) {
+        EQUALS("=="), LESS_THAN("<"), LESS_EQUAL("<="), GREATER_THAN(">"), GREATER_EQUAL(">=");
     }
 }
