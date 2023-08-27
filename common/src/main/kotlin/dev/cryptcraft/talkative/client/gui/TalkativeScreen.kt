@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 
 abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(title) {
-    var popup: PopupWidget? = null
+    private var popup: PopupWidget? = null
     var submenu: SubmenuWidget? = null
 
     private var centerX: Int = 0
@@ -99,7 +99,16 @@ abstract class TalkativeScreen(var parent: Screen?, title: Component?) : Screen(
         minecraft?.setScreen(parent)
     }
 
+    fun openPopup(popup: PopupWidget) {
+        this.popup = popup
+    }
+
+    fun getPopup(): PopupWidget? {
+        return popup
+    }
+
     fun closePopup() {
+        popup?.onClose()
         popup = null
     }
 

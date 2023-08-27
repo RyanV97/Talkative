@@ -46,15 +46,15 @@ class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: Lis
     }
 
     private fun openCreateBranchPopup(button: Button) {
-        popup = PopupWidget.Builder((width / 2) - 155, (height / 2) - 15, 310, 30, this)
+        openPopup(PopupWidget.Builder((width / 2) - 155, (height / 2) - 15, 310, 30, this)
             .textField(5, 5, width = 195)
             .button(205, 5, "Save") {
-                createBranch(popup!!.getAllTextFields()[0].value)
+                createBranch(getPopup()!!.getAllTextFields()[0].value)
             }
             .button(259, 5, "Cancel") {
                 closePopup()
             }
-            .build()
+            .build())
     }
 
     enum class ListMode {

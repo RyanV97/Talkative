@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component
 open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: TalkativeScreen, private val label: String? = null, private val clickThrough: Boolean = false) : NestedWidget(x, y, width, height, Component.literal("Popup Window")) {
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack, x, y, x + width, y + height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        fill(poseStack, x, y, x + width, y + height, GuiConstants.COLOR_POPUP_BORDER)
         fill(poseStack, x + 2, y + 2, x + width - 2, y + height - 2, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
 
         if (!label.isNullOrEmpty()) GuiComponent.drawCenteredString(poseStack, Minecraft.getInstance().font, label, x + (width / 2), y - 9, 0xFFFFFF)
@@ -135,6 +135,7 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
         }
     }
 
+    open fun onClose() {}
     open fun tick() {}
 
 }

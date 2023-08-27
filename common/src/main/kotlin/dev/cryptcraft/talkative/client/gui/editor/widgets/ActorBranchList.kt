@@ -12,7 +12,6 @@ import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import dev.cryptcraft.talkative.common.network.serverbound.RequestBranchForEditPacket
-import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchConditionalPacket
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
@@ -79,14 +78,14 @@ class ActorBranchList(private val parentTab: ActorTab, x: Int, y: Int, width: In
             val parentScreen = parentTab.parentScreen
             val context = ConditionalContext.BranchContext(TalkativeClient.editingActorEntity!!.id, index, branch.getConditional())
 
-            val popupSize = parentScreen.height - 10
-            val popupX = (parentTab.width / 2) - (popupSize / 2)
+            val popupWidth = (parentScreen.width / 1.75).toInt()
+            val popupHeight = parentScreen.height - 25
+            val popupX = (parentTab.width / 2) - (popupWidth / 2)
 
-            parentScreen.popup = ConditionalEditorPopup(parentScreen, popupX, 10, popupSize, popupSize, context) {
+            parentScreen.openPopup(ConditionalEditorPopup(parentScreen, popupX, 15, popupWidth, popupHeight, context) {
                 val newContext = it as ConditionalContext.BranchContext
-                UpdateBranchConditionalPacket(newContext.actorId, newContext.branchIndex, newContext.conditional).sendToServer()
-                parentTab.parentScreen.closePopup()
-            }
+                TalkativeClient.editingActorData?.dialogBranches?.get(newContext.branchIndex)?.setConditional(newContext.conditional)
+            })
         }
 
         private fun detachBranch(button: Button) {

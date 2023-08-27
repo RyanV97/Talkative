@@ -108,7 +108,7 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
     override fun onClose() {
         val popupX = width / 2 - 127
         val popupY = height / 2 - 25
-        popup = PopupWidget.Builder(popupX, popupY, 255, 50, this)
+        openPopup(PopupWidget.Builder(popupX, popupY, 255, 50, this)
             .label(6, 7, Component.translatable("talkative.gui.editor.close_confirm"))
             .button(5, 25, "Save", 50, 20,
                 {
@@ -144,7 +144,7 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
                     renderTooltip(poseStack, label, (popupX + 127) - (labelWidth / 2) - 8, popupY + 65)
                 }
             )
-            .build()
+            .build())
     }
 
     override fun tick() {

@@ -196,12 +196,11 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
                     val context = ConditionalContext.NodeContext(TalkativeClient.editingBranchPath!!, widget.node.nodeId, widget.node.getConditional())
                     val popupSize = height - 10
                     val popupX = (width / 2) - (popupSize / 2)
-                    popup = ConditionalEditorPopup(this, popupX, 10, popupSize, popupSize, context) {
+                    openPopup(ConditionalEditorPopup(this, popupX, 10, popupSize, popupSize, context) {
                         val newContext = it as ConditionalContext.NodeContext
                         widget.node.setConditional(newContext.conditional)
                         UpdateNodeConditionalPacket(newContext.branchPath, newContext.nodeId, newContext.conditional).sendToServer()
-                        closePopup()
-                    }
+                    })
                     closeSubmenu()
                 }
             }

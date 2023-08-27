@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.cryptcraft.talkative.api.conditional.Conditional
 import dev.cryptcraft.talkative.api.conditional.ScoreboardExpression
 import dev.cryptcraft.talkative.client.data.ConditionalContext
-import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.editor.widgets.evaluable.ExpressionWidget
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
@@ -24,14 +23,9 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
         entryList.setSize(width - 5, height - 20)
         addChild(entryList)
 
-        button(width - 22,2, "+", 20,20)  {
+        button(width - 23,4, "+", 16,16)  {
             val expression = ScoreboardExpression("", 0, ScoreboardExpression.Operation.EQUALS)
             entryList.addChild(ExpressionWidget(this, expression, width, 25, Minecraft.getInstance().font))
-        }
-
-        iconButton(width - 44, 2, 20, 20, GuiConstants.SAVE_ICON) {
-            context.conditional = createConditional()
-            onSave.invoke(context)
         }
     }
 
@@ -49,7 +43,7 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         when (keyCode) {
-            GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER, GLFW.GLFW_KEY_SPACE -> return true
+            GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER, GLFW.GLFW_KEY_SPACE -> return true
         }
         return super.keyPressed(keyCode, scanCode, modifiers)
     }
@@ -66,6 +60,11 @@ class ConditionalEditorPopup(parent: TalkativeScreen, x: Int, y: Int, width: Int
         entryList.y = y + 20
         entryList.width = width
         entryList.height = height - 20
+    }
+
+    override fun onClose() {
+        context.conditional = createConditional()
+        onSave.invoke(context)
     }
 
     override fun tick() {

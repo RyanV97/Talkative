@@ -26,7 +26,6 @@ object NetworkHandler {
         register(::RequestBranchForEditPacket)
         register(::RequestBranchListPacket)
         register(::UpdateBranchPacket)
-        register(::UpdateBranchConditionalPacket)
         register(::UpdateNodeConditionalPacket)
         register(::UpdateActorData)
 
@@ -91,14 +90,12 @@ object NetworkHandler {
 
             fun sendToPlayers(players: Collection<ServerPlayer>) {
                 players.forEach {
-                    CHANNEL.sendToPlayer(it, this)
+                    sendToPlayer(it)
                 }
             }
 
             fun sendToTrackingPlayers(entity: Entity) {
-                getTrackingPlayers(entity).forEach {
-                    sendToPlayer(it)
-                }
+                sendToPlayers(getTrackingPlayers(entity))
             }
         }
     }

@@ -10,7 +10,8 @@ object GuiConstants {
     const val COLOR_EDITOR_BG_SECONDARY = 0xFF212121.toInt()
     const val COLOR_BTN_BG = 0xFF353c48.toInt()
     const val COLOR_BTN_BORDER = 0xFF238b4e.toInt()
-    const val COLOR_BTN_BORDER_HL = 0xFF3ecf7d.toInt()
+    const val COLOR_BTN_BORDER_HL = 0xFF36D97A.toInt()
+    const val COLOR_POPUP_BORDER = 0xFF165932.toInt()
 
     //Textures
     val DIALOG_MESSAGE = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message.png")

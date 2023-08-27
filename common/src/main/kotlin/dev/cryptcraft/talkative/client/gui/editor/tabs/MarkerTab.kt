@@ -149,7 +149,7 @@ class MarkerTab(x: Int, y: Int, width: Int, height: Int, parentScreen: MainEdito
             val markerAreaX2 = x + width - 100
             val markerAreaY2 = y + height - 45
 
-            if (parentScreen.popup == null) {
+            if (parentScreen.getPopup() == null) {
                 fill(poseStack, markerAreaX, markerAreaY, markerAreaX2, markerAreaY2, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
                 ScissorUtil.start(markerAreaX, markerAreaY, markerAreaX2 - markerAreaX, markerAreaY2 - markerAreaY)
                 renderMarker(marker, poseStack, markerAreaX + ((markerAreaX2 - markerAreaX) / 2), markerAreaY + ((markerAreaY2 - markerAreaY) / 2), zoom, rotation, Color.HSBtoRGB(markerColourPicker.hue, markerColourPicker.sat, markerColourPicker.bri))
@@ -269,7 +269,7 @@ class MarkerTab(x: Int, y: Int, width: Int, height: Int, parentScreen: MainEdito
         }
 
         override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
-            if (parentTab.parentScreen.popup != null)
+            if (parentTab.parentScreen.getPopup() != null)
                 return false
             if (isMouseOver(mouseX, mouseY)) {
                 parentTab.selectedEntry = this
@@ -287,11 +287,9 @@ class MarkerTab(x: Int, y: Int, width: Int, height: Int, parentScreen: MainEdito
             val popupHeight = parentScreen.height - 25
             val popupX = (parentTab.width / 2) - (popupWidth / 2)
 
-            parentScreen.popup = ConditionalEditorPopup(parentScreen, popupX, 15, popupWidth, popupHeight, context) {
-                val newContext = it as ConditionalContext.MarkerContext
-                marker.conditional = newContext.conditional
-                parentTab.parentScreen.closePopup()
-            }
+            parentScreen.openPopup(ConditionalEditorPopup(parentScreen, popupX, 15, popupWidth, popupHeight, context) {
+                marker.conditional = it.conditional
+            })
         }
 
         override fun recalculateChildren() {
