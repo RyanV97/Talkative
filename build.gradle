@@ -41,6 +41,9 @@ subprojects {
             parchment("org.parchmentmc.data:parchment-1.19.2:2022.11.27@zip")
         }
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+
+        implementation("com.atlassian.commonmark:commonmark:0.2.0")
+        include("com.atlassian.commonmark:commonmark:0.2.0")
     }
 }
 

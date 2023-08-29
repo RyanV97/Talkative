@@ -17,6 +17,7 @@ import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.NodeWidge
 import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.TextNodeWidget
 import dev.cryptcraft.talkative.client.gui.widgets.SubmenuWidget
 import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
+import dev.cryptcraft.talkative.common.markdown.MarkdownParser
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateNodeConditionalPacket
 import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
@@ -34,7 +35,6 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     var offsetX: Int = 100
     var offsetY: Int = -50
     var zoomScale: Float = 1.0F
-    var jsonMode: Boolean = false
 
     override fun init() {
         super.init()
@@ -51,12 +51,6 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
         addRenderableWidget(TalkativeButton(45, 5, 50, 20, Component.literal("Cancel")) {
             onClose()
-        })
-
-        addRenderableWidget(TalkativeButton(100, 5, 100, 20, Component.literal("Json Mode: $jsonMode")) {
-            jsonMode = !jsonMode
-            refresh()
-            it.message = Component.literal("Json Mode: $jsonMode")
         })
     }
 
@@ -76,8 +70,12 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     private fun saveChanges() {
         TalkativeClient.editingBranch?.let { branch ->
             branch.clearNodes()
-            nodeWidgets.forEach {
-                branch.addNode(it.node)
+            nodeWidgets.forEach { widget ->
+                val node = widget.node
+                if (node is TextNode) {
+                    MarkdownParser.parse(node.getContents().string)?.let { node.setContents(it) }
+                }
+                branch.addNode(node)
             }
             UpdateBranchPacket(TalkativeClient.editingBranchPath!!, UpdateBranchPacket.UpdateAction.MODIFY, branch).sendToServer()
         }
