@@ -8,14 +8,14 @@ import dev.cryptcraft.talkative.common.markdown.MarkdownParser
 import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
 import net.minecraft.network.chat.Component
 
-class TextNodeWidget(x: Int, y: Int, node: NodeBase, parentWidget: NodeWidget?, parentScreen: BranchNodeEditorScreen) : NodeWidget(x, y, if (node.getNodeType() == NodeBase.NodeType.Dialog) 75 else 40, node, parentWidget, parentScreen) {
+class TextNodeWidget(x: Int, y: Int, node: TextNode, parentWidget: NodeWidget?, parentScreen: BranchNodeEditorScreen) : NodeWidget(x, y, if (node.getNodeType() == NodeBase.NodeType.Dialog) 75 else 40, node, parentWidget, parentScreen) {
     val editBox = addChild(NodeEditBox(this, x, y + 10, width, height - 10))
 
     init {
         editBox.setValueListener {
-            (node as TextNode).setContents(Component.literal(it))
+            node.setContents(Component.literal(it))
         }
-        editBox.value = MarkdownParser.decode((node as TextNode).getContents())
+        editBox.value = MarkdownParser.decode(node.getContents())
     }
 
     override fun renderNode(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {

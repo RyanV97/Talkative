@@ -5,7 +5,7 @@ import dev.cryptcraft.talkative.common.util.NBTConstants
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 
-class ResponseNode(nodeId: Int, private var contents: Component, conditional: Conditional? = null) : NodeBase(nodeId, conditional), TextNode {
+class ResponseNode(nodeId: Int, private var contents: Component, conditional: Conditional? = null) : TextNode(nodeId, conditional) {
     override fun serialize(tag: CompoundTag): CompoundTag {
         tag.putString(NBTConstants.NODE_TEXT_CONTENTS, Component.Serializer.toJson(contents))
         return super.serialize(tag)
