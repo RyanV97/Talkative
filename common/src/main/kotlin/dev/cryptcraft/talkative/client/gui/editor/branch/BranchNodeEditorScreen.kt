@@ -38,11 +38,14 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
     override fun init() {
         super.init()
-        TalkativeClient.editingBranch?.let {
+
+        if (rootNodeWidget == null) {
             refresh()
             offsetX = rootNodeWidget!!.width / 2
             offsetY = -(rootNodeWidget!!.height / 2)
         }
+        else
+            refresh()
 
         addRenderableWidget(TalkativeButton(5, 5, 35, 20, Component.literal("Save")) {
             saveChanges()
@@ -130,14 +133,11 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     }
 
     fun createWidgetForNode(node: NodeBase, parent: NodeWidget?): NodeWidget? {
-        val widget = if (node is TextNode)
-            TextNodeWidget(width / 2, height / 2, node, parent, this)
-        else if (node is BridgeNode)
-            BridgeNodeWidget(width / 2, height / 2, node, parent, this)
-        else
-            return null
-//        else
-//            MissingNodeWidget(width / 2, height / 2, parent, this)
+        val widget = when (node) {
+            is TextNode -> TextNodeWidget(width / 2, height / 2, node, parent, this)
+            is BridgeNode -> BridgeNodeWidget(width / 2, height / 2, node, parent, this)
+            else -> return null //ToDo MissingNodeWidget(width / 2, height / 2, parent, this)
+        }
 
         addChild(widget)
         return widget
@@ -156,11 +156,12 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     private fun clearNodes() {
         children().removeIf { it is NodeWidget }
         nodeWidgets.clear()
+        rootNodeWidget = null
     }
 
     override fun refresh() {
         clearNodes()
-        rootNodeWidget = TalkativeClient.editingBranch!!.getNode(0)?.let { loadNodeAndChildren(it) }
+        rootNodeWidget = loadNodeAndChildren(TalkativeClient.editingBranch!!.getNode(0) ?: return)
         NodePositioner.layoutTree(rootNodeWidget!!)
     }
 
@@ -174,20 +175,9 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
     fun createSubMenu(mouseX: Int, mouseY: Int, widget: AbstractWidget) {
         if (widget is NodeWidget) {
-            val actionMap = HashMap<String, () -> Unit>()
+            val actionMap = LinkedHashMap<String, () -> Unit>()
 
-            if (widget.childNodes.isEmpty() || widget.node.getChildrenType() == NodeBase.NodeType.Dialog)
-                actionMap["New Child (Dialog)"] = {
-                    widget.addChildNode(NodeBase.NodeType.Dialog, TalkativeClient.editingBranch!!.highestId)
-                    NodePositioner.layoutTree(rootNodeWidget!!)
-                    closeSubmenu()
-                }
-            if (widget.childNodes.isEmpty() || widget.node.getChildrenType() == NodeBase.NodeType.Response)
-                actionMap["New Child (Response)"] = {
-                    widget.addChildNode(NodeBase.NodeType.Response, TalkativeClient.editingBranch!!.highestId)
-                    NodePositioner.layoutTree(rootNodeWidget!!)
-                    closeSubmenu()
-                }
+            addChildEntries(actionMap, widget)
 
             if (widget != rootNodeWidget) {
                 actionMap["Edit Conditional"] = {
@@ -230,5 +220,24 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
             submenu = SubmenuWidget(mouseX, mouseY, "${widget.node.getNodeType().name} Node", actionMap)
         }
+    }
+
+    fun addChildEntries(actionMap: LinkedHashMap<String, () -> Unit>, nodeWidget: NodeWidget) {
+        if (nodeWidget.node.getNodeType() == NodeBase.NodeType.Bridge)
+            return
+
+        for (type in NodeBase.NodeType.values()) {
+            if (nodeWidget.childNodes.isEmpty() || nodeWidget.node.getChildrenType() == type) {
+                actionMap["New Child (${type.name})"] = { addNewChild(nodeWidget, type) }
+            }
+        }
+    }
+
+    private fun addNewChild(parentWidget: NodeWidget, type: NodeBase.NodeType) {
+        val newNode = NodeBase.createNodeFromType(type, TalkativeClient.editingBranch!!.highestId)
+        TalkativeClient.editingBranch!!.addNode(newNode!!)
+        parentWidget.node.addChild(newNode)
+        refresh()
+        closeSubmenu()
     }
 }

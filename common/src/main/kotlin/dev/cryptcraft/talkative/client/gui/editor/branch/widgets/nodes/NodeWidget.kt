@@ -16,12 +16,6 @@ abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val p
 
     var lowestChildY: Int = 0
 
-    fun addChildNode(type: NodeBase.NodeType, id: Int) {
-        val newNode = NodeBase.createNodeFromType(type, id) ?: return
-        node.addChild(newNode)
-        childNodes.add(parentScreen.createWidgetForNode(newNode, this) ?: return)
-    }
-
     fun removeChildNode(child: NodeWidget) {
         if (childNodes.remove(child)) {
             node.removeChild(child.node.nodeId)
@@ -45,7 +39,7 @@ abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val p
 
             if(shouldRender(posX, posY)) {
                 val bgColour = getBackgroundColour()
-                val outline = isMouseOver(mouseX.toDouble(), mouseY.toDouble()) or (parentScreen.selectedNode == this)
+                val outline = (isMouseOver(mouseX.toDouble(), mouseY.toDouble()) && parentScreen.getPopup() == null) or (parentScreen.selectedNode == this)
                 var outlineColour: Int = 0xFF00FF00.toInt()
 
                 if(parentScreen.selectedNode == this)
@@ -56,7 +50,7 @@ abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val p
                 fill(poseStack, posX, posY, posX + width, posY + 11, 0xFF333333.toInt())
                 fill(poseStack, posX, posY + 11, posX + width, posY + height, bgColour)
 
-                GuiComponent.drawString(poseStack, minecraft.font, "${node?.getNodeType()?.name ?: "Missing"} Node", posX + 2, posY + 1, 0xFFFFFF)
+                GuiComponent.drawString(poseStack, minecraft.font, "${node?.getNodeType()?.name ?: "Missing"} Node [${node.nodeId}]", posX + 2, posY + 1, 0xFFFFFF)
 
                 if(parentScreen.selectedNode == this) {
                     fill(poseStack, posX, posY + height + 1, posX + width, posY + height + 12, 0xFF333333.toInt())
