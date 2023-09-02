@@ -1,6 +1,10 @@
 package dev.cryptcraft.talkative.client.gui.editor
 
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.Tesselator
+import com.mojang.blaze3d.vertex.VertexFormat
 import dev.architectury.platform.Platform
 import dev.cryptcraft.talkative.client.TalkativeClient
 import dev.cryptcraft.talkative.client.gui.EditorScreen
@@ -14,6 +18,7 @@ import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateActorData
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiComponent
+import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 
 class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")), EditorScreen {
@@ -47,8 +52,21 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
     }
 
     override fun renderBackground(poseStack: PoseStack) {
-        fill(poseStack, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
-        fill(poseStack, 5, tabsHeight, width - 5, height - 5, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
+        val tesselator = Tesselator.getInstance()
+        val bufferBuilder = tesselator.builder
+        RenderSystem.setShader { GameRenderer.getPositionTexColorShader() }
+        RenderSystem.setShaderTexture(0, GuiConstants.EDITOR_BACKGROUND)
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
+        val scale = 48f
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR)
+        bufferBuilder.vertex(0.0, height.toDouble(), 0.0).uv(0.0f, height.toFloat() / scale).color(64, 70, 64, 255).endVertex()
+        bufferBuilder.vertex(width.toDouble(), height.toDouble(), 0.0).uv(width.toFloat() / scale, height.toFloat() / scale).color(64, 85, 64, 255).endVertex()
+        bufferBuilder.vertex(width.toDouble(), 0.0, 0.0).uv(width.toFloat() / scale, 0f).color(64, 64, 64, 255).endVertex()
+        bufferBuilder.vertex(0.0, 0.0, 0.0).uv(0f, 0f).color(64, 64, 64, 255).endVertex()
+        tesselator.end()
+
+        fill(poseStack, 0, 0, width, tabsHeight, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        fill(poseStack, 0, tabsHeight, width, tabsHeight + 3, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
     }
 
     private fun generateTabs() {
