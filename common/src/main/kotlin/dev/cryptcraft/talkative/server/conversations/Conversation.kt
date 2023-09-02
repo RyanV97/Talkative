@@ -43,16 +43,19 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
 
     fun onResponse(responseID: Int) {
         getBranch()?.let { branch ->
-            branch.getNode(responseID)?.let { responseNode ->
-                currentNodeID = responseNode.nodeId
-                executeNodeCommands(responseNode)
-
-                val nextNode = getNextNode()
-                if (nextNode != null)
-                    sendDialog(nextNode)
-                //else
-                    //ToDo Throw Exception?
+            if (responseID > 0) {
+                branch.getNode(responseID)?.let { responseNode ->
+                    currentNodeID = responseNode.nodeId
+                    executeNodeCommands(responseNode)
+                }
             }
+            val nextNode = getNextNode()
+            if (nextNode != null) {
+                executeNodeCommands(nextNode)
+                sendDialog(nextNode)
+            }
+            //else
+            //ToDo Throw Exception?
         }
     }
 

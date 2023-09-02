@@ -1,11 +1,10 @@
 package dev.cryptcraft.talkative.common.network.serverbound
 
 import dev.architectury.networking.NetworkManager
-import net.minecraft.network.FriendlyByteBuf
-import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.common.network.NetworkHandler.TalkativePacket
 import dev.cryptcraft.talkative.server.conversations.ConversationManager
-import java.util.function.Supplier
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.server.level.ServerPlayer
 
 class DialogResponsePacket(private val responseId: Int) : TalkativePacket.ServerboundTalkativePacket {
     constructor(buf: FriendlyByteBuf) : this(buf.readInt())

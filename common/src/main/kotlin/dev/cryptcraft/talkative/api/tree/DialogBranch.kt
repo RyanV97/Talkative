@@ -39,14 +39,13 @@ class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<NodeBase> =
     }
 
     fun getNextDialogForPlayer(parent: NodeBase?, player: ServerPlayer): DialogNode? {
-        var node: DialogNode? = null
         parent?.getChildren()?.forEach {
+            println("Checking nodeId: ${it.nodeId}")
             val child = nodes[it.nodeId]
             if (child?.getConditional() == null || child.getConditional()!!.eval(player)) {
                 when (child) {
                     is DialogNode -> {
-                        node = child
-                        return@forEach
+                        return child
                     }
                     is BridgeNode -> {
                         println("Arrived at Bridge Node")
@@ -54,9 +53,8 @@ class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<NodeBase> =
                         if (destinationBranch != null) {
                             val destinationNode = destinationBranch.getNode(child.destinationNodeId)
                             if (destinationNode != null && destinationNode is DialogNode) {
-                                node = destinationNode
                                 println("Set new Destination")
-                                return@forEach
+                                return destinationNode
                             }
                         }
                         //ToDo No Valid Destination found. Kick from convo?
@@ -66,7 +64,7 @@ class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<NodeBase> =
                 }
             }
         }
-        return node
+        return null
     }
 
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {

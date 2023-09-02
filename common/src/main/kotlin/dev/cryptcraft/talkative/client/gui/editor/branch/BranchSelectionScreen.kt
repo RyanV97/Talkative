@@ -35,6 +35,7 @@ class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: Lis
         listTag?.forEach {
             when (mode) {
                 ListMode.ATTACH -> branchList.addAttachEntry(it.asString)
+                ListMode.BRIDGE_LINK -> branchList.addBridgeEntry(it.asString)
                 ListMode.EDIT -> branchList.addEditableEntry(it.asString)
             }
         }
@@ -58,6 +59,6 @@ class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: Lis
     }
 
     enum class ListMode {
-        ATTACH, EDIT
+        ATTACH, BRIDGE_LINK, EDIT
     }
 }
