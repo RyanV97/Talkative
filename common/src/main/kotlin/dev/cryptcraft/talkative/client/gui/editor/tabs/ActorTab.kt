@@ -26,8 +26,11 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
 
         actorDisplayName.setResponder {
             TalkativeClient.editingActorData?.displayData?.displayName = it
+            if (it.isEmpty())
+                actorDisplayName.setSuggestion(TalkativeClient.editingActorEntity!!.displayName.string)
+            else
+                actorDisplayName.setSuggestion(null)
         }
-        actorDisplayName.setSuggestion(TalkativeClient.editingActorEntity!!.displayName.string)
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
