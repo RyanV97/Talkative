@@ -1,10 +1,10 @@
 package dev.cryptcraft.talkative.server.conversations
 
-import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.api.actor.ActorEntity
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.RefCountMap
+import net.minecraft.server.level.ServerPlayer
 import java.util.*
 
 object ConversationManager {
@@ -38,7 +38,7 @@ object ConversationManager {
 
     fun endConversation(player: ServerPlayer) {
         conversations.remove(player.uuid)?.let {
-//            endConversation(player)
+            it.endConversation(player)
             unregisterBranchReference(it.getBranchPath(), it)
         }
     }
@@ -51,8 +51,10 @@ object ConversationManager {
         return null
     }
 
-    fun registerBranchReference(path: String, reference: Any): (() -> DialogBranch)? {
-        return loadedBranches.registerReference(path, reference)
+    fun registerBranchReference(branchPath: String, reference: Any): (() -> DialogBranch)? {
+        val branchRef = loadedBranches[branchPath] ?: loadBranch(branchPath)
+        if (branchRef != null) return loadedBranches.registerReference(branchPath, reference)
+        return null
     }
 
     fun unregisterBranchReference(path: String, reference: Any) {

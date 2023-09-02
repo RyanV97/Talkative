@@ -2,6 +2,7 @@ package dev.cryptcraft.talkative.server.conversations
 
 import dev.cryptcraft.talkative.api.actor.ActorEntity
 import dev.cryptcraft.talkative.api.tree.DialogBranch
+import dev.cryptcraft.talkative.api.tree.node.BridgeNode
 import dev.cryptcraft.talkative.api.tree.node.DialogNode
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import dev.cryptcraft.talkative.api.tree.node.ResponseNode
@@ -124,7 +125,36 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     }
 
     private fun getNextNode(): DialogNode? {
-        return getBranch()?.getNextDialogForPlayer(currentNodeID, player)
+        val destination = getNextDialogForPlayer(currentNodeID, player) ?: return null
+        if (destination.branchPath != branchPath)
+            changeBranch(destination.branchPath)
+
+        val node = getBranch()?.getNode(destination.nodeId)
+        return if (node is DialogNode)
+            node
+        else
+            null //ToDo No valid destination was found, exit convo and report issue
+    }
+
+    private fun getNextDialogForPlayer(parentId: Int, player: ServerPlayer): Destination? {
+        return getNextDialogForPlayer(getBranch()?.getNode(parentId), player)
+    }
+
+    private fun getNextDialogForPlayer(parent: NodeBase?, player: ServerPlayer): Destination? {
+        parent?.getChildren()?.forEach {
+            val child = getBranch()!!.getNode(it.nodeId)
+            if (child?.getConditional() == null || child.getConditional()!!.eval(player)) {
+                when (child) {
+                    is DialogNode -> {
+                        return Destination(branchPath, child.nodeId)
+                    }
+                    is BridgeNode -> {
+                        return Destination(child.destinationBranchPath, child.destinationNodeId)
+                    }
+                }
+            }
+        }
+        return null
     }
 
     override fun sendSystemMessage(component: Component) {
@@ -142,4 +172,6 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     override fun shouldInformAdmins(): Boolean {
         return false
     }
+
+    data class Destination(val branchPath: String, val nodeId: Int)
 }

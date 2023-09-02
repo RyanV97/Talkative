@@ -1,15 +1,11 @@
 package dev.cryptcraft.talkative.api.tree
 
-import dev.cryptcraft.talkative.api.tree.node.BridgeNode
-import dev.cryptcraft.talkative.api.tree.node.DialogNode
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
-import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.NBTConstants
 import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
-import net.minecraft.server.level.ServerPlayer
 
 /**
  * Data class for a Dialog Tree Branch. Made up of a root [NodeBase] and it's children.
@@ -32,39 +28,6 @@ class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<NodeBase> =
 
     fun clearNodes() {
         nodes.clear()
-    }
-
-    fun getNextDialogForPlayer(parentId: Int, player: ServerPlayer): DialogNode? {
-        return getNextDialogForPlayer(getNode(parentId), player)
-    }
-
-    fun getNextDialogForPlayer(parent: NodeBase?, player: ServerPlayer): DialogNode? {
-        parent?.getChildren()?.forEach {
-            println("Checking nodeId: ${it.nodeId}")
-            val child = nodes[it.nodeId]
-            if (child?.getConditional() == null || child.getConditional()!!.eval(player)) {
-                when (child) {
-                    is DialogNode -> {
-                        return child
-                    }
-                    is BridgeNode -> {
-                        println("Arrived at Bridge Node")
-                        val destinationBranch = FileUtil.getBranchFromPath(child.destinationBranchPath)
-                        if (destinationBranch != null) {
-                            val destinationNode = destinationBranch.getNode(child.destinationNodeId)
-                            if (destinationNode != null && destinationNode is DialogNode) {
-                                println("Set new Destination")
-                                return destinationNode
-                            }
-                        }
-                        //ToDo No Valid Destination found. Kick from convo?
-                        println("No Valid Destination for Bridge")
-                        return null
-                    }
-                }
-            }
-        }
-        return null
     }
 
     fun serialize(tag: CompoundTag = CompoundTag()): CompoundTag {
