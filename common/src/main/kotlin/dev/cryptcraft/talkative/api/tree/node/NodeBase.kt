@@ -142,7 +142,7 @@ abstract class NodeBase(val nodeId: Int, private var conditional: Conditional? =
             return when (nodeType) {
                 NodeType.Dialog -> DialogNode(nodeId, Component.empty())
                 NodeType.Response -> ResponseNode(nodeId, Component.empty())
-                NodeType.Bridge -> BridgeNode(nodeId, 0, "")
+                NodeType.Bridge -> BridgeNode(nodeId, "", 0)
                 else -> return null
             }
         }

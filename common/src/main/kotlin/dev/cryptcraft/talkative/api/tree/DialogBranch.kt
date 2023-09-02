@@ -1,7 +1,9 @@
 package dev.cryptcraft.talkative.api.tree
 
+import dev.cryptcraft.talkative.api.tree.node.BridgeNode
 import dev.cryptcraft.talkative.api.tree.node.DialogNode
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
+import dev.cryptcraft.talkative.common.util.FileUtil
 import dev.cryptcraft.talkative.common.util.NBTConstants
 import it.unimi.dsi.fastutil.ints.Int2ReferenceLinkedOpenHashMap
 import net.minecraft.nbt.CompoundTag
@@ -41,11 +43,27 @@ class DialogBranch(private val nodes: Int2ReferenceLinkedOpenHashMap<NodeBase> =
         parent?.getChildren()?.forEach {
             val child = nodes[it.nodeId]
             if (child?.getConditional() == null || child.getConditional()!!.eval(player)) {
-                if (child is DialogNode) {
-                    node = child
-                    return@forEach
+                when (child) {
+                    is DialogNode -> {
+                        node = child
+                        return@forEach
+                    }
+                    is BridgeNode -> {
+                        println("Arrived at Bridge Node")
+                        val destinationBranch = FileUtil.getBranchFromPath(child.destinationBranchPath)
+                        if (destinationBranch != null) {
+                            val destinationNode = destinationBranch.getNode(child.destinationNodeId)
+                            if (destinationNode != null && destinationNode is DialogNode) {
+                                node = destinationNode
+                                println("Set new Destination")
+                                return@forEach
+                            }
+                        }
+                        //ToDo No Valid Destination found. Kick from convo?
+                        println("No Valid Destination for Bridge")
+                        return null
+                    }
                 }
-                //ToDo Implement BridgeNode here
             }
         }
         return node
