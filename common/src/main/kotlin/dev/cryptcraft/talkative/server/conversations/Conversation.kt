@@ -29,6 +29,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
         this.branchGetter = ConversationManager.registerBranchReference(branchPath, this)
         val node = getBranch()?.getNode(0) ?: return
         sendDialog(node as DialogNode)
+        executeNodeCommands(node)
     }
 
     fun progressConversation() {
@@ -108,7 +109,8 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
         val entity = actor as LivingEntity
         val commandSourceStack = CommandSourceStack(this, entity.position(), entity.rotationVector, entity.level as ServerLevel, 3, entity.name.string, entity.displayName, entity.level.server, entity)
         node.commands?.forEach {
-            player.server.commands.performPrefixedCommand(commandSourceStack, it)
+            if (player.server.commands.performPrefixedCommand(commandSourceStack, it) == 0)
+                println("Failed to run command '$it' in Conversation with player: ${player.displayName.string}") //ToDo Proper Logger
         }
     }
 
