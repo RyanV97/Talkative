@@ -59,14 +59,15 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
         val scale = 48f
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR)
-        bufferBuilder.vertex(0.0, height.toDouble(), 0.0).uv(0.0f, height.toFloat() / scale).color(64, 70, 64, 255).endVertex()
+        bufferBuilder.vertex(0.0, height.toDouble(), 0.0).uv(0.0f, height.toFloat() / scale).color(80, 100, 80, 255).endVertex()
         bufferBuilder.vertex(width.toDouble(), height.toDouble(), 0.0).uv(width.toFloat() / scale, height.toFloat() / scale).color(64, 85, 64, 255).endVertex()
-        bufferBuilder.vertex(width.toDouble(), 0.0, 0.0).uv(width.toFloat() / scale, 0f).color(64, 64, 64, 255).endVertex()
+        bufferBuilder.vertex(width.toDouble(), 0.0, 0.0).uv(width.toFloat() / scale, 0f).color(64, 69, 64, 255).endVertex()
         bufferBuilder.vertex(0.0, 0.0, 0.0).uv(0f, 0f).color(64, 64, 64, 255).endVertex()
         tesselator.end()
 
-        fill(poseStack, 0, 0, width, tabsHeight, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
-        fill(poseStack, 0, tabsHeight, width, tabsHeight + 3, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
+        //Tabs Bar
+        fill(poseStack, 0, 0, width, tabsHeight, 0xA50F0F0F.toInt())
+        fill(poseStack, 0, tabsHeight, width, tabsHeight + 5, GuiConstants.COLOR_EDITOR_BG_SECONDARY)
     }
 
     private fun generateTabs() {

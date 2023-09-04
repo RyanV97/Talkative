@@ -34,6 +34,8 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
     }
 
     override fun renderButton(poseStack: PoseStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        fill(poseStack, branchList.x - 5, branchList.y - 20, branchList.x + branchList.width + 5, branchList.y + branchList.height, 0x600F0F0F) //Background
+
         GuiComponent.drawString(poseStack, Minecraft.getInstance().font, Component.literal("Attached Branches").withStyle { it.withBold(true).withUnderlined(true) }, x + (width / 2) - 5, y + 20, 0xFFFFFF)
         this.actorDisplayName.setEditable(this.overrideDisplayName.selected())
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
