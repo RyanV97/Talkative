@@ -1,7 +1,11 @@
 package dev.cryptcraft.talkative.client.gui.editor.branch
 
 import com.mojang.blaze3d.platform.GlStateManager
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.Tesselator
+import com.mojang.blaze3d.vertex.VertexFormat
 import dev.cryptcraft.talkative.api.tree.node.BridgeNode
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import dev.cryptcraft.talkative.api.tree.node.TextNode
@@ -23,6 +27,7 @@ import dev.cryptcraft.talkative.common.network.serverbound.UpdateNodeConditional
 import dev.cryptcraft.talkative.mixin.client.AbstractWidgetAccessor
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -58,7 +63,7 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     }
 
     override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
-        fill(poseStack, 0, 0, width, height, GuiConstants.COLOR_EDITOR_BG_PRIMARY)
+        renderBackground(poseStack)
         poseStack.pushPose()
         poseStack.scale(zoomScale, zoomScale, 1.0F)
 
@@ -67,7 +72,23 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
 
         poseStack.popPose()
 
+        fill(poseStack, 0, 0, width, 30, 0xA50F0F0F.toInt())
         super.render(poseStack, mouseX, mouseY, delta)
+    }
+
+    override fun renderBackground(poseStack: PoseStack) {
+        val tesselator = Tesselator.getInstance()
+        val bufferBuilder = tesselator.builder
+        RenderSystem.setShader { GameRenderer.getPositionTexColorShader() }
+        RenderSystem.setShaderTexture(0, GuiConstants.BRANCH_EDITOR_BACKGROUND)
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
+        val scale = 16f
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR)
+        bufferBuilder.vertex(0.0, height.toDouble(), 0.0).uv(0.0f, height.toFloat() / scale).color(80, 100, 80, 255).endVertex()
+        bufferBuilder.vertex(width.toDouble(), height.toDouble(), 0.0).uv(width.toFloat() / scale, height.toFloat() / scale).color(64, 85, 64, 255).endVertex()
+        bufferBuilder.vertex(width.toDouble(), 0.0, 0.0).uv(width.toFloat() / scale, 0f).color(64, 69, 64, 255).endVertex()
+        bufferBuilder.vertex(0.0, 0.0, 0.0).uv(0f, 0f).color(64, 64, 64, 255).endVertex()
+        tesselator.end()
     }
 
     private fun saveChanges() {

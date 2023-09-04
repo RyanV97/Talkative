@@ -20,6 +20,7 @@ object GuiConstants {
     val DIALOG_REPLY = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_reply.png")
     val EDITOR_WIDGETS = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/editor_widgets.png")
     val EDITOR_BACKGROUND = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/editor_background.png")
+    val BRANCH_EDITOR_BACKGROUND = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/branch_editor_background.png")
 
     //Icons
     val ATTACH_ICON = IconButton.Icon(ResourceLocation(Talkative.MOD_ID, "textures/gui/icons/attach.png"), 20, 20, 0, 0, 20, 40, textureWidth = 20, textureHeight = 60)

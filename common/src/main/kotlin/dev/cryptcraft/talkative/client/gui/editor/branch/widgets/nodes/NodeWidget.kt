@@ -108,8 +108,8 @@ abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val p
     }
 
     override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean {
-        if (parentScreen.submenu != null && parentScreen.submenu!!.isMouseOver(mouseX, mouseY))
-            return false
+        if (mouseY < 30) return false
+        if (parentScreen.submenu != null && parentScreen.submenu!!.isMouseOver(mouseX, mouseY)) return false
 
         val scaledMouseX = mouseX / parentScreen.zoomScale
         val scaledMouseY = mouseY / parentScreen.zoomScale
