@@ -1,6 +1,7 @@
 package dev.cryptcraft.talkative.server.conversations
 
 import dev.cryptcraft.talkative.api.actor.ActorEntity
+import dev.cryptcraft.talkative.api.event.ConversationEvent
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.api.tree.node.BridgeNode
 import dev.cryptcraft.talkative.api.tree.node.DialogNode
@@ -15,7 +16,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.LivingEntity
 
 /**
- * A Conversation represents an ongoing Dialog between a Player and an Actor.
+ * A Conversation represents an ongoing "Dialog" between a Player and an Actor.
  */
 class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var branchPath: String) : CommandSource {
     val listeners: ArrayList<ServerPlayer>? = null
@@ -23,7 +24,8 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     private var branchGetter: (() -> DialogBranch)? = null
 
     fun startConversation() {
-        //ToDo Fire an event or somethin
+        if (ConversationEvent.START.invoker().start(this).isFalse) return
+
         this.branchGetter = ConversationManager.registerBranchReference(branchPath, this)
         val node = getBranch()?.getNode(0) ?: return
         sendDialog(node as DialogNode)
@@ -43,6 +45,8 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     }
 
     fun onResponse(responseID: Int) {
+        ConversationEvent.RESPONSE.invoker().response(this, responseID)
+
         getBranch()?.let { branch ->
             if (responseID > 0) {
                 branch.getNode(responseID)?.let { responseNode ->
@@ -61,11 +65,11 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     }
 
     fun endConversation(player: ServerPlayer) {
-        //ToDo Fire an event or somethin
-        //If I want to run any logic/fire an event when a player ends their conversation
+        ConversationEvent.END.invoker().end(this)
     }
 
     private fun sendDialog(node: DialogNode) {
+        ConversationEvent.PROGRESS.invoker().progress(this, currentNodeID, node.nodeId)
         currentNodeID = node.nodeId
         val branch = getBranch() ?: return
         val responses = ArrayList<DialogPacket.ResponseData>()
