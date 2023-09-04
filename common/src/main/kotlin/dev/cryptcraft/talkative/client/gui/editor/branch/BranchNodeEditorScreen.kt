@@ -194,7 +194,9 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             }
 
             actionMap["Edit Commands"] = {
-                minecraft!!.setScreen(CommandEditorScreen(this, widget.node))
+                val popupWidth = 250
+                val popupHeight = height - 20
+                openPopup(CommandEditorPopup(this, widget.node, (width / 2) - (popupWidth / 2), (height / 2) - (popupHeight / 2), popupWidth, popupHeight))
                 closeSubmenu()
             }
 
