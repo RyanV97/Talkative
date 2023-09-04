@@ -1,10 +1,10 @@
 package dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.cryptcraft.talkative.mixin.client.AbstractScrollWidgetAccessor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.MultiLineEditBox
 import net.minecraft.network.chat.Component
-import dev.cryptcraft.talkative.mixin.client.AbstractScrollWidgetAccessor
 
 class NodeEditBox(val parentWidget: NodeWidget, x: Int, y: Int, width: Int, height: Int, placeholder: Component = Component.empty(), message: Component = Component.literal("Edit Box")) : MultiLineEditBox(Minecraft.getInstance().font, x, y, width, height, placeholder, message) {
     override fun isMouseOver(mouseX: Double, mouseY: Double): Boolean {
@@ -16,7 +16,7 @@ class NodeEditBox(val parentWidget: NodeWidget, x: Int, y: Int, width: Int, heig
             return
 
         val zoom = parentWidget.parentScreen.zoomScale
-        enableScissor(((x + 1) * zoom).toInt(), ((y + 1 ) * zoom).toInt(), ((x + width - 1) * zoom).toInt(), ((y + height - 1) * zoom).toInt())
+        enableScissor(((x + 1) * zoom).toInt(), ((y + 2 ) * zoom).toInt(), ((x + width - 1) * zoom).toInt(), ((y + height + 2) * zoom).toInt())
         poseStack.pushPose()
         poseStack.translate(0.0, -(this as AbstractScrollWidgetAccessor).scrollAmount, 0.0)
         renderContents(poseStack, mouseX, mouseY, partialTick)

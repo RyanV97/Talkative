@@ -3,6 +3,7 @@ package dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes
 import com.google.common.collect.Lists
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
+import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import net.minecraft.client.Minecraft
@@ -39,14 +40,10 @@ abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val p
 
             if(shouldRender(posX, posY)) {
                 val bgColour = getBackgroundColour()
-                val outline = (isMouseOver(mouseX.toDouble(), mouseY.toDouble()) && parentScreen.getPopup() == null) or (parentScreen.selectedNode == this)
-                var outlineColour: Int = 0xFF00FF00.toInt()
+                val hover = (isMouseOver(mouseX.toDouble(), mouseY.toDouble()) && parentScreen.getPopup() == null) or (parentScreen.selectedNode == this)
+                var outlineColour: Int = if (parentScreen.selectedNode == this) GuiConstants.COLOR_BTN_BORDER_HL else if (hover) GuiConstants.COLOR_BTN_BORDER_HL else GuiConstants.COLOR_BTN_BORDER
 
-                if(parentScreen.selectedNode == this)
-                    outlineColour = 0xFFFF0000.toInt()
-                if(outline)
-                    fill(poseStack, posX - 1, posY - 1, posX + width + 1, posY + height + 1, outlineColour)
-
+                fill(poseStack, posX - 1, posY - 1, posX + width + 1, posY + height + 1, outlineColour)
                 fill(poseStack, posX, posY, posX + width, posY + 11, 0xFF333333.toInt())
                 fill(poseStack, posX, posY + 11, posX + width, posY + height, bgColour)
 

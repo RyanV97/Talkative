@@ -45,10 +45,9 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
 
     override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(poseStack)
-        super.render(poseStack, mouseX, mouseY, delta)
-
         if (tabsWidget.getActiveTab() != null)
             GuiComponent.drawCenteredString(poseStack, minecraft!!.font, tabsWidget.getActiveTab()!!.message, width / 2, 4, 0xFFFFFF)
+        super.render(poseStack, mouseX, mouseY, delta)
     }
 
     override fun renderBackground(poseStack: PoseStack) {

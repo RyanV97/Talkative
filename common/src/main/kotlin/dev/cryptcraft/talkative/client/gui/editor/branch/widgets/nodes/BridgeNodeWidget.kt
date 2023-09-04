@@ -43,7 +43,7 @@ class BridgeNodeWidget(x: Int, y: Int, node: BridgeNode, parentWidget: NodeWidge
     }
 
     override fun getBackgroundColour(): Int {
-        return 0xFFCC0000.toInt()
+        return 0xFF913F3F.toInt()
     }
 
     class BridgePopup(x: Int, y: Int, width: Int, height: Int, parentScreen: BranchNodeEditorScreen, val parentWidget: BridgeNodeWidget): PopupWidget(x, y, width, height, parentScreen) {

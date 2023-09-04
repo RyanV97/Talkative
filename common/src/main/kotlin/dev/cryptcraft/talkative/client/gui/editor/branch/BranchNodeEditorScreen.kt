@@ -1,6 +1,5 @@
 package dev.cryptcraft.talkative.client.gui.editor.branch
 
-import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.PoseStack
@@ -65,9 +64,8 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
     override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(poseStack)
         poseStack.pushPose()
-        poseStack.scale(zoomScale, zoomScale, 1.0F)
+        poseStack.scale(zoomScale, zoomScale, 0.0F)
 
-        GlStateManager._depthMask(false)
         rootNodeWidget?.renderNodeAndChildren(poseStack, mouseX, mouseY, delta)
 
         poseStack.popPose()

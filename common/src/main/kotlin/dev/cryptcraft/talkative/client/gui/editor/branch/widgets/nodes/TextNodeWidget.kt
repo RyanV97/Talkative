@@ -22,7 +22,7 @@ class TextNodeWidget(x: Int, y: Int, node: TextNode, parentWidget: NodeWidget?, 
         super.renderNode(poseStack, mouseX, mouseY, delta)
 
         editBox.x = x + parentScreen.offsetX
-        editBox.y = y + 10 + parentScreen.offsetY
+        editBox.y = y + 12 + parentScreen.offsetY
         editBox.render(poseStack, mouseX, mouseY, delta)
     }
 
@@ -37,8 +37,8 @@ class TextNodeWidget(x: Int, y: Int, node: TextNode, parentWidget: NodeWidget?, 
 
     override fun getBackgroundColour(): Int {
         return when(node.getNodeType()) {
-            NodeBase.NodeType.Dialog -> 0xFF116611.toInt()
-            NodeBase.NodeType.Response -> 0xFF111166.toInt()
+            NodeBase.NodeType.Dialog -> 0xFF419634.toInt()
+            NodeBase.NodeType.Response -> 0xFF005682.toInt()
             else -> 0xFFFFFFFF.toInt()
         }
     }
