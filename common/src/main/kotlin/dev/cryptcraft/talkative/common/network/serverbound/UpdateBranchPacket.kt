@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.common.network.NetworkHandler.TalkativePacket
 import dev.cryptcraft.talkative.common.network.clientbound.SyncBranchListPacket
-import dev.cryptcraft.talkative.common.util.FileUtil
+import dev.cryptcraft.talkative.server.FileUtil
 
 class UpdateBranchPacket(private val branchPath: String, private val action: UpdateAction, private val data: CompoundTag?) : TalkativePacket.ServerboundTalkativePacket {
     constructor(path: String, action: UpdateAction, branch: DialogBranch) : this(path, action, branch.serialize())

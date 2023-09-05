@@ -2,7 +2,7 @@ package dev.cryptcraft.talkative.api.tree
 
 import dev.cryptcraft.talkative.api.conditional.Conditional
 import dev.cryptcraft.talkative.api.conditional.ConditionalHolder
-import dev.cryptcraft.talkative.common.util.FileUtil
+import dev.cryptcraft.talkative.server.FileUtil
 import dev.cryptcraft.talkative.common.util.NBTConstants
 import net.minecraft.nbt.CompoundTag
 

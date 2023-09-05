@@ -5,7 +5,7 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.api.conditional.Conditional
 import dev.cryptcraft.talkative.common.network.NetworkHandler
-import dev.cryptcraft.talkative.common.util.FileUtil
+import dev.cryptcraft.talkative.server.FileUtil
 
 class UpdateNodeConditionalPacket(private val branchPath: String, private val nodeId: Int, private val conditional: Conditional?) : NetworkHandler.TalkativePacket.ServerboundTalkativePacket {
     constructor(buf: FriendlyByteBuf) : this(buf.readUtf(), buf.readInt(), Conditional.deserialize(buf.readNbt()))

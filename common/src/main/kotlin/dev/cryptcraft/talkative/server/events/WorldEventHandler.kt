@@ -1,9 +1,9 @@
 package dev.cryptcraft.talkative.server.events
 
 import dev.architectury.event.events.common.LifecycleEvent
+import dev.cryptcraft.talkative.server.FileUtil
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.storage.LevelResource
-import dev.cryptcraft.talkative.common.util.FileUtil
 
 object WorldEventHandler {
 
@@ -18,10 +18,6 @@ object WorldEventHandler {
         FileUtil.DIR_BRANCHES = worldDir.resolve("talkative/branches")
         if (!FileUtil.DIR_BRANCHES!!.toFile().exists())
             FileUtil.DIR_BRANCHES!!.toFile().mkdirs()
-
-        FileUtil.DIR_MARKERS = worldDir.resolve("talkative/markers")
-        if (!FileUtil.DIR_MARKERS!!.toFile().exists())
-            FileUtil.DIR_MARKERS!!.toFile().mkdirs()
     }
 
 }

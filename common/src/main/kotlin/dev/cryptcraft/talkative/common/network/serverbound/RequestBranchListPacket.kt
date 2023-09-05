@@ -5,8 +5,7 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.common.network.NetworkHandler
 import dev.cryptcraft.talkative.common.network.clientbound.SyncBranchListPacket
-import dev.cryptcraft.talkative.common.util.FileUtil
-import java.util.function.Supplier
+import dev.cryptcraft.talkative.server.FileUtil
 
 class RequestBranchListPacket() : NetworkHandler.TalkativePacket.ServerboundTalkativePacket {
     constructor(buf: FriendlyByteBuf) : this()

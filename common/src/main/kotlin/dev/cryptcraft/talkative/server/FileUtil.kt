@@ -1,6 +1,5 @@
-package dev.cryptcraft.talkative.common.util
+package dev.cryptcraft.talkative.server
 
-import dev.cryptcraft.talkative.api.actor.markers.Marker
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.api.tree.node.DialogNode
 import net.minecraft.nbt.CompoundTag
@@ -15,7 +14,6 @@ import java.nio.file.Path
 object FileUtil {
     var DIR_WORLD: Path? = null
     var DIR_BRANCHES: Path? = null
-    var DIR_MARKERS: Path? = null
 
     //Branches
     fun createBranchAtPath(path: String) {
@@ -61,32 +59,6 @@ object FileUtil {
 
     fun deleteBranchAtPath(path: String) {
         deleteFileAtPath(DIR_BRANCHES, "$path.branch")
-    }
-
-    //Markers
-    fun createMarkerAtPath(path: String) {
-        DIR_MARKERS?.let { dir ->
-            val file = File(dir.toFile(), "$path.marker")
-            val marker = Marker()
-            val markerTag = marker.serialize()
-            file.parentFile.mkdirs()
-            NbtIo.writeCompressed(markerTag, file)
-        }
-    }
-
-    fun getMarkerFromPath(path: String): Marker? {
-        DIR_MARKERS?.let { dir ->
-            return readCompoundFromPath(dir, "$path.marker")?.let { Marker.deserialize(it) }
-        }
-        return null
-    }
-
-    fun saveMarkerData(path: String, data: CompoundTag) {
-        writeCompoundToPath(DIR_MARKERS, "$path.marker", data)
-    }
-
-    fun deleteMarkerAtPath(path: String) {
-        deleteFileAtPath(DIR_MARKERS, "$path.branch")
     }
 
     //General
