@@ -66,7 +66,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
     }
 
     fun endConversation(player: ServerPlayer) {
-        ConversationEvent.END.invoker().end(this)
+        ConversationEvent.END.invoker().end(this, currentNodeID)
     }
 
     private fun sendDialog(node: DialogNode) {

@@ -59,7 +59,8 @@ public interface ConversationEvent {
          * Invoked when a player is about to finish a Conversation with an Actor.
          *
          * @param conversation The Conversation that is about to start
+         * @param nodeId The NodeID for the Node the player was on when exiting
          */
-        void end(Conversation conversation);
+        void end(Conversation conversation, int nodeId);
     }
 }
