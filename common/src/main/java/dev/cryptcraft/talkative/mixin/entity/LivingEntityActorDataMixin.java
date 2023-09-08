@@ -12,8 +12,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,13 +33,17 @@ public abstract class LivingEntityActorDataMixin extends Entity implements Actor
         return actorData;
     }
 
-    public @NotNull ActorData getOrCreateActorData() {
+    public ActorData getOrCreateActorData() {
+        if (((ActorEntity) (Object) this) instanceof Player) return null;
+
         if (actorData == null)
             actorData = new ActorData();
         return actorData;
     }
 
     public void setActorData(ActorData serverActorDataData) {
+        if (((ActorEntity) (Object) this) instanceof Player) return;
+
         this.actorData = serverActorDataData;
         syncMarker();
     }

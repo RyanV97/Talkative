@@ -3,7 +3,7 @@ package dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.cryptcraft.talkative.api.tree.node.BridgeNode
 import dev.cryptcraft.talkative.client.gui.GuiConstants
-import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
+import dev.cryptcraft.talkative.client.gui.editor.branch.NodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchSelectionScreen
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
 import net.minecraft.ChatFormatting
@@ -12,7 +12,7 @@ import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.Button
 import net.minecraft.network.chat.Component
 
-class BridgeNodeWidget(x: Int, y: Int, node: BridgeNode, parentWidget: NodeWidget?, parentScreen: BranchNodeEditorScreen) : NodeWidget(x, y, 40, node, parentWidget, parentScreen) {
+class BridgeNodeWidget(x: Int, y: Int, node: BridgeNode, parentWidget: NodeWidget?, parentScreen: NodeEditorScreen) : NodeWidget(x, y, 40, node, parentWidget, parentScreen) {
     override fun renderNode(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         super.renderNode(poseStack, mouseX, mouseY, delta)
         val posX = this.x + parentScreen.offsetX
@@ -46,7 +46,7 @@ class BridgeNodeWidget(x: Int, y: Int, node: BridgeNode, parentWidget: NodeWidge
         return 0xFF913F3F.toInt()
     }
 
-    class BridgePopup(x: Int, y: Int, width: Int, height: Int, parentScreen: BranchNodeEditorScreen, val parentWidget: BridgeNodeWidget): PopupWidget(x, y, width, height, parentScreen) {
+    class BridgePopup(x: Int, y: Int, width: Int, height: Int, parentScreen: NodeEditorScreen, val parentWidget: BridgeNodeWidget): PopupWidget(x, y, width, height, parentScreen) {
         private val branchLinkButton = iconButton(width - 25, 6, 20, 20, GuiConstants.EDIT_ICON, ::openBranchSelection)
         val branchDestinationLabel = label(5, 16, "...")
         private val nodeIdEntry = textField(width - 46, 31, 40, 14, (parentWidget.node as BridgeNode).destinationNodeId.toString())
@@ -67,7 +67,7 @@ class BridgeNodeWidget(x: Int, y: Int, node: BridgeNode, parentWidget: NodeWidge
         }
 
         private fun openBranchSelection(button: Button) {
-            (parent as BranchNodeEditorScreen).selectedNode = parentWidget
+            (parent as NodeEditorScreen).selectedNode = parentWidget
             Minecraft.getInstance().setScreen(BranchSelectionScreen(parent, BranchSelectionScreen.ListMode.BRIDGE_LINK))
         }
 

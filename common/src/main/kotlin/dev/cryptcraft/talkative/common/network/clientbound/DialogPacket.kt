@@ -6,7 +6,7 @@ import dev.cryptcraft.talkative.common.network.NetworkHandler.TalkativePacket
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 
-class DialogPacket(private val dialogLine: Component, private val responses: ArrayList<ResponseData>?, private val isExitNode: Boolean = false) : TalkativePacket.ClientboundTalkativePacket {
+open class DialogPacket(private val dialogLine: Component, private val responses: ArrayList<ResponseData>?, private val isExitNode: Boolean = false) : TalkativePacket.ClientboundTalkativePacket {
     constructor(buf: FriendlyByteBuf) : this(buf.readComponent(), readResponses(buf), buf.readBoolean())
 
     override fun encode(buf: FriendlyByteBuf) {

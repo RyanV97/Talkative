@@ -2,7 +2,9 @@ package dev.cryptcraft.talkative.client.gui.dialog.widgets
 
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.cryptcraft.talkative.api.actor.DisplayData
 import dev.cryptcraft.talkative.client.gui.GuiConstants
+import dev.cryptcraft.talkative.client.gui.dialog.DialogScreen
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -13,7 +15,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 
-class DialogList(parent: Screen, x: Int, width: Int, var maxHeight: Int, private var bottom: Int) : WidgetList<Screen>(parent, x, bottom, width, 0) {
+class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, private var bottom: Int) : WidgetList<Screen>(parent, x, bottom, width, 0) {
     init {
         renderBackground = false
         renderEntryBackground = false
@@ -27,8 +29,9 @@ class DialogList(parent: Screen, x: Int, width: Int, var maxHeight: Int, private
     }
 
     fun addEntry(dialogLine: Component) {
-        //ToDo Add Speaker to packet
-        addChild(DialogListEntry(Component.literal("Speaker"), dialogLine, width))
+        val displayData = (parent as DialogScreen).displayData ?: DisplayData()
+        val speaker = if (displayData.overrideDisplayName) Component.literal(displayData.displayName) else parent.actorEntity?.displayName ?: Component.literal("Actor")
+        addChild(DialogListEntry(speaker, dialogLine, width))
     }
 
     override fun addChild(widget: AbstractWidget) {

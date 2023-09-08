@@ -1,5 +1,6 @@
 package dev.cryptcraft.talkative.server.conversations
 
+import dev.cryptcraft.talkative.Talkative
 import dev.cryptcraft.talkative.api.actor.ActorEntity
 import dev.cryptcraft.talkative.api.event.ConversationEvent
 import dev.cryptcraft.talkative.api.tree.DialogBranch
@@ -8,6 +9,7 @@ import dev.cryptcraft.talkative.api.tree.node.DialogNode
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import dev.cryptcraft.talkative.api.tree.node.ResponseNode
 import dev.cryptcraft.talkative.common.network.clientbound.DialogPacket
+import dev.cryptcraft.talkative.common.network.clientbound.StartDialogPacket
 import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
@@ -28,19 +30,19 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
 
         this.branchGetter = ConversationManager.registerBranchReference(branchPath, this)
         val node = getBranch()?.getNode(0) ?: return
-        sendDialog(node as DialogNode)
+        sendDialog(node as DialogNode, true)
         executeNodeCommands(node)
     }
 
     fun progressConversation() {
         getBranch()?.let {
-            getNextNode()?.let { node ->
+            getNextDialogNode()?.let { node ->
                 sendDialog(node)
                 executeNodeCommands(node)
             }
         }
 
-        val node = getNextNode() ?: return
+        val node = getNextDialogNode() ?: return
         sendDialog(node as DialogNode)
         executeNodeCommands(node)
     }
@@ -55,13 +57,13 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
                     executeNodeCommands(responseNode)
                 }
             }
-            val nextNode = getNextNode()
+            val nextNode = getNextDialogNode()
             if (nextNode != null) {
                 executeNodeCommands(nextNode)
                 sendDialog(nextNode)
             }
-            //else
-            //ToDo Throw Exception?
+            else
+                endConversation(player)
         }
     }
 
@@ -69,8 +71,9 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
         ConversationEvent.END.invoker().end(this, currentNodeID)
     }
 
-    private fun sendDialog(node: DialogNode) {
+    private fun sendDialog(node: DialogNode, startingConversation: Boolean = false) {
         ConversationEvent.PROGRESS.invoker().progress(this, currentNodeID, node.nodeId)
+
         currentNodeID = node.nodeId
         val branch = getBranch() ?: return
         val responses = ArrayList<DialogPacket.ResponseData>()
@@ -91,7 +94,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
                             responses.add(DialogPacket.ResponseData(ref.nodeId, responseNode.getContents(), type))
                         }
                         else
-                            println("No Response Node found with ID: $ref.nodeId")
+                            Talkative.LOGGER.warn("No Response Node found with ID: $ref.nodeId")
                         //ToDo: Make and Throw Talkative exceptions?
                     }
                 }
@@ -102,7 +105,11 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
         else
             responses.add(DialogPacket.ResponseData(0, Component.literal("Leave").withStyle { it.withItalic(true) }, DialogPacket.ResponseData.Type.Exit))
 
-        DialogPacket(node.getContents(), responses, node.getChildren().isEmpty()).sendToPlayer(player)
+        val isExit = node.getChildren().isEmpty()
+        if (startingConversation)
+            StartDialogPacket((actor as LivingEntity).id, actor.getActorData()?.displayData, node.getContents(), responses, isExit).sendToPlayer(player)
+        else
+            DialogPacket(node.getContents(), responses, isExit).sendToPlayer(player)
     }
 
     private fun executeNodeCommands(node: NodeBase) {
@@ -110,7 +117,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
         val commandSourceStack = CommandSourceStack(this, entity.position(), entity.rotationVector, entity.level as ServerLevel, 3, entity.name.string, entity.displayName, entity.level.server, entity)
         node.commands?.forEach {
             if (player.server.commands.performPrefixedCommand(commandSourceStack, it) == 0)
-                println("Failed to run command '$it' in Conversation with player: ${player.displayName.string}") //ToDo Proper Logger
+                Talkative.LOGGER.warn("Failed to run command '$it' in Conversation with player: ${player.displayName.string}")
         }
     }
 
@@ -130,7 +137,7 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
         return branchGetter?.invoke()
     }
 
-    private fun getNextNode(): DialogNode? {
+    private fun getNextDialogNode(): DialogNode? {
         val destination = getNextDialogForPlayer(currentNodeID, player) ?: return null
         if (destination.branchPath != branchPath)
             changeBranch(destination.branchPath)

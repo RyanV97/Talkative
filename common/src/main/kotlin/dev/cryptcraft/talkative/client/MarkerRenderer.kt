@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Quaternion
+import dev.cryptcraft.talkative.client.gui.dialog.DialogScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.Sheets
 import net.minecraft.client.renderer.block.model.ItemTransforms
@@ -51,7 +52,7 @@ object MarkerRenderer {
     }
 
     fun renderModel(model: BakedModel, transformType: ItemTransforms.TransformType, poseStack: PoseStack, buffer: VertexConsumer, directions: Array<Direction>?, colour: Int, light: Int, overlay: Int, ) {
-        if (model.isCustomRenderer) return
+        if (model.isCustomRenderer || Minecraft.getInstance().screen is DialogScreen) return
 
         poseStack.pushPose()
         model.transforms.getTransform(transformType).apply(false, poseStack)

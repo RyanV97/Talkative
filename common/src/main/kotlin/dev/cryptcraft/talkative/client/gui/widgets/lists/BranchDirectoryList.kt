@@ -5,7 +5,7 @@ import dev.cryptcraft.talkative.api.tree.BranchReference
 import dev.cryptcraft.talkative.client.TalkativeClient
 import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
-import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
+import dev.cryptcraft.talkative.client.gui.editor.branch.NodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchSelectionScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.BridgeNodeWidget
 import dev.cryptcraft.talkative.client.gui.widgets.IconButton
@@ -79,8 +79,8 @@ open class BranchDirectoryList(val parentScreen: BranchSelectionScreen, x: Int, 
 
     class BridgeEntry(val parentScreen: TalkativeScreen, val branchPath: String, width: Int) : NestedWidget(0, 0, width, 20, Component.empty()) {
         private val linkButton = addChild(IconButton(0, 0, 0, 0, GuiConstants.ATTACH_ICON) {
-            val nodeWidget = ((parentScreen.parent as BranchNodeEditorScreen).selectedNode as BridgeNodeWidget)
-            val lastScreen = (parentScreen.parent as BranchNodeEditorScreen)
+            val nodeWidget = ((parentScreen.parent as NodeEditorScreen).selectedNode as BridgeNodeWidget)
+            val lastScreen = (parentScreen.parent as NodeEditorScreen)
             nodeWidget.setDestinationBranch(branchPath)
             (lastScreen.getPopup() as BridgeNodeWidget.BridgePopup).branchDestinationLabel.contents = Component.literal(branchPath)
             lastScreen.selectedNode = null

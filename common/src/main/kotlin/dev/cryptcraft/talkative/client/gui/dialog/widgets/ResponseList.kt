@@ -34,10 +34,11 @@ class ResponseList(parent: Screen, x: Int, y: Int, width: Int, height: Int, val 
         }
 
         fun onResponse() {
-            if (responseData.type == DialogPacket.ResponseData.Type.Exit)
+            if (responseData.type == DialogPacket.ResponseData.Type.Exit) {
+                if (responseData.responseId > 0)
+                    DialogResponsePacket(responseData.responseId).sendToServer()
                 parentList.parent.onClose()
-            else
-                DialogResponsePacket(responseData.responseId).sendToServer()
+            }
         }
 
         override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}

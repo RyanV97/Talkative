@@ -59,7 +59,7 @@ class ActorData {
             for (branchTag in tagList)
                 actorData.dialogBranches.add(BranchReference.deserialize(branchTag as CompoundTag))
 
-            actorData.displayData = DisplayData.deserialize(tag.getCompound(NBTConstants.DISPLAY_DATA))
+            actorData.displayData = DisplayData.deserialize(tag.getCompound(NBTConstants.DISPLAY_DATA)) ?: DisplayData()
 
             val markerList = tag.getList(NBTConstants.MARKER_DATA, Tag.TAG_COMPOUND.toInt())
             for (markerTag in markerList) {

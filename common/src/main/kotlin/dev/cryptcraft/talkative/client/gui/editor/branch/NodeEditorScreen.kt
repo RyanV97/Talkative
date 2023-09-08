@@ -31,7 +31,7 @@ import net.minecraft.network.chat.Component
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.literal("Dialog Tree Editor")), EditorScreen {
+class NodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.literal("Dialog Tree Editor")), EditorScreen {
     private var rootNodeWidget: NodeWidget? = null
     private var nodeWidgets: ArrayList<NodeWidget> = ArrayList()
     var selectedNode: NodeWidget? = null
@@ -240,6 +240,12 @@ class BranchNodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Componen
             }
 
             submenu = SubmenuWidget(mouseX, mouseY, "${widget.node.getNodeType().name} Node", actionMap)
+
+            if (submenu!!.x + submenu!!.width > width)
+                submenu!!.x = width - submenu!!.width
+
+            if (submenu!!.y + submenu!!.height > height)
+                submenu!!.y = height - submenu!!.height
         }
     }
 

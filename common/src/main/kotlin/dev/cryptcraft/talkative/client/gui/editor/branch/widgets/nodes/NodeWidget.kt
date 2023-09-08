@@ -4,14 +4,14 @@ import com.google.common.collect.Lists
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import dev.cryptcraft.talkative.client.gui.GuiConstants
-import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
+import dev.cryptcraft.talkative.client.gui.editor.branch.NodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.network.chat.Component
 
-abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val parentWidget: NodeWidget?, val parentScreen: BranchNodeEditorScreen) : NestedWidget(x, y, 200, height, Component.literal("Dialog Node")) {
+abstract class NodeWidget(x: Int, y: Int, height: Int, val node: NodeBase, val parentWidget: NodeWidget?, val parentScreen: NodeEditorScreen) : NestedWidget(x, y, 200, height, Component.literal("Dialog Node")) {
     protected val minecraft: Minecraft = Minecraft.getInstance()
     val childNodes: ArrayList<NodeWidget> = Lists.newArrayList()
 

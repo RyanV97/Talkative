@@ -2,6 +2,7 @@ package dev.cryptcraft.talkative.common.network
 
 import dev.architectury.networking.NetworkChannel
 import dev.architectury.networking.NetworkManager
+import dev.cryptcraft.talkative.Talkative
 import dev.cryptcraft.talkative.common.network.clientbound.*
 import dev.cryptcraft.talkative.common.network.serverbound.*
 import dev.cryptcraft.talkative.mixin.entity.ChunkMapAccessor
@@ -22,21 +23,22 @@ object NetworkHandler {
         //Serverbound
         register(::DialogResponsePacket)
         register(::ExitConversationPacket)
-        register(::RequestEditActorPacket)
         register(::RequestBranchForEditPacket)
         register(::RequestBranchListPacket)
+        register(::RequestEditActorPacket)
+        register(::UpdateActorData)
         register(::UpdateBranchPacket)
         register(::UpdateNodeConditionalPacket)
-        register(::UpdateActorData)
 
         //Clientbound
         register(::DialogPacket)
         register(::OpenActorEditorPacket)
         register(::OpenBranchEditorPacket)
-        register(::UpdateEditingActorDataPacket)
-        register(::UpdateEditingBranchPacket)
+        register(::StartDialogPacket)
         register(::SyncBranchListPacket)
         register(::SyncMarkerPacket)
+        register(::UpdateEditingActorDataPacket)
+        register(::UpdateEditingBranchPacket)
     }
 
     private inline fun <reified T : TalkativePacket> register(decoder: Function<FriendlyByteBuf, T>) {
@@ -52,7 +54,7 @@ object NetworkHandler {
                 ctx.player.sendSystemMessage(Component.literal("You don't have permission for this action."))
                 return@queue
             }
-            println("Handling Packet: ${packet.javaClass.name} on Side: ${if (ctx.player.level.isClientSide) "Client" else "Server"}")
+            Talkative.LOGGER.debug("Handling Packet: ${packet.javaClass.name} on Side: ${if (ctx.player.level.isClientSide) "Client" else "Server"}")
             packet.onReceived(ctx)
         }
     }

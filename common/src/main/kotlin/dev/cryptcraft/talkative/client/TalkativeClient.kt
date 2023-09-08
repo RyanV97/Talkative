@@ -1,14 +1,15 @@
 package dev.cryptcraft.talkative.client
 
 import dev.cryptcraft.talkative.api.actor.ActorData
+import dev.cryptcraft.talkative.api.actor.DisplayData
 import dev.cryptcraft.talkative.api.actor.markers.Marker
 import dev.cryptcraft.talkative.api.actor.markers.MarkerEntity
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.client.gui.EditorScreen
 import dev.cryptcraft.talkative.client.gui.dialog.DialogScreen
 import dev.cryptcraft.talkative.client.gui.editor.MainEditorScreen
-import dev.cryptcraft.talkative.client.gui.editor.branch.BranchNodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchSelectionScreen
+import dev.cryptcraft.talkative.client.gui.editor.branch.NodeEditorScreen
 import dev.cryptcraft.talkative.common.network.clientbound.DialogPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.nbt.ListTag
@@ -47,15 +48,23 @@ object TalkativeClient {
         if (screen is EditorScreen) screen.refresh()
     }
 
+    fun startDialog(entityId: Int, displayData: DisplayData?) {
+        if (minecraft.screen !is DialogScreen)
+            minecraft.setScreen(DialogScreen())
+
+        val screen = minecraft.screen as DialogScreen
+        val entity = Minecraft.getInstance().level?.getEntity(entityId)
+        if (entity !is LivingEntity) return
+
+        screen.actorEntity = entity
+        screen.displayData = displayData
+    }
+
     fun onReceiveDialog(dialogLine: Component, responses: ArrayList<DialogPacket.ResponseData>?, isExitNode: Boolean) {
-        var currentScreen = minecraft.screen
+        if (minecraft.screen !is DialogScreen)
+            minecraft.setScreen(DialogScreen())
 
-        if (currentScreen !is DialogScreen) {
-            currentScreen = DialogScreen()
-            minecraft.setScreen(currentScreen)
-        }
-
-        currentScreen.receiveDialog(dialogLine, responses, isExitNode)
+        (minecraft.screen as DialogScreen).receiveDialog(dialogLine, responses, isExitNode)
     }
 
     fun openEditorScreen(actorEntity: Entity?, actorData: ActorData?) {
@@ -77,7 +86,7 @@ object TalkativeClient {
     fun openBranchEditor(branchPath: String, branch: DialogBranch) {
         editingBranch = branch
         editingBranchPath = branchPath
-        minecraft.setScreen(BranchNodeEditorScreen(minecraft.screen))
+        minecraft.setScreen(NodeEditorScreen(minecraft.screen))
     }
 
     fun syncMarker(entityId: Int, marker: Marker?) {
