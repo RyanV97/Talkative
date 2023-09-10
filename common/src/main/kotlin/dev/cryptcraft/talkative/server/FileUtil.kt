@@ -22,7 +22,6 @@ object FileUtil {
             val branch = DialogBranch()
             branch.addNode(DialogNode(0, Component.literal("Hello World")))
             val branchTag = branch.serialize()
-            //ToDo: Do a Exists check to handle overwriting
             file.parentFile.mkdirs()
             NbtIo.writeCompressed(branchTag, file)
         }

@@ -22,10 +22,6 @@ class NodeEditBox(val parentWidget: NodeWidget, x: Int, y: Int, width: Int, heig
         renderContents(poseStack, mouseX, mouseY, partialTick)
         poseStack.popPose()
         disableScissor()
-
-        //ToDo: This doesn't scale
-//        if (parentWidget.parentScreen.selectedNode == parentWidget)
-//            renderDecorations(poseStack)
     }
 
     override fun withinContentAreaTopBottom(top: Int, bottom: Int): Boolean {

@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.Tesselator
 import com.mojang.blaze3d.vertex.VertexFormat
-import dev.architectury.platform.Platform
 import dev.cryptcraft.talkative.client.TalkativeClient
 import dev.cryptcraft.talkative.client.gui.EditorScreen
 import dev.cryptcraft.talkative.client.gui.GuiConstants
@@ -95,11 +94,12 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
                 MarkerTab(5, tabY, width - 10, height - tabsHeight, this)
             )
 
-            if (Platform.isModLoaded("simplemuseum") || Platform.isDevelopmentEnvironment()) {
-                tabsWidget.addShortcut(GuiConstants.SM_ICON) {
-                    //ToDo: Tell SM to open Screen
-                }
-            }
+            //ToDo Simple Museum compat
+//            if (Platform.isModLoaded("simplemuseum") || Platform.isDevelopmentEnvironment()) {
+//                tabsWidget.addShortcut(GuiConstants.SM_ICON) {
+//                    //Tell SM to open Screen
+//                }
+//            }
         }
 
         if (actorEntity != null)

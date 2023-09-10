@@ -5,15 +5,19 @@ import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.widgets.TalkativeButton
 import dev.cryptcraft.talkative.client.gui.widgets.lists.BranchDirectoryList
+import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupLabel
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
 import dev.cryptcraft.talkative.common.network.serverbound.RequestBranchListPacket
 import dev.cryptcraft.talkative.common.network.serverbound.UpdateBranchPacket
+import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.components.Button
 import net.minecraft.nbt.ListTag
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 
 class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: ListMode) : TalkativeScreen(parentScreen, Component.empty()) {
     private val branchList = BranchDirectoryList(this, 5, 26, 0, 0)
+    private var warningLabel: PopupLabel? = null
 
     override fun init() {
         super.init()
@@ -42,12 +46,17 @@ class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: Lis
     }
 
     private fun createBranch(path: String) {
-        UpdateBranchPacket(path, UpdateBranchPacket.UpdateAction.CREATE).sendToServer()
-        closePopup()
+        if (branchList.contains(path)) {
+            warningLabel!!.visible = true
+        }
+        else {
+            UpdateBranchPacket(path, UpdateBranchPacket.UpdateAction.CREATE).sendToServer()
+            closePopup()
+        }
     }
 
     private fun openCreateBranchPopup(button: Button) {
-        openPopup(PopupWidget.Builder((width / 2) - 155, (height / 2) - 15, 310, 30, this)
+        val popup = PopupWidget.Builder((width / 2) - 155, (height / 2) - 15, 310, 30, this)
             .textField(5, 5, width = 195)
             .button(205, 5, "Save") {
                 createBranch(getPopup()!!.getAllTextFields()[0].value)
@@ -55,7 +64,17 @@ class BranchSelectionScreen(parentScreen: TalkativeScreen, private val mode: Lis
             .button(259, 5, "Cancel") {
                 closePopup()
             }
-            .build())
+        .build()
+
+        popup.getAllTextFields()[0].setResponder {
+            if (warningLabel!!.visible) warningLabel!!.visible = false
+        }
+
+        val label = Component.translatable("talkative.gui.editor.branch_exists").setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
+        warningLabel = popup.label(155 - (font.width(label) / 2), 40, label)
+        warningLabel!!.visible = false
+
+        openPopup(popup)
     }
 
     enum class ListMode {

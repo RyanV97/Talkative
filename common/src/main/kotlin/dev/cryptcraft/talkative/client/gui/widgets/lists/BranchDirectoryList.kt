@@ -5,8 +5,8 @@ import dev.cryptcraft.talkative.api.tree.BranchReference
 import dev.cryptcraft.talkative.client.TalkativeClient
 import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
-import dev.cryptcraft.talkative.client.gui.editor.branch.NodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.BranchSelectionScreen
+import dev.cryptcraft.talkative.client.gui.editor.branch.NodeEditorScreen
 import dev.cryptcraft.talkative.client.gui.editor.branch.widgets.nodes.BridgeNodeWidget
 import dev.cryptcraft.talkative.client.gui.widgets.IconButton
 import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
@@ -31,6 +31,20 @@ open class BranchDirectoryList(val parentScreen: BranchSelectionScreen, x: Int, 
 
     fun addEditableEntry(value: String) {
         addChild(EditableEntry(value, width))
+    }
+
+    fun contains(value: String): Boolean {
+        children.forEach {
+            val path = when(it) {
+                is AttachEntry -> it.branchPath
+                is BridgeEntry -> it.branchPath
+                is EditableEntry -> it.branchPath
+                else -> null
+            }
+            if (path.equals(value, true))
+                return true
+        }
+        return false
     }
 
     override fun recalculateChildren() {
