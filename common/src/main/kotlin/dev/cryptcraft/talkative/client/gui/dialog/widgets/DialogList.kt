@@ -8,7 +8,6 @@ import dev.cryptcraft.talkative.client.gui.dialog.DialogScreen
 import dev.cryptcraft.talkative.client.gui.widgets.lists.WidgetList
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiComponent
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
@@ -52,8 +51,25 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
         return false
     }
 
-    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {
+    override fun renderScrollBar(poseStack: PoseStack?) {
+        val minX = if (scrollBarLeft) x - scrollBarWidth else x + width
+        val maxX = minX + scrollBarWidth
+        val minY = y
+        val maxY = y + height
+        fill(poseStack, minX, minY, maxX, maxY, 0x55000000)
+
+        val barHeight = scrollBarHeight
+        val barY = scrollBarY
+        RenderSystem.setShader(GameRenderer::getPositionTexShader)
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
+        RenderSystem.setShaderTexture(0, GuiConstants.DIALOG_SCROLL)
+
+        blit(poseStack, minX, barY, scrollBarWidth, 5, 0f, 0f, 9, 5, 9, 21)
+        blit(poseStack, minX, barY + 5, scrollBarWidth, scrollBarHeight  - 10, 0f, 5f, 9, 11, 9, 21)
+        blit(poseStack, minX, barY + barHeight - 5, scrollBarWidth, 5, 0f, 16f, 9, 5, 9, 21)
     }
+
+    override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}
 
     class DialogListEntry(private val speaker: Component, private val contents: Component, width: Int, val font: Font = Minecraft.getInstance().font)
     : AbstractWidget(0, 0, width, calculateHeight(font, contents, width), Component.empty()) {
@@ -66,7 +82,7 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
             drawMessageBackground(poseStack, top)
             drawSpeakerLabel(poseStack, x + 6, top - 13)
 
-            font.drawWordWrap(contents, x + 11, top + 9, width - 16, 0xFFFFFF)
+            font.drawWordWrap(contents, x + 11, top + 9, width - 17, 0xFFFFFF)
         }
 
         private fun drawMessageBackground(poseStack: PoseStack, top: Int) {
@@ -74,16 +90,16 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
             RenderSystem.setShaderTexture(0, GuiConstants.DIALOG_MESSAGE)
 
             drawMessageTexture(poseStack, x, top, 16, 16, 0, 0) //TopLeft
-            drawMessageTexture(poseStack, x + width - 16, top, 16, 16, 32, 0) //TopRight
+            drawMessageTexture(poseStack, x + width - 17, top, 16, 16, 32, 0) //TopRight
             drawMessageTexture(poseStack, x, bottom, 16, 16, 0, 32) //BottomLeft
-            drawMessageTexture(poseStack, x + width - 16, bottom, 16, 16, 32, 32) //BottomRight
+            drawMessageTexture(poseStack, x + width - 17, bottom, 16, 16, 32, 32) //BottomRight
 
             drawMessageTexture(poseStack, x + 16, top, width - 32, 16, 16, 0) //Top
             drawMessageTexture(poseStack, x + 16, bottom, width - 32, 16, 16, 32) //Bottom
 
             if (height > 32) {
                 drawMessageTexture(poseStack, x, top + 16, 16, height - 48, 0, 16) //Left Side
-                drawMessageTexture(poseStack, x + width - 16, top + 16, 16, height - 48, 32, 16)//Right Side
+                drawMessageTexture(poseStack, x + width - 17, top + 16, 16, height - 48, 32, 16)//Right Side
                 drawMessageTexture(poseStack, x + 16, top + 16, width - 32, height - 48, 16, 16) //Background Fill
             }
         }
@@ -116,11 +132,11 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
 
         companion object {
             fun drawMessageTexture(poseStack: PoseStack, x: Int, y: Int, width: Int, height: Int, u: Int, v: Int) {
-                GuiComponent.blit(poseStack, x, y, width, height, u.toFloat(), v.toFloat(), 16, 16, 48, 48)
+                blit(poseStack, x, y, width, height, u.toFloat(), v.toFloat(), 16, 16, 48, 48)
             }
 
             fun drawSpeakerTexture(poseStack: PoseStack, x: Int, y: Int, width: Int, height: Int, u: Int, v: Int) {
-                GuiComponent.blit(poseStack, x, y, width, height, u.toFloat(), v.toFloat(), 8, 8, 24, 24)
+                blit(poseStack, x, y, width, height, u.toFloat(), v.toFloat(), 8, 8, 24, 24)
             }
 
             fun calculateHeight(font: Font, contents: Component, width: Int): Int {

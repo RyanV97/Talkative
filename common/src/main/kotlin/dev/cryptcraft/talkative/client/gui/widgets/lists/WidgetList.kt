@@ -1,12 +1,12 @@
 package dev.cryptcraft.talkative.client.gui.widgets.lists
 
 import com.mojang.blaze3d.vertex.PoseStack
+import dev.cryptcraft.talkative.client.ScissorUtil
+import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
 import net.minecraft.client.gui.components.AbstractWidget
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
-import dev.cryptcraft.talkative.client.gui.widgets.NestedWidget
-import dev.cryptcraft.talkative.client.ScissorUtil
 import java.awt.Color
 
 //Original Code provided by DenimRed - https://github.com/DenimRed/
@@ -30,8 +30,8 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
                 }
             }
         }
-    private var scrollBarWidth = 8
-    private var scrollBarLeft = false
+    protected var scrollBarWidth = 8
+    protected var scrollBarLeft = false
     private var scrolling = false
 
     var renderBackground: Boolean = true
@@ -192,7 +192,7 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
         return (((widget.x <= x + width) && (widget.x + widget.width >= x)) && widget.y <= y + height) && widget.y + widget.height >= y
     }
 
-    protected fun renderScrollBar(poseStack: PoseStack?) {
+    protected open fun renderScrollBar(poseStack: PoseStack?) {
         val minX = if (scrollBarLeft) x - scrollBarWidth else x + width
         val maxX = minX + scrollBarWidth
         val minY = y

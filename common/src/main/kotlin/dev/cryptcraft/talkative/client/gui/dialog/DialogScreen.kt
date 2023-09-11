@@ -39,9 +39,9 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
         addRenderableWidget(dialogList)
 
         responseList.x = (width * .25).toInt()
-        responseList.y = height - responseBoxHeight
+        responseList.y = height - responseBoxHeight + 4
         responseList.width = width / 2
-        responseList.height = responseBoxHeight
+        responseList.height = responseBoxHeight - 3
         addRenderableWidget(responseList)
     }
 
@@ -65,7 +65,7 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
         fillGradient(poseStack, 0, fadeHeight, width, responseHeight, 0x001c1c1c, 0xD9141414.toInt())
         fill(poseStack, 0, responseHeight, width, height, 0xD9141414.toInt())
 
-        val separatorY = responseHeight - 1
+        val separatorY = responseHeight - 2
         horizontalGradient(poseStack, (width * .1).toInt(), separatorY, (width * .5).toInt(), separatorY + 1, 0x00FFFFFF, 0xFFFFFFFF.toInt())
         horizontalGradient(poseStack, (width * .5).toInt(), separatorY, width - (width * .1).toInt(), separatorY + 1, 0xFFFFFFFF.toInt(), 0x00FFFFFF)
 

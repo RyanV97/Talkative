@@ -16,8 +16,7 @@ object GuiConstants {
     //Textures
     val DIALOG_MESSAGE = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message.png")
     val DIALOG_MESSAGE_SPEAKER = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message_speaker.png")
-    val DIALOG_CONTINUE = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_continue.png")
-    val DIALOG_REPLY = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_reply.png")
+    val DIALOG_SCROLL = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_scroll.png")
     val EDITOR_WIDGETS = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/editor_widgets.png")
     val EDITOR_BACKGROUND = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/editor_background.png")
     val BRANCH_EDITOR_BACKGROUND = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/branch_editor_background.png")

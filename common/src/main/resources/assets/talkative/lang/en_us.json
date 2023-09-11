@@ -5,5 +5,7 @@
   "talkative.gui.editor.save": "Save these settings to this Actor, and close the Editor",
   "talkative.gui.editor.discard": "Leave Actor settings as they were, and close the Editor",
   "talkative.gui.editor.cancel": "Return to the Editor",
-  "talkative.gui.editor.branch_exists": "Branch with name/path already exists"
+  "talkative.gui.editor.branch_exists": "Branch with name/path already exists",
+
+  "talkative.message.insufficient_permissions": "You don't have permission for this action."
 }
