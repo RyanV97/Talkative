@@ -228,13 +228,13 @@ class NodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.lite
                 if (widget.childNodes.isEmpty())
                     actionMap["Delete Node"] = {
                         widget.parentWidget?.removeChildNode(widget)
-                        NodePositioner.layoutTree(rootNodeWidget!!)
+                        refresh()
                         closeSubmenu()
                     }
                 else
                     actionMap["Delete Node (And Children)"] = {
                         widget.parentWidget?.removeChildNode(widget)
-                        NodePositioner.layoutTree(rootNodeWidget!!)
+                        refresh()
                         closeSubmenu()
                     }
             }
