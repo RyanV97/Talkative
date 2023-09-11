@@ -11,7 +11,7 @@ class UpdateNodeConditionalPacket(private val branchPath: String, private val no
     constructor(buf: FriendlyByteBuf) : this(buf.readUtf(), buf.readInt(), Conditional.deserialize(buf.readNbt()))
 
     override fun permissionCheck(player: ServerPlayer): Boolean {
-        return player.hasPermissions(3)
+        return player.hasPermissions(2)
     }
 
     override fun encode(buf: FriendlyByteBuf) {

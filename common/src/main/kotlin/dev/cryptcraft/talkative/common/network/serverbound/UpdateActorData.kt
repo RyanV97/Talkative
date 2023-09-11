@@ -11,7 +11,7 @@ class UpdateActorData(private val entityId: Int, private val actorData: ActorDat
     constructor(buf: FriendlyByteBuf) : this(buf.readInt(), ActorData.deserialize(buf.readNbt()))
 
     override fun permissionCheck(player: ServerPlayer): Boolean {
-        return player.hasPermissions(3)
+        return player.hasPermissions(2)
     }
 
     override fun encode(buf: FriendlyByteBuf) {

@@ -50,8 +50,7 @@ object NetworkHandler {
         ctx.queue {
             if (packet is TalkativePacket.ServerboundTalkativePacket && !packet.permissionCheck(ctx.player as ServerPlayer)) {
                 //ToDo Configurable Permissions
-                //ToDo More formal system for warnings like this
-                ctx.player.sendSystemMessage(Component.literal("You don't have permission for this action."))
+                ctx.player.sendSystemMessage(Component.translatable("talkative.message.insufficient_permissions"))
                 return@queue
             }
             Talkative.LOGGER.debug("Handling Packet: ${packet.javaClass.name} on Side: ${if (ctx.player.level.isClientSide) "Client" else "Server"}")

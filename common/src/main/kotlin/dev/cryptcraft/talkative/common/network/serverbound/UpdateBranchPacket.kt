@@ -1,13 +1,13 @@
 package dev.cryptcraft.talkative.common.network.serverbound
 
 import dev.architectury.networking.NetworkManager
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.FriendlyByteBuf
-import net.minecraft.server.level.ServerPlayer
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.common.network.NetworkHandler.TalkativePacket
 import dev.cryptcraft.talkative.common.network.clientbound.SyncBranchListPacket
 import dev.cryptcraft.talkative.server.FileUtil
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.server.level.ServerPlayer
 
 class UpdateBranchPacket(private val branchPath: String, private val action: UpdateAction, private val data: CompoundTag?) : TalkativePacket.ServerboundTalkativePacket {
     constructor(path: String, action: UpdateAction, branch: DialogBranch) : this(path, action, branch.serialize())
@@ -15,7 +15,7 @@ class UpdateBranchPacket(private val branchPath: String, private val action: Upd
     constructor(buf: FriendlyByteBuf) : this(buf.readUtf(), buf.readEnum(UpdateAction::class.java), buf.readNbt()!!)
 
     override fun permissionCheck(player: ServerPlayer): Boolean {
-        return player.hasPermissions(3)
+        return player.hasPermissions(2)
     }
 
     override fun encode(buf: FriendlyByteBuf) {

@@ -11,7 +11,7 @@ class RequestBranchForEditPacket(private val branchPath: String) : TalkativePack
     constructor(buf: FriendlyByteBuf): this(buf.readUtf())
 
     override fun permissionCheck(player: ServerPlayer): Boolean {
-        return player.hasPermissions(3)
+        return player.hasPermissions(2)
     }
 
     override fun encode(buf: FriendlyByteBuf) {
