@@ -55,6 +55,7 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
     override fun render(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {
         fill(poseStack, 0, 0, width, height, 0xD91c1c1c.toInt()) //Background
 
+        dialogList.render(poseStack, mouseX, mouseY, delta)
         renderPlayer()
         renderActor(poseStack)
 
@@ -69,7 +70,8 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
         horizontalGradient(poseStack, (width * .1).toInt(), separatorY, (width * .5).toInt(), separatorY + 1, 0x00FFFFFF, 0xFFFFFFFF.toInt())
         horizontalGradient(poseStack, (width * .5).toInt(), separatorY, width - (width * .1).toInt(), separatorY + 1, 0xFFFFFFFF.toInt(), 0x00FFFFFF)
 
-        super.render(poseStack, mouseX, mouseY, delta)
+        responseList.render(poseStack, mouseX, mouseY, delta)
+//        super.render(poseStack, mouseX, mouseY, delta)
     }
 
     private fun renderPlayer() {

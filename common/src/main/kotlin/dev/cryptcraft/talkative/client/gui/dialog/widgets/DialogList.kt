@@ -94,7 +94,7 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
         if (totalHeight > height)
             renderScrollBar(poseStack)
         val offset = parent.width / 8
-        ScissorUtil.start(offset, y, parent.width - offset, height)
+        ScissorUtil.start(offset, y, parent.width - (offset * 2), height)
         var i = 0
         val size: Int = children.size
         while (i < size) {
@@ -195,15 +195,15 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
 
-            poseStack.pushPose()
-            poseStack.translate(0.0, 0.0, 100.0)
+//            poseStack.pushPose()
+//            poseStack.translate(0.0, 0.0, 100.0)
             drawMessageBackground(poseStack, left, top)
             drawSpeakerLabel(poseStack, left + speakerX, top - 12)
 
             for ((i, line) in fittedContents.withIndex()) {
                 font.draw(poseStack, line, left + 11f, top + ((i + 1) * 9f), 0xFFFFFF)
             }
-            poseStack.popPose()
+//            poseStack.popPose()
         }
 
         private fun drawMessageBackground(poseStack: PoseStack, left: Float, top: Int) {
