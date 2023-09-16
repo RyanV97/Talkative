@@ -100,10 +100,10 @@ class Conversation(val player: ServerPlayer, val actor: ActorEntity, private var
                 }
             }
             else
-                responses.add(DialogPacket.ResponseData(0, Component.literal("Continue").withStyle { it.withItalic(true) }, DialogPacket.ResponseData.Type.Continue))
+                responses.add(DialogPacket.ResponseData(0, arrayListOf(Component.literal("Continue").withStyle { it.withItalic(true) }), DialogPacket.ResponseData.Type.Continue))
         }
         else
-            responses.add(DialogPacket.ResponseData(0, Component.literal("Leave").withStyle { it.withItalic(true) }, DialogPacket.ResponseData.Type.Exit))
+            responses.add(DialogPacket.ResponseData(0, arrayListOf(Component.literal("Leave").withStyle { it.withItalic(true) }), DialogPacket.ResponseData.Type.Exit))
 
         val isExit = node.getChildren().isEmpty()
         if (startingConversation)

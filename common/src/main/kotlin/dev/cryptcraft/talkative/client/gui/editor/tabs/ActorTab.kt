@@ -92,6 +92,12 @@ class ActorTab(x: Int, y: Int, width: Int, height: Int, val parent: MainEditorSc
         super.renderButton(poseStack, mouseX, mouseY, partialTicks)
     }
 
+    override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (actorDisplayName.isFocused)
+            return actorDisplayName.keyPressed(keyCode, scanCode, modifiers)
+        return super.keyPressed(keyCode, scanCode, modifiers)
+    }
+
     override fun onClose() {}
 
     override fun refresh() {

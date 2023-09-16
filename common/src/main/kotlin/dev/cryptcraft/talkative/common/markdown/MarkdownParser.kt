@@ -6,18 +6,33 @@ import org.commonmark.node.*
 import org.commonmark.parser.Parser
 
 object MarkdownParser {
-    fun parse(string: String): MutableComponent? {
-        val parser = Parser.builder().build()
-        val node = parser.parse(string)
-        val visitor = TalkativeVisitor()
-        node.accept(visitor)
-        return visitor.completeMessage
+    fun markdownToComponents(input: String): List<MutableComponent> {
+        return markdownToComponents(input.split("\n", ignoreCase = true))
     }
 
-    fun decode(component: Component): String {
+    fun markdownToComponents(input: List<String>): List<MutableComponent> {
+        val list = ArrayList<MutableComponent>()
+        val parser = Parser.builder().build()
+
+        for (string in input) {
+            val node = parser.parse(string)
+            val visitor = TalkativeVisitor()
+            node.accept(visitor)
+            list.add(visitor.completeMessage ?: Component.empty())
+        }
+
+        return list
+    }
+
+    fun componentsToMarkdown(input: List<Component>): String {
         var s = ""
-        for (c in component.toFlatList())
-            s += decodePart(c)
+        val it = input.iterator()
+        while (it.hasNext()) {
+            val component = it.next()
+            for (c in component.toFlatList())
+                s += decodePart(c)
+            if (it.hasNext()) s += "\n"
+        }
         return s
     }
 

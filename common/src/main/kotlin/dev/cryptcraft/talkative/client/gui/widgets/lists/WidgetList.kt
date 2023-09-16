@@ -181,10 +181,10 @@ open class WidgetList<T : Screen?> (val parent: T, x: Int, y: Int, width: Int, h
                 val color = Color.HSBtoRGB(0.0f, 0.0f, if (i % 2 == 0) 0.1f else 0.2f) and 0x66FFFFFF
                 if (renderEntryBackground)
                     fill(poseStack, x, child.y, x + width, child.y + child.height, color)
+                child.render(poseStack, mouseX, mouseY, partialTicks)
             }
             i++
         }
-        super.renderButton(poseStack, mouseX, mouseY, partialTicks)
         ScissorUtil.stop()
     }
 

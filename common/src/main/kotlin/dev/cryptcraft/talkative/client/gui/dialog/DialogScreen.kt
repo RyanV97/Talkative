@@ -21,8 +21,8 @@ import org.lwjgl.glfw.GLFW
 
 
 class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Screen")) {
-    private val dialogList = DialogList(this, 0, 0, 0, 0)
-    private val responseList = ResponseList(this, 0, 0, 0, 0)
+    val dialogList = DialogList(this, 0, 0, 0, 0)
+    val responseList = ResponseList(this, 0, 0, 0, 0)
 
     var actorEntity: LivingEntity? = null
     var displayData: DisplayData? = null
@@ -45,8 +45,8 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
         addRenderableWidget(responseList)
     }
 
-    fun receiveDialog(dialogLine: Component, responses: ArrayList<DialogPacket.ResponseData>?, exitNode: Boolean) {
-        dialogList.addEntry(dialogLine)
+    fun receiveDialog(dialogLines: List<Component>, responses: ArrayList<DialogPacket.ResponseData>?, exitNode: Boolean) {
+        dialogList.addEntry(dialogLines)
         responseList.clear()
         if (!responses.isNullOrEmpty())
             responses.forEach(responseList::addEntry)

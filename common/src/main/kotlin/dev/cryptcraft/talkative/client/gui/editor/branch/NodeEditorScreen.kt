@@ -92,10 +92,14 @@ class NodeEditorScreen(parent: Screen?) : TalkativeScreen(parent, Component.lite
     private fun saveChanges() {
         TalkativeClient.editingBranch?.let { branch ->
             branch.clearNodes()
-            nodeWidgets.forEach { widget ->
+            for (widget in nodeWidgets) {
                 val node = widget.node
                 if (node is TextNode) {
-                    MarkdownParser.parse(node.getContents().string)?.let { node.setContents(it) }
+                    val list = ArrayList<String>()
+                    for (component in node.getContents()) {
+                        list.add(component.string)
+                    }
+                    node.setContents(MarkdownParser.markdownToComponents(list))
                 }
                 branch.addNode(node)
             }

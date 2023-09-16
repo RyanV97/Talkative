@@ -1,12 +1,11 @@
 package dev.cryptcraft.talkative.server
 
 import dev.cryptcraft.talkative.api.tree.DialogBranch
-import dev.cryptcraft.talkative.api.tree.node.DialogNode
+import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.nbt.StringTag
-import net.minecraft.network.chat.Component
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -20,7 +19,7 @@ object FileUtil {
         DIR_BRANCHES?.let { dir ->
             val file = File(dir.toFile(), "$path.branch")
             val branch = DialogBranch()
-            branch.addNode(DialogNode(0, Component.literal("Hello World")))
+            branch.addNode(NodeBase.createNodeFromType(NodeBase.NodeType.Dialog, 0)!!)
             val branchTag = branch.serialize()
             file.parentFile.mkdirs()
             NbtIo.writeCompressed(branchTag, file)

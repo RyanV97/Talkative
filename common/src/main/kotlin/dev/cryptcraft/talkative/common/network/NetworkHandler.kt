@@ -72,6 +72,21 @@ object NetworkHandler {
         return list
     }
 
+    fun readContents(buf: FriendlyByteBuf): List<Component> {
+        val list = ArrayList<Component>()
+        val size = buf.readInt()
+        for (i in 0 until size) {
+            list.add(buf.readComponent())
+        }
+        return list
+    }
+
+    fun writeContents(buf: FriendlyByteBuf, contents: List<Component>) {
+        buf.writeInt(contents.size)
+        for (line in contents)
+            buf.writeComponent(line)
+    }
+
     interface TalkativePacket {
         fun encode(buf: FriendlyByteBuf)
         fun onReceived(ctx: NetworkManager.PacketContext)

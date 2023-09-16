@@ -13,9 +13,12 @@ class TextNodeWidget(x: Int, y: Int, node: TextNode, parentWidget: NodeWidget?, 
 
     init {
         editBox.setValueListener {
-            node.setContents(Component.literal(it))
+            val list = ArrayList<Component>()
+            for (line in it.split("\n", ignoreCase = true))
+                list.add(Component.literal(line))
+            node.setContents(list)
         }
-        editBox.value = MarkdownParser.decode(node.getContents())
+        editBox.value = MarkdownParser.componentsToMarkdown(node.getContents())
     }
 
     override fun renderNode(poseStack: PoseStack, mouseX: Int, mouseY: Int, delta: Float) {

@@ -140,8 +140,8 @@ abstract class NodeBase(val nodeId: Int, private var conditional: Conditional? =
 
         fun createNodeFromType(nodeType: NodeType, nodeId: Int): NodeBase? {
             return when (nodeType) {
-                NodeType.Dialog -> DialogNode(nodeId, Component.empty())
-                NodeType.Response -> ResponseNode(nodeId, Component.empty())
+                NodeType.Dialog -> DialogNode(nodeId, arrayListOf(Component.literal("Hello World")))
+                NodeType.Response -> ResponseNode(nodeId, arrayListOf(Component.literal("Lorem Ipsum")))
                 NodeType.Bridge -> BridgeNode(nodeId, "", 0)
                 else -> return null
             }

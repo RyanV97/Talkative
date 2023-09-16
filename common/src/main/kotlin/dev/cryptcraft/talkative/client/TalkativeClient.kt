@@ -60,11 +60,11 @@ object TalkativeClient {
         screen.displayData = displayData
     }
 
-    fun onReceiveDialog(dialogLine: Component, responses: ArrayList<DialogPacket.ResponseData>?, isExitNode: Boolean) {
+    fun onReceiveDialog(dialogLines: List<Component>, responses: ArrayList<DialogPacket.ResponseData>?, isExitNode: Boolean) {
         if (minecraft.screen !is DialogScreen)
             minecraft.setScreen(DialogScreen())
 
-        (minecraft.screen as DialogScreen).receiveDialog(dialogLine, responses, isExitNode)
+        (minecraft.screen as DialogScreen).receiveDialog(dialogLines, responses, isExitNode)
     }
 
     fun openEditorScreen(actorEntity: Entity?, actorData: ActorData?) {

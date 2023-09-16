@@ -32,6 +32,7 @@ open class PopupWidget(x: Int, y: Int, width: Int, height: Int, val parent: Talk
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (keyCode == 257) return false //ToDo I hate having to handle confirm keys
         if (keyCode == 256) {
             parent.closePopup()
             return true
