@@ -162,7 +162,7 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
     override fun updateNarration(narrationElementOutput: NarrationElementOutput) {}
 
     class DialogListEntry(private val parentList: DialogList, private val speaker: Component, private val contentsIn: List<Component>, width: Int, val actorSpeaking: Boolean, val font: Font = Minecraft.getInstance().font) : AbstractWidget(0, 0, width, 0, Component.empty()) {
-        private var speakerX = if (actorSpeaking) width - font.width(speaker) - 6 else 6
+        private var speakerX = if (actorSpeaking) width - font.width(speaker) - 6 else 4
         private var fittedContents = setContents(contentsIn)
 
         var animationProgress = 0f
@@ -195,20 +195,17 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
             RenderSystem.setShader(GameRenderer::getPositionTexShader)
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha)
 
-//            poseStack.pushPose()
-//            poseStack.translate(0.0, 0.0, 100.0)
-            drawMessageBackground(poseStack, left, top)
-            drawSpeakerLabel(poseStack, left + speakerX, top - 12)
+            drawMessageBackground(poseStack, left, top, actorSpeaking)
+            drawSpeakerLabel(poseStack, left + speakerX, top - 12, actorSpeaking)
 
             for ((i, line) in fittedContents.withIndex()) {
                 font.draw(poseStack, line, left + 11f, top + ((i + 1) * 9f), 0xFFFFFF)
             }
-//            poseStack.popPose()
         }
 
-        private fun drawMessageBackground(poseStack: PoseStack, left: Float, top: Int) {
+        private fun drawMessageBackground(poseStack: PoseStack, left: Float, top: Int, actorSpeaking: Boolean) {
             val bottom = y + height - 16
-            RenderSystem.setShaderTexture(0, GuiConstants.DIALOG_MESSAGE)
+            RenderSystem.setShaderTexture(0, if (actorSpeaking) GuiConstants.DIALOG_MESSAGE_ACTOR else GuiConstants.DIALOG_MESSAGE_PLAYER)
 
             drawMessageTexture(poseStack, left, top, 16, 16, 0, 0) //TopLeft
             drawMessageTexture(poseStack, left + width - 17, top, 16, 16, 32, 0) //TopRight
@@ -225,9 +222,9 @@ class DialogList(parent: DialogScreen, x: Int, width: Int, var maxHeight: Int, p
             }
         }
 
-        private fun drawSpeakerLabel(poseStack: PoseStack, left: Float, top: Int) {
+        private fun drawSpeakerLabel(poseStack: PoseStack, left: Float, top: Int, actorSpeaking: Boolean) {
             val textWidth = font.width(speaker)
-            RenderSystem.setShaderTexture(0, GuiConstants.DIALOG_MESSAGE_SPEAKER)
+            RenderSystem.setShaderTexture(0, if (actorSpeaking) GuiConstants.DIALOG_MESSAGE_ACTOR_SPEAKER else GuiConstants.DIALOG_MESSAGE_PLAYER_SPEAKER)
 
             drawSpeakerTexture(poseStack, left, top, 8, 8, 0, 0) //TopLeft
             drawSpeakerTexture(poseStack, left + textWidth + 8, top, 8, 8, 16, 0) //TopRight

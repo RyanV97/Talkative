@@ -30,10 +30,11 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
     override fun init() {
         super.init()
         val responseBoxHeight = (height * .3).toInt()
-        val dialogListHeight = height - responseBoxHeight - 10
+        val dialogListHeight = height - responseBoxHeight - 5
 
         dialogList.x = (width * .25).toInt()
         dialogList.width = width / 2
+        dialogList.height = dialogListHeight
         dialogList.maxHeight = dialogListHeight
         dialogList.setBottom(dialogListHeight)
         addRenderableWidget(dialogList)
@@ -71,7 +72,6 @@ class DialogScreen : TalkativeScreen(null, Component.literal("Conversation Scree
         horizontalGradient(poseStack, (width * .5).toInt(), separatorY, width - (width * .1).toInt(), separatorY + 1, 0xFFFFFFFF.toInt(), 0x00FFFFFF)
 
         responseList.render(poseStack, mouseX, mouseY, delta)
-//        super.render(poseStack, mouseX, mouseY, delta)
     }
 
     private fun renderPlayer() {

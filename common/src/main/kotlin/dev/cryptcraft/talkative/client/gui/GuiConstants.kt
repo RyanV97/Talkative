@@ -14,8 +14,10 @@ object GuiConstants {
     const val COLOR_POPUP_BORDER = 0xFF165932.toInt()
 
     //Textures
-    val DIALOG_MESSAGE = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message.png")
-    val DIALOG_MESSAGE_SPEAKER = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message_speaker.png")
+    val DIALOG_MESSAGE_ACTOR = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message_actor.png")
+    val DIALOG_MESSAGE_PLAYER = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message_player.png")
+    val DIALOG_MESSAGE_ACTOR_SPEAKER = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message_actor_speaker.png")
+    val DIALOG_MESSAGE_PLAYER_SPEAKER = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_message_player_speaker.png")
     val DIALOG_SCROLL = ResourceLocation(Talkative.MOD_ID, "textures/gui/dialog/dialog_scroll.png")
     val EDITOR_WIDGETS = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/editor_widgets.png")
     val EDITOR_BACKGROUND = ResourceLocation(Talkative.MOD_ID, "textures/gui/editor/editor_background.png")
