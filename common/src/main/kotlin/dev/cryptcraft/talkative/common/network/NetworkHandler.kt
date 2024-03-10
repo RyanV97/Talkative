@@ -37,6 +37,7 @@ object NetworkHandler {
         register(::StartDialogPacket)
         register(::SyncBranchListPacket)
         register(::SyncMarkerPacket)
+        register(::SyncWorldConfigPacket)
         register(::UpdateEditingActorDataPacket)
         register(::UpdateEditingBranchPacket)
     }

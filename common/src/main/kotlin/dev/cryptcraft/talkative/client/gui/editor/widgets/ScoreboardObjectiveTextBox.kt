@@ -13,10 +13,18 @@ class ScoreboardObjectiveTextBox(font: Font, parentScreen: Screen, x: Int, y: In
     val completionSuggestion: CommandSuggestions = CommandSuggestions(Minecraft.getInstance(), parentScreen, this, font, false, false, 0, 10, false, Int.MIN_VALUE)
 
     init {
-
-        //ToDo Decide how to make suggestions for current scoreboard objective names
-        setResponder {
-
-        }
+        //ToDo Scoreboard Objective suggestions
+//        setResponder {
+//            var suggestion = ""
+//
+//            if (!value.isNullOrBlank()) {
+//                val objectives = Minecraft.getInstance().level!!.scoreboard.objectiveNames
+//                val pendingSuggestions = SharedSuggestionProvider.suggest(objectives, SuggestionsBuilder(value.substring(0, cursorPosition), 0)).get()
+//                if (!pendingSuggestions.isEmpty)
+//                    suggestion = pendingSuggestions.list[0].text.replace(it, "")
+//            }
+//
+//            setSuggestion(suggestion)
+//        }
     }
 }

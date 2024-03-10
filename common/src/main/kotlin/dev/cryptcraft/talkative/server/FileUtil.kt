@@ -1,5 +1,6 @@
 package dev.cryptcraft.talkative.server
 
+import dev.cryptcraft.talkative.Talkative
 import dev.cryptcraft.talkative.api.tree.DialogBranch
 import dev.cryptcraft.talkative.api.tree.node.NodeBase
 import net.minecraft.nbt.CompoundTag
@@ -12,7 +13,16 @@ import java.nio.file.Path
 
 object FileUtil {
     var DIR_WORLD: Path? = null
+    var DIR_TALKATIVE: Path? = null
+        set(value) {
+            field = value
+            value?.toFile()?.mkdirs()
+        }
     var DIR_BRANCHES: Path? = null
+        set(value) {
+            field = value
+            value?.toFile()?.mkdirs()
+        }
 
     //Branches
     fun createBranchAtPath(path: String) {
@@ -57,6 +67,18 @@ object FileUtil {
 
     fun deleteBranchAtPath(path: String) {
         deleteFileAtPath(DIR_BRANCHES, "$path.branch")
+    }
+
+    //Config
+    fun loadWorldConfigData(): CompoundTag? {
+        return readCompoundFromPath(DIR_TALKATIVE, "global.config")
+    }
+
+    fun writeWorldConfigToFile() {
+        if (TalkativeWorldConfig.INSTANCE != null)
+            writeCompoundToPath(DIR_TALKATIVE, "global.config", TalkativeWorldConfig.INSTANCE!!.serialize())
+        else
+            Talkative.LOGGER.warn("No World Config data to write")
     }
 
     //General

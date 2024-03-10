@@ -11,6 +11,7 @@ import dev.cryptcraft.talkative.client.gui.GuiConstants
 import dev.cryptcraft.talkative.client.gui.TalkativeScreen
 import dev.cryptcraft.talkative.client.gui.editor.tabs.ActorTab
 import dev.cryptcraft.talkative.client.gui.editor.tabs.EditorTab
+import dev.cryptcraft.talkative.client.gui.editor.tabs.GlobalTab
 import dev.cryptcraft.talkative.client.gui.editor.tabs.MarkerTab
 import dev.cryptcraft.talkative.client.gui.editor.widgets.EditorTabsWidget
 import dev.cryptcraft.talkative.client.gui.widgets.popup.PopupWidget
@@ -75,10 +76,10 @@ class MainEditorScreen : TalkativeScreen(null, Component.literal("Actor Editor")
         var actorTabIndex = 0
 
         //Global Settings
-//        globalTabIndex = tabsWidget.addTab(
-//            Component.literal("Global"),
-//            GlobalTab(5, tabY, width - 10, height - tabsHeight, this)
-//        )
+        globalTabIndex = tabsWidget.addTab(
+            Component.literal("Global"),
+            GlobalTab(5, tabY, width - 10, height - tabsHeight, this)
+        )
 
         //Actor Specific Settings
         if (actorEntity != null) {

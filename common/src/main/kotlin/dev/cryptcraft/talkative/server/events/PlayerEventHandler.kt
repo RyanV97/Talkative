@@ -6,7 +6,12 @@ import net.minecraft.server.level.ServerPlayer
 
 object PlayerEventHandler {
     fun init() {
+        PlayerEvent.PLAYER_JOIN.register(PlayerEventHandler::playerJoinEvent)
         PlayerEvent.PLAYER_QUIT.register(PlayerEventHandler::playerQuitEvent)
+    }
+
+    private fun playerJoinEvent(serverPlayer: ServerPlayer?) {
+
     }
 
     private fun playerQuitEvent(player: ServerPlayer) {
